@@ -109,11 +109,14 @@ build, test, or commit that follows a Tiled edit, otherwise the game will use
 stale collision, door, actable, or Wild-zone data.
 
 `Gym1.tmx` is rendered from its Tiled layers at runtime. After changing it,
-run `npm.cmd run map:gym`. Its `Ice` layer uses `ice = true`. Objects in the
-`Portals` layer pair on their integer `portal` property; layer-level
-`directionalExit = true` makes a player emerge one tile past the linked portal
-in the same travel direction. The exporter rejects invalid pairs, blocked exits,
-and ice loops.
+run `npm.cmd run map:gym`. Its `Ice` layer uses `ice = true`. Portal appearance
+is authored on its `Portal Visuals` tile layer, using `PortalTileset.tsx`:
+blue, orange, then purple. Put the desired portal tile at each endpoint.
+Objects in the `Portals` layer pair on their integer `portal` property;
+layer-level `directionalExit = true` makes a player emerge one tile past the
+linked portal in the same travel direction. The exporter rejects invalid pairs,
+blocked exits, and ice loops. Portal visuals deliberately have no gameplay
+properties, so changing a portal's color in Tiled never changes its linkage.
 
 ### Actables (talkable people and signs)
 

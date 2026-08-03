@@ -158,6 +158,26 @@ def portals(root: ET.Element, tile_width: int, tile_height: int) -> list[dict[st
     return result
 
 
+def validate_portal_visuals(
+    layers: list[tuple[ET.Element, list[int]]],
+    width: int,
+    portal_defs: list[dict[str, object]],
+) -> None:
+    """Keep portal behavior objects and their Tiled visuals in sync."""
+
+    visual_layer = next((layer for layer, _ in layers if layer.get("name") == "Portal Visuals"), None)
+    if visual_layer is None:
+        raise ValueError("Gym map needs a 'Portal Visuals' tile layer")
+    visual_gids = next(gids for layer, gids in layers if layer is visual_layer)
+    missing = [
+        portal["position"]
+        for portal in portal_defs
+        if visual_gids[portal["position"]["y"] * width + portal["position"]["x"]] == 0
+    ]
+    if missing:
+        raise ValueError(f"Portal Visuals is missing tiles at portal endpoints: {missing}")
+
+
 def validate_slides(
     width: int,
     height: int,
@@ -239,19 +259,36 @@ def main() -> None:
     if width <= 0 or height <= 0 or tile_width != 16 or tile_height != 16:
         raise ValueError("Gym maps must have positive 16px tile dimensions")
 
-    tileset_reference = root.find("tileset")
-    if tileset_reference is None or tileset_reference.get("source") is None:
-        raise ValueError("Gym map needs one external tileset")
-    tileset_path = SOURCE_PATH.parent / tileset_reference.get("source")
-    tileset = ET.parse(tileset_path).getroot()
-    image = tileset.find("image")
-    if image is None or image.get("source") is None:
-        raise ValueError("Gym tileset needs an image")
+    tilesets: list[dict[str, int | str]] = []
+    for tileset_reference in root.findall("tileset"):
+        source = tileset_reference.get("source")
+        if source is None:
+            raise ValueError("Gym maps only support external tilesets")
+        tileset_path = SOURCE_PATH.parent / source
+        tileset = ET.parse(tileset_path).getroot()
+        image = tileset.find("image")
+        if image is None or image.get("source") is None:
+            raise ValueError(f"Gym tileset {source!r} needs an image")
+        tile_count = int(tileset.get("tilecount", "0"))
+        columns = int(tileset.get("columns", "0"))
+        if tile_count <= 0 or columns <= 0:
+            raise ValueError(f"Gym tileset {source!r} needs positive tilecount and columns")
+        tilesets.append({
+            "imagePath": "/" + image.get("source"),
+            "firstGid": int(tileset_reference.get("firstgid", "0")),
+            "tileCount": tile_count,
+            "columns": columns,
+            "spacing": int(tileset.get("spacing", "0")),
+            "margin": int(tileset.get("margin", "0")),
+        })
+    if not tilesets:
+        raise ValueError("Gym map needs at least one external tileset")
 
     layers = [(layer, layer_gids(layer, width)) for layer in root.findall("layer")]
     collision_rects, blocked_tiles = collision_rectangles(layers, width)
     ice = ice_tiles(layers, width)
     portal_defs = portals(root, tile_width, tile_height)
+    validate_portal_visuals(layers, width, portal_defs)
     validate_slides(width, height, blocked_tiles, ice, portal_defs)
     for spawn in spawns(root, tile_width, tile_height):
         position = spawn["position"]
@@ -264,11 +301,7 @@ def main() -> None:
         "",
         f"export const GYM1_WIDTH = {width};",
         f"export const GYM1_HEIGHT = {height};",
-        "export const GYM1_TILESET: MapTilesetDef = " + json.dumps({
-            "imagePath": "/" + image.get("source"),
-            "firstGid": int(tileset_reference.get("firstgid", "1")),
-            "columns": int(tileset.get("columns", "0")),
-        }) + ";",
+        "export const GYM1_TILESETS: MapTilesetDef[] = " + json.dumps(tilesets) + ";",
         "export const GYM1_TILE_LAYERS: number[][] = " + json.dumps([gids for _, gids in layers]) + ";",
         "export const GYM1_COLLISION_RECTS: MapCollisionRect[] = " + json.dumps(collision_rects) + ";",
         "export const GYM1_ICE_TILES: MapPoint[] = " + json.dumps(ice) + ";",

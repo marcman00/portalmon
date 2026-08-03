@@ -130,8 +130,11 @@ export class OverworldManager
 		{
 			if (map.backgroundImagePath && !this.mapBackgroundImages.has(map.backgroundImagePath))
 				this.mapBackgroundImages.set(map.backgroundImagePath, this.loadImage(map.backgroundImagePath));
-			if (map.tileset && !this.tiledTilesetImages.has(map.tileset.imagePath))
-				this.tiledTilesetImages.set(map.tileset.imagePath, this.loadImage(map.tileset.imagePath));
+			for (const tileset of map.tilesets ?? [])
+			{
+				if (!this.tiledTilesetImages.has(tileset.imagePath))
+					this.tiledTilesetImages.set(tileset.imagePath, this.loadImage(tileset.imagePath));
+			}
 			for (const npc of map.npcs)
 			{
 				if (npc.spritePath && !this.npcImages.has(npc.spritePath))
@@ -280,8 +283,8 @@ export class OverworldManager
 	{
 		const backgroundReady = map.backgroundImagePath
 			? (this.mapBackgroundImages.get(map.backgroundImagePath)?.naturalWidth ?? 0) > 0
-			: map.tileset
-				? (this.tiledTilesetImages.get(map.tileset.imagePath)?.naturalWidth ?? 0) > 0
+			: map.tilesets
+				? map.tilesets.every(tileset => (this.tiledTilesetImages.get(tileset.imagePath)?.naturalWidth ?? 0) > 0)
 			: this.terrainImage.naturalWidth > 0;
 		if (!backgroundReady || this.playerImage.naturalWidth <= 0) return false;
 		return map.npcs.every(npc => !npc.spritePath || (this.npcImages.get(npc.spritePath)?.naturalWidth ?? 0) > 0);
@@ -485,7 +488,6 @@ export class OverworldManager
 		canvas.dataset.mapId = map.id;
 		this.drawTerrain(context, camera, map);
 		this.drawObjects(context, camera, map);
-		this.drawPortals(context, camera, map);
 		const actorsReady = this.areMapAssetsReady(map);
 		canvas.dataset.actorsReady = actorsReady ? "true" : "false";
 		if (!actorsReady)
@@ -527,7 +529,7 @@ export class OverworldManager
 			);
 			return;
 		}
-		if (map.tileLayers && map.tileset)
+		if (map.tileLayers && map.tilesets?.length)
 		{
 			this.drawTiledLayers(context, camera, map);
 			return;
@@ -558,10 +560,7 @@ export class OverworldManager
 
 	private drawTiledLayers(context: CanvasRenderingContext2D, camera: MapPoint, map: OverworldMapDef): void
 	{
-		const tileset = map.tileset;
-		if (!tileset || !map.tileLayers) return;
-		const image = this.tiledTilesetImages.get(tileset.imagePath);
-		if (!image || image.naturalWidth <= 0) return;
+		if (!map.tilesets?.length || !map.tileLayers) return;
 
 		const firstX = Math.max(0, Math.floor(camera.x / TILE_SIZE));
 		const lastX = Math.min(map.width - 1, Math.ceil((camera.x + VIEWPORT_WIDTH) / TILE_SIZE));
@@ -574,12 +573,17 @@ export class OverworldManager
 				for (let x = firstX; x <= lastX; x++)
 				{
 					const gid = layer[y * map.width + x] & 0x1FFFFFFF;
-					if (gid < tileset.firstGid) continue;
+					const tileset = map.tilesets.find(candidate =>
+						gid >= candidate.firstGid && gid < candidate.firstGid + candidate.tileCount,
+					);
+					if (!tileset) continue;
+					const image = this.tiledTilesetImages.get(tileset.imagePath);
+					if (!image || image.naturalWidth <= 0) continue;
 					const tileIndex = gid - tileset.firstGid;
 					context.drawImage(
 						image,
-						(tileIndex % tileset.columns) * TILE_SIZE,
-						Math.floor(tileIndex / tileset.columns) * TILE_SIZE,
+						tileset.margin + (tileIndex % tileset.columns) * (TILE_SIZE + tileset.spacing),
+						tileset.margin + Math.floor(tileIndex / tileset.columns) * (TILE_SIZE + tileset.spacing),
 						TILE_SIZE,
 						TILE_SIZE,
 						Math.round(x * TILE_SIZE - camera.x),
@@ -589,26 +593,6 @@ export class OverworldManager
 					);
 				}
 			}
-		}
-	}
-
-	private drawPortals(context: CanvasRenderingContext2D, camera: MapPoint, map: OverworldMapDef): void
-	{
-		for (const portal of map.portals)
-		{
-			const centerX = portal.position.x * TILE_SIZE + TILE_SIZE / 2 - camera.x;
-			const centerY = portal.position.y * TILE_SIZE + TILE_SIZE / 2 - camera.y;
-			const gradient = context.createRadialGradient(centerX, centerY, 1, centerX, centerY, 8);
-			gradient.addColorStop(0, "#e0fbff");
-			gradient.addColorStop(0.45, "#48d5ff");
-			gradient.addColorStop(1, "#153f9e");
-			context.fillStyle = gradient;
-			context.beginPath();
-			context.arc(centerX, centerY, 7, 0, Math.PI * 2);
-			context.fill();
-			context.strokeStyle = "#ffffff";
-			context.lineWidth = 1;
-			context.stroke();
 		}
 	}
 

@@ -58,7 +58,10 @@ export interface MapTilesetDef
 {
 	imagePath: string;
 	firstGid: number;
+	tileCount: number;
 	columns: number;
+	spacing: number;
+	margin: number;
 }
 
 export interface MapPortalDef
@@ -122,7 +125,8 @@ export interface OverworldMapDef
 	tileAt?: (x: number, y: number) => number;
 	/** TMX tile layers, rendered in source order when a precomposed image is unavailable. */
 	tileLayers?: number[][];
-	tileset?: MapTilesetDef;
+	/** TMX tilesets, in the same order they are declared by the source map. */
+	tilesets?: MapTilesetDef[];
 	objects: MapObjectDef[];
 	collisionRects: MapCollisionRect[];
 	collisionPoints: MapCollisionPoint[];
