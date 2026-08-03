@@ -184,14 +184,16 @@ def validate_slides(
     blocked_tiles: set[tuple[int, int]],
     ice: list[dict[str, int]],
     portal_defs: list[dict[str, object]],
+    spawn_defs: list[dict[str, object]],
+    warp_defs: list[dict[str, object]],
 ) -> None:
-    """Reject every ice route that would loop or leave a portal into a wall.
-
-    Testing every open tile and direction means this remains correct even after a
-    level designer rearranges the ice without updating a separate test case.
-    """
+    """Validate every movement route reachable from this map's configured spawns."""
 
     ice_tiles = {(tile["x"], tile["y"]) for tile in ice}
+    warp_tiles = {
+        (warp["position"]["x"], warp["position"]["y"])
+        for warp in warp_defs
+    }
     endpoints_by_id: dict[int, list[dict[str, object]]] = {}
     portals_by_position: dict[tuple[int, int], dict[str, object]] = {}
     for portal in portal_defs:
@@ -200,54 +202,69 @@ def validate_slides(
         portals_by_position[(position["x"], position["y"])] = portal
 
     directions = {"up": (0, -1), "down": (0, 1), "left": (-1, 0), "right": (1, 0)}
-    for start_y in range(height):
-        for start_x in range(width):
-            if (start_x, start_y) in blocked_tiles:
-                continue
-            for direction_name, (delta_x, delta_y) in directions.items():
-                position = (start_x, start_y)
-                seen: set[tuple[tuple[int, int], str]] = set()
-                while True:
-                    next_position = (position[0] + delta_x, position[1] + delta_y)
-                    if (
-                        next_position[0] < 0
-                        or next_position[0] >= width
-                        or next_position[1] < 0
-                        or next_position[1] >= height
-                        or next_position in blocked_tiles
-                    ):
-                        break
-                    position = next_position
-                    state = (position, direction_name)
-                    if state in seen:
-                        raise ValueError(f"Ice movement loops from {start_x},{start_y} while moving {direction_name}")
-                    seen.add(state)
 
-                    source = portals_by_position.get(position)
-                    if source is not None:
-                        target = next(
-                            endpoint
-                            for endpoint in endpoints_by_id[source["portalId"]]
-                            if endpoint["position"] != source["position"]
-                        )
-                        target_position = target["position"]
-                        position = (
-                            target_position["x"] + (delta_x if target["directionalExit"] else 0),
-                            target_position["y"] + (delta_y if target["directionalExit"] else 0),
-                        )
-                        if (
-                            position[0] < 0
-                            or position[0] >= width
-                            or position[1] < 0
-                            or position[1] >= height
-                            or position in blocked_tiles
-                        ):
-                            raise ValueError(
-                                f"Portal {source['portalId']} exits into a blocked tile from {source['position']} "
-                                f"while moving {direction_name}"
-                            )
-                    if position not in ice_tiles:
-                        break
+    def resolve_move(start: tuple[int, int], direction_name: str) -> tuple[int, int] | None:
+        """Return the resting tile, or None when the move leaves the map by warp."""
+
+        delta_x, delta_y = directions[direction_name]
+        position = start
+        seen: set[tuple[tuple[int, int], str]] = set()
+        while True:
+            next_position = (position[0] + delta_x, position[1] + delta_y)
+            if (
+                next_position[0] < 0
+                or next_position[0] >= width
+                or next_position[1] < 0
+                or next_position[1] >= height
+                or next_position in blocked_tiles
+            ):
+                return start
+            position = next_position
+            state = (position, direction_name)
+            if state in seen:
+                raise ValueError(f"Ice movement loops from {start} while moving {direction_name}")
+            seen.add(state)
+
+            source = portals_by_position.get(position)
+            if source is not None:
+                target = next(
+                    endpoint
+                    for endpoint in endpoints_by_id[source["portalId"]]
+                    if endpoint["position"] != source["position"]
+                )
+                target_position = target["position"]
+                position = (
+                    target_position["x"] + (delta_x if target["directionalExit"] else 0),
+                    target_position["y"] + (delta_y if target["directionalExit"] else 0),
+                )
+                if (
+                    position[0] < 0
+                    or position[0] >= width
+                    or position[1] < 0
+                    or position[1] >= height
+                    or position in blocked_tiles
+                ):
+                    raise ValueError(
+                        f"Portal {source['portalId']} exits into a blocked tile from {source['position']} "
+                        f"while moving {direction_name}"
+                    )
+            if position in warp_tiles:
+                return None
+            if position not in ice_tiles:
+                return position
+
+    reachable = {
+        (spawn["position"]["x"], spawn["position"]["y"])
+        for spawn in spawn_defs
+    }
+    pending = list(reachable)
+    while pending:
+        start = pending.pop()
+        for direction_name in directions:
+            destination = resolve_move(start, direction_name)
+            if destination is not None and destination not in reachable:
+                reachable.add(destination)
+                pending.append(destination)
 
 
 def main() -> None:
@@ -288,12 +305,14 @@ def main() -> None:
     collision_rects, blocked_tiles = collision_rectangles(layers, width)
     ice = ice_tiles(layers, width)
     portal_defs = portals(root, tile_width, tile_height)
+    spawn_defs = spawns(root, tile_width, tile_height)
+    warp_defs = warps(root, tile_width, tile_height)
     validate_portal_visuals(layers, width, portal_defs)
-    validate_slides(width, height, blocked_tiles, ice, portal_defs)
-    for spawn in spawns(root, tile_width, tile_height):
+    for spawn in spawn_defs:
         position = spawn["position"]
         if (position["x"], position["y"]) in blocked_tiles:
             raise ValueError(f"Spawn {spawn['id']!r} is blocked")
+    validate_slides(width, height, blocked_tiles, ice, portal_defs, spawn_defs, warp_defs)
 
     output = [
         "// Generated from Gym1.tmx by scripts/build-tiled-gym.py. Do not edit.",
@@ -306,8 +325,8 @@ def main() -> None:
         "export const GYM1_COLLISION_RECTS: MapCollisionRect[] = " + json.dumps(collision_rects) + ";",
         "export const GYM1_ICE_TILES: MapPoint[] = " + json.dumps(ice) + ";",
         "export const GYM1_PORTALS: MapPortalDef[] = " + json.dumps(portal_defs) + ";",
-        "export const GYM1_SPAWNS: MapSpawnDef[] = " + json.dumps(spawns(root, tile_width, tile_height)) + ";",
-        "export const GYM1_WARPS: MapWarpDef[] = " + json.dumps(warps(root, tile_width, tile_height)) + ";",
+        "export const GYM1_SPAWNS: MapSpawnDef[] = " + json.dumps(spawn_defs) + ";",
+        "export const GYM1_WARPS: MapWarpDef[] = " + json.dumps(warp_defs) + ";",
         "",
     ]
     OUTPUT_PATH.write_text("\n".join(output), encoding="utf-8")

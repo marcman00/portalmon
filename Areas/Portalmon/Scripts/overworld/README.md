@@ -115,8 +115,9 @@ blue, orange, then purple. Put the desired portal tile at each endpoint.
 Objects in the `Portals` layer pair on their integer `portal` property;
 layer-level `directionalExit = true` makes a player emerge one tile past the
 linked portal in the same travel direction. The exporter rejects invalid pairs,
-blocked exits, and ice loops. Portal visuals deliberately have no gameplay
-properties, so changing a portal's color in Tiled never changes its linkage.
+blocked exits, and ice loops on routes reachable from a configured spawn.
+Portal visuals deliberately have no gameplay properties, so changing a portal's
+color in Tiled never changes its linkage.
 
 ### Actables (talkable people and signs)
 
