@@ -96,7 +96,9 @@ npm.cmd run map:tiled
 
 This writes `TiledOverworld.generated.ts`. Every visible tile on a layer with
 `walkable = false` becomes blocked; transparent placeholder tiles are ignored.
-Warp objects require an integer `door` property; `Actables` objects require
+Legacy Warp objects use an integer `door` property. Map-transition Warp
+objects use non-empty `map` and `spawn` properties; `spawn` identifies a safe
+arrival point in the target map's `Spawns` layer. `Actables` objects require
 non-empty `name` and `message` string properties. A rectangle in the `Wild`
 object layer with `wild = true` creates a random-encounter zone. All such objects
 must be one 16×16 tile aligned to the map grid. Door 5 currently opens the
@@ -105,6 +107,13 @@ Enrichment Center healing sequence.
 `npm.cmd run build` does **not** run `map:tiled`. Run the exporter before every
 build, test, or commit that follows a Tiled edit, otherwise the game will use
 stale collision, door, actable, or Wild-zone data.
+
+`Gym1.tmx` is rendered from its Tiled layers at runtime. After changing it,
+run `npm.cmd run map:gym`. Its `Ice` layer uses `ice = true`. Objects in the
+`Portals` layer pair on their integer `portal` property; layer-level
+`directionalExit = true` makes a player emerge one tile past the linked portal
+in the same travel direction. The exporter rejects invalid pairs, blocked exits,
+and ice loops.
 
 ### Actables (talkable people and signs)
 
@@ -196,10 +205,9 @@ A warp activates after the player finishes stepping onto its tile:
 ```ts
 warps: [
 	{
-		position: { x: 7, y: 6 },
-		targetMapId: "center_building",
-		targetPosition: { x: 7, y: 8 },
-		targetFacing: "up",
+		position: { x: 23, y: 8 },
+		targetMapId: "gym1",
+		targetSpawnId: "gym1-entrance",
 	},
 ],
 ```

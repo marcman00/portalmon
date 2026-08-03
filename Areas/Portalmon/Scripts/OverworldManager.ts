@@ -17,6 +17,7 @@ interface MoveState
 {
 	from: MapPoint;
 	to: MapPoint;
+	direction: WalkDirection;
 	startedAt: number;
 }
 
@@ -95,6 +96,7 @@ export class OverworldManager
 	private readonly terrainImage: HTMLImageElement = new Image();
 	private readonly playerImage: HTMLImageElement = new Image();
 	private readonly mapBackgroundImages: Map<string, HTMLImageElement> = new Map();
+	private readonly tiledTilesetImages: Map<string, HTMLImageElement> = new Map();
 	private readonly objectCutouts: Map<number, HTMLCanvasElement> = new Map();
 	private readonly npcImages: Map<string, HTMLImageElement> = new Map();
 	private readonly npcFacings: Map<string, WalkDirection> = new Map();
@@ -128,6 +130,8 @@ export class OverworldManager
 		{
 			if (map.backgroundImagePath && !this.mapBackgroundImages.has(map.backgroundImagePath))
 				this.mapBackgroundImages.set(map.backgroundImagePath, this.loadImage(map.backgroundImagePath));
+			if (map.tileset && !this.tiledTilesetImages.has(map.tileset.imagePath))
+				this.tiledTilesetImages.set(map.tileset.imagePath, this.loadImage(map.tileset.imagePath));
 			for (const npc of map.npcs)
 			{
 				if (npc.spritePath && !this.npcImages.has(npc.spritePath))
@@ -148,7 +152,6 @@ export class OverworldManager
 		event?.preventDefault();
 		if (!this.canAcceptMovement() || this.dialogue.visible()) return true;
 		this.pointerHeld.add(direction);
-		this.facing = direction;
 		this.tryStartMove(performance.now(), direction);
 		return true;
 	};
@@ -231,7 +234,6 @@ export class OverworldManager
 		if (!direction || !this.canAcceptMovement() || this.dialogue.visible()) return;
 		event.preventDefault();
 		this.keyboardHeld.add(direction);
-		this.facing = direction;
 		this.tryStartMove(performance.now(), direction);
 	};
 
@@ -278,6 +280,8 @@ export class OverworldManager
 	{
 		const backgroundReady = map.backgroundImagePath
 			? (this.mapBackgroundImages.get(map.backgroundImagePath)?.naturalWidth ?? 0) > 0
+			: map.tileset
+				? (this.tiledTilesetImages.get(map.tileset.imagePath)?.naturalWidth ?? 0) > 0
 			: this.terrainImage.naturalWidth > 0;
 		if (!backgroundReady || this.playerImage.naturalWidth <= 0) return false;
 		return map.npcs.every(npc => !npc.spritePath || (this.npcImages.get(npc.spritePath)?.naturalWidth ?? 0) > 0);
@@ -324,9 +328,12 @@ export class OverworldManager
 
 		if (this.movement && now - this.movement.startedAt >= MOVE_DURATION_MS)
 		{
-			this.player = this.movement.to;
+			const completedMove = this.movement;
+			this.player = completedMove.to;
 			this.movement = null;
 			this.positionLabel(`Tile ${this.player.x}, ${this.player.y}`);
+
+			if (!this.resolvePortal(completedMove.direction)) return;
 			const warp = this.currentMap().warps.find(candidate => this.pointsEqual(candidate.position, this.player));
 			if (warp)
 			{
@@ -342,6 +349,11 @@ export class OverworldManager
 				return;
 			}
 			if (this.tryStartWildEncounter()) return;
+			if (this.isIceTile(this.player))
+			{
+				this.tryStartMove(now, completedMove.direction);
+				return;
+			}
 		}
 
 		if (!this.movement)
@@ -383,8 +395,49 @@ export class OverworldManager
 		this.movement = {
 			from: { ...this.player },
 			to: destination,
+			direction,
 			startedAt: now,
 		};
+	}
+
+	/** Resolve one portal landing. The destination portal is never re-entered in the same step. */
+	private resolvePortal(direction: WalkDirection): boolean
+	{
+		const map = this.currentMap();
+		const source = map.portals.find(portal => this.pointsEqual(portal.position, this.player));
+		if (!source) return true;
+
+		const endpoints = map.portals.filter(portal => portal.portalId === source.portalId);
+		const destination = endpoints.find(portal => !this.pointsEqual(portal.position, source.position));
+		if (!destination)
+		{
+			console.error(`Portal ${source.portalId} does not have a linked destination.`);
+			this.showTemporaryStatus("Portal link missing");
+			return false;
+		}
+
+		const offset = destination.directionalExit ? DIRECTION_DELTAS[direction] : { x: 0, y: 0 };
+		const exit: MapPoint = {
+			x: destination.position.x + offset.x,
+			y: destination.position.y + offset.y,
+		};
+		const blocked = this.collisionLabels.get(this.pointKey(exit));
+		if (exit.x < 0 || exit.x >= map.width || exit.y < 0 || exit.y >= map.height || blocked)
+		{
+			console.error(`Portal ${source.portalId} exits into an invalid tile.`, { direction, exit, blocked });
+			this.showTemporaryStatus("Portal exit blocked");
+			return false;
+		}
+
+		this.player = exit;
+		this.facing = direction;
+		this.positionLabel(`Tile ${this.player.x}, ${this.player.y}`);
+		return true;
+	}
+
+	private isIceTile(point: MapPoint): boolean
+	{
+		return this.currentMap().iceTiles.some(candidate => this.pointsEqual(candidate, point));
 	}
 
 	private tryStartWildEncounter(): boolean
@@ -432,6 +485,7 @@ export class OverworldManager
 		canvas.dataset.mapId = map.id;
 		this.drawTerrain(context, camera, map);
 		this.drawObjects(context, camera, map);
+		this.drawPortals(context, camera, map);
 		const actorsReady = this.areMapAssetsReady(map);
 		canvas.dataset.actorsReady = actorsReady ? "true" : "false";
 		if (!actorsReady)
@@ -473,6 +527,11 @@ export class OverworldManager
 			);
 			return;
 		}
+		if (map.tileLayers && map.tileset)
+		{
+			this.drawTiledLayers(context, camera, map);
+			return;
+		}
 		if (this.terrainImage.naturalWidth <= 0) return;
 		if (!map.tileAt) return;
 
@@ -494,6 +553,62 @@ export class OverworldManager
 					TILE_SIZE,
 				);
 			}
+		}
+	}
+
+	private drawTiledLayers(context: CanvasRenderingContext2D, camera: MapPoint, map: OverworldMapDef): void
+	{
+		const tileset = map.tileset;
+		if (!tileset || !map.tileLayers) return;
+		const image = this.tiledTilesetImages.get(tileset.imagePath);
+		if (!image || image.naturalWidth <= 0) return;
+
+		const firstX = Math.max(0, Math.floor(camera.x / TILE_SIZE));
+		const lastX = Math.min(map.width - 1, Math.ceil((camera.x + VIEWPORT_WIDTH) / TILE_SIZE));
+		const firstY = Math.max(0, Math.floor(camera.y / TILE_SIZE));
+		const lastY = Math.min(map.height - 1, Math.ceil((camera.y + VIEWPORT_HEIGHT) / TILE_SIZE));
+		for (const layer of map.tileLayers)
+		{
+			for (let y = firstY; y <= lastY; y++)
+			{
+				for (let x = firstX; x <= lastX; x++)
+				{
+					const gid = layer[y * map.width + x] & 0x1FFFFFFF;
+					if (gid < tileset.firstGid) continue;
+					const tileIndex = gid - tileset.firstGid;
+					context.drawImage(
+						image,
+						(tileIndex % tileset.columns) * TILE_SIZE,
+						Math.floor(tileIndex / tileset.columns) * TILE_SIZE,
+						TILE_SIZE,
+						TILE_SIZE,
+						Math.round(x * TILE_SIZE - camera.x),
+						Math.round(y * TILE_SIZE - camera.y),
+						TILE_SIZE,
+						TILE_SIZE,
+					);
+				}
+			}
+		}
+	}
+
+	private drawPortals(context: CanvasRenderingContext2D, camera: MapPoint, map: OverworldMapDef): void
+	{
+		for (const portal of map.portals)
+		{
+			const centerX = portal.position.x * TILE_SIZE + TILE_SIZE / 2 - camera.x;
+			const centerY = portal.position.y * TILE_SIZE + TILE_SIZE / 2 - camera.y;
+			const gradient = context.createRadialGradient(centerX, centerY, 1, centerX, centerY, 8);
+			gradient.addColorStop(0, "#e0fbff");
+			gradient.addColorStop(0.45, "#48d5ff");
+			gradient.addColorStop(1, "#153f9e");
+			context.fillStyle = gradient;
+			context.beginPath();
+			context.arc(centerX, centerY, 7, 0, Math.PI * 2);
+			context.fill();
+			context.strokeStyle = "#ffffff";
+			context.lineWidth = 1;
+			context.stroke();
 		}
 	}
 
@@ -716,10 +831,18 @@ export class OverworldManager
 
 	private enterMap(warp: MapWarpDef): void
 	{
+		const targetMap = WORLD_MAPS[warp.targetMapId];
+		const spawn = targetMap?.spawns.find(candidate => candidate.id === warp.targetSpawnId);
+		if (!spawn)
+		{
+			console.error(`Missing spawn '${warp.targetSpawnId}' in map '${warp.targetMapId}'.`);
+			this.showTemporaryStatus("Warp destination missing");
+			return;
+		}
 		this.teleportTo({
 			mapId: warp.targetMapId,
-			position: warp.targetPosition,
-			facing: warp.targetFacing,
+			position: spawn.position,
+			facing: spawn.facing,
 		});
 	}
 

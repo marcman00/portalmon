@@ -4,7 +4,7 @@ The game deliberately renders the precomposed Overworld.png at runtime.  This
 script turns the non-visual information in Overworld.tmx into TypeScript:
 
 * every non-empty tile in a layer whose ``walkable`` property is false blocks;
-* objects in the Warp layer become numbered door locations;
+* objects in the Warp layer become numbered door locations or named map warps;
 * objects in the Actables layer become talkable people and signs, carrying the
   ``name`` and ``message`` authored in Tiled.
 
@@ -53,6 +53,8 @@ def object_placements(
     for object_ in group.findall("object"):
         object_properties = properties(object_)
         if property_name not in object_properties:
+            if object_properties.get("map", "").strip() or object_properties.get("spawn", "").strip():
+                continue
             raise ValueError(
                 f"{group_name} object {object_.get('id')} needs an integer {property_name!r} property"
             )
@@ -76,6 +78,82 @@ def object_placements(
         placements.append((placement_id, x, y))
 
     return sorted(placements)
+
+
+def warp_placements(
+    root: ET.Element,
+    tile_width: int,
+    tile_height: int,
+) -> list[tuple[int, int, str, str]]:
+    """Read Warp objects that use the map/spawn transition convention.
+
+    Legacy objects with only a ``door`` property remain available through
+    ``TILED_DOORS``. A transition must provide both values so it can resolve to
+    a non-triggering spawn point in the target map.
+    """
+
+    group = next((candidate for candidate in root.findall("objectgroup") if candidate.get("name") == "Warp"), None)
+    if group is None:
+        return []
+
+    placements: list[tuple[int, int, str, str]] = []
+    for object_ in group.findall("object"):
+        object_properties = properties(object_)
+        target_map = object_properties.get("map", "").strip()
+        target_spawn = object_properties.get("spawn", "").strip()
+        if not target_map and not target_spawn:
+            continue
+        if not target_map or not target_spawn:
+            raise ValueError(
+                f"Warp object {object_.get('id')} needs non-empty 'map' and 'spawn' properties"
+            )
+
+        object_id = object_.get("id", "?")
+        x = exact_tile(float(object_.get("x", "0")), tile_width, f"Warp object {object_id} X")
+        y = exact_tile(float(object_.get("y", "0")), tile_height, f"Warp object {object_id} Y")
+        width = exact_tile(float(object_.get("width", "0")), tile_width, f"Warp object {object_id} width")
+        height = exact_tile(float(object_.get("height", "0")), tile_height, f"Warp object {object_id} height")
+        if width != 1 or height != 1:
+            raise ValueError(f"Warp object {object_id} must be exactly one tile (found {width}x{height})")
+        placements.append((x, y, target_map, target_spawn))
+
+    return placements
+
+
+def spawn_placements(
+    root: ET.Element,
+    tile_width: int,
+    tile_height: int,
+) -> list[tuple[str, int, int, str]]:
+    """Read safe arrival points from the optional Spawns object layer."""
+
+    group = next((candidate for candidate in root.findall("objectgroup") if candidate.get("name") == "Spawns"), None)
+    if group is None:
+        return []
+
+    placements: list[tuple[str, int, int, str]] = []
+    seen_ids: set[str] = set()
+    for object_ in group.findall("object"):
+        object_properties = properties(object_)
+        spawn_id = object_properties.get("spawn", "").strip()
+        if not spawn_id:
+            raise ValueError(f"Spawns object {object_.get('id')} needs a non-empty 'spawn' property")
+        if spawn_id in seen_ids:
+            raise ValueError(f"Duplicate spawn ID: {spawn_id}")
+        seen_ids.add(spawn_id)
+        facing = object_properties.get("facing", "down")
+        if facing not in {"up", "down", "left", "right"}:
+            raise ValueError(f"Spawns object {object_.get('id')} has invalid facing: {facing}")
+        object_id = object_.get("id", "?")
+        x = exact_tile(float(object_.get("x", "0")), tile_width, f"Spawns object {object_id} X")
+        y = exact_tile(float(object_.get("y", "0")), tile_height, f"Spawns object {object_id} Y")
+        width = exact_tile(float(object_.get("width", "0")), tile_width, f"Spawns object {object_id} width")
+        height = exact_tile(float(object_.get("height", "0")), tile_height, f"Spawns object {object_id} height")
+        if width != 1 or height != 1:
+            raise ValueError(f"Spawns object {object_id} must be exactly one tile (found {width}x{height})")
+        placements.append((spawn_id, x, y, facing))
+
+    return placements
 
 
 def actable_placements(
@@ -247,13 +325,15 @@ def main() -> None:
         raise ValueError("TMX map must have positive width, height, tilewidth, and tileheight")
 
     doors = object_placements(root, "Warp", "door", tile_width, tile_height)
+    warps = warp_placements(root, tile_width, tile_height)
+    spawns = spawn_placements(root, tile_width, tile_height)
     actables = actable_placements(root, tile_width, tile_height)
     wild_zones = encounter_zones(root, tile_width, tile_height)
     rectangles, transparent_tile_count = collision_rectangles(root, width)
 
     lines = [
         "// Generated from Overworld.tmx by scripts/build-tiled-overworld.py. Do not edit.",
-        'import { MapCollisionRect, MapEncounterZone, MapPoint } from "./OverworldMapTypes";',
+        'import { MapCollisionRect, MapEncounterZone, MapPoint, MapSpawnDef, MapWarpDef } from "./OverworldMapTypes";',
         "",
         "export interface TiledActable",
         "{",
@@ -272,10 +352,18 @@ def main() -> None:
         *[f"\t{door_id}: {{ x: {x}, y: {y} }}," for door_id, x, y in doors],
         "};",
         "",
-		"export const TILED_WILD_ZONES: MapEncounterZone[] = [",
-		*[f"\t{{ x: {x}, y: {y}, width: {zone_width}, height: {zone_height} }}," for x, y, zone_width, zone_height in wild_zones],
-		"];",
-		"",
+        "export const TILED_WARPS: MapWarpDef[] = [",
+        *[f'\t{{ position: {{ x: {x}, y: {y} }}, targetMapId: "{target_map}", targetSpawnId: "{target_spawn}" }},' for x, y, target_map, target_spawn in warps],
+        "];",
+        "",
+        "export const TILED_SPAWNS: MapSpawnDef[] = [",
+        *[f'\t{{ id: "{spawn_id}", position: {{ x: {x}, y: {y} }}, facing: "{facing}" }},' for spawn_id, x, y, facing in spawns],
+        "];",
+        "",
+        "export const TILED_WILD_ZONES: MapEncounterZone[] = [",
+        *[f"\t{{ x: {x}, y: {y}, width: {zone_width}, height: {zone_height} }}," for x, y, zone_width, zone_height in wild_zones],
+        "];",
+        "",
         "export const TILED_ACTABLES: TiledActable[] = [",
         *[
             f"\t{{ id: {actable_id}, name: {ts_string(name)}, message: {ts_string(message)},"

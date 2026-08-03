@@ -123,7 +123,7 @@
   </object>
   <object id="8" x="368" y="128" width="16" height="16">
    <properties>
-    <property name="map" value="Gym1"/>
+    <property name="map" value="gym1"/>
     <property name="spawn" value="gym1-entrance"/>
    </properties>
   </object>
@@ -135,6 +135,14 @@
   <object id="10" x="592" y="128" width="16" height="16">
    <properties>
     <property name="door" type="int" value="8"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup color="#ff00ff" id="10" name="Spawns">
+  <object id="32" x="368" y="144" width="16" height="16">
+   <properties>
+    <property name="spawn" value="gym1-exit"/>
+    <property name="facing" value="down"/>
    </properties>
   </object>
  </objectgroup>

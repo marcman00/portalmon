@@ -1,7 +1,7 @@
 import { DialogueSequence } from "../OverworldDialogue";
 
 export type WalkDirection = "up" | "down" | "left" | "right";
-export type OverworldMapId = "town";
+export type OverworldMapId = "town" | "gym1";
 
 export interface MapPoint
 {
@@ -43,8 +43,30 @@ export interface MapWarpDef
 {
 	position: MapPoint;
 	targetMapId: OverworldMapId;
-	targetPosition: MapPoint;
-	targetFacing: WalkDirection;
+	targetSpawnId: string;
+}
+
+/** A non-triggering map arrival point, identified only within its own map. */
+export interface MapSpawnDef
+{
+	id: string;
+	position: MapPoint;
+	facing: WalkDirection;
+}
+
+export interface MapTilesetDef
+{
+	imagePath: string;
+	firstGid: number;
+	columns: number;
+}
+
+export interface MapPortalDef
+{
+	portalId: number;
+	position: MapPoint;
+	/** When true, arrive one tile beyond this endpoint in the incoming direction. */
+	directionalExit: boolean;
 }
 
 /** A reusable map destination for recovery, scripted movement, and future interiors. */
@@ -98,11 +120,19 @@ export interface OverworldMapDef
 	backgroundImagePath?: string;
 	/** Atlas tile lookup for legacy/small maps such as interiors. */
 	tileAt?: (x: number, y: number) => number;
+	/** TMX tile layers, rendered in source order when a precomposed image is unavailable. */
+	tileLayers?: number[][];
+	tileset?: MapTilesetDef;
 	objects: MapObjectDef[];
 	collisionRects: MapCollisionRect[];
 	collisionPoints: MapCollisionPoint[];
 	/** Tiles that may start a random wild encounter after a completed movement step. */
 	encounterZones: MapEncounterZone[];
+	/** Tiles that continue movement in the same direction after landing. */
+	iceTiles: MapPoint[];
+	/** Paired, same-map portals. Each portalId must have exactly two endpoints. */
+	portals: MapPortalDef[];
+	spawns: MapSpawnDef[];
 	warps: MapWarpDef[];
 	interactions: MapInteractionDef[];
 	npcs: MapNpcDef[];

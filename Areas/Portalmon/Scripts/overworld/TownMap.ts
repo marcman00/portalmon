@@ -1,5 +1,5 @@
 import { MapNpcDef, OverworldMapDef } from "./OverworldMapTypes";
-import { TILED_ACTABLES, TILED_COLLISION_RECTS, TILED_DOORS, TILED_WILD_ZONES } from "./TiledOverworld.generated";
+import { TILED_ACTABLES, TILED_COLLISION_RECTS, TILED_DOORS, TILED_SPAWNS, TILED_WARPS, TILED_WILD_ZONES } from "./TiledOverworld.generated";
 
 const MAP_WIDTH = 56;
 const MAP_HEIGHT = 39;
@@ -18,7 +18,10 @@ export const TOWN_MAP: OverworldMapDef = {
 	collisionRects: TILED_COLLISION_RECTS,
 	collisionPoints: [],
 	encounterZones: TILED_WILD_ZONES,
-	warps: [],
+	iceTiles: [],
+	portals: [],
+	spawns: TILED_SPAWNS,
+	warps: TILED_WARPS,
 	interactions: [
 		{ position: TILED_DOORS[5], kind: "center" },
 	],

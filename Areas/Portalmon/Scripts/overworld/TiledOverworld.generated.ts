@@ -1,5 +1,5 @@
 // Generated from Overworld.tmx by scripts/build-tiled-overworld.py. Do not edit.
-import { MapCollisionRect, MapEncounterZone, MapPoint } from "./OverworldMapTypes";
+import { MapCollisionRect, MapEncounterZone, MapPoint, MapSpawnDef, MapWarpDef } from "./OverworldMapTypes";
 
 export interface TiledActable
 {
@@ -222,10 +222,17 @@ export const TILED_DOORS: Record<number, MapPoint> = {
 	3: { x: 6, y: 7 },
 	4: { x: 12, y: 14 },
 	5: { x: 23, y: 16 },
-	6: { x: 23, y: 8 },
 	7: { x: 30, y: 7 },
 	8: { x: 37, y: 8 },
 };
+
+export const TILED_WARPS: MapWarpDef[] = [
+	{ position: { x: 23, y: 8 }, targetMapId: "gym1", targetSpawnId: "gym1-entrance" },
+];
+
+export const TILED_SPAWNS: MapSpawnDef[] = [
+	{ id: "gym1-exit", position: { x: 23, y: 9 }, facing: "down" },
+];
 
 export const TILED_WILD_ZONES: MapEncounterZone[] = [
 	{ x: 44, y: 4, width: 9, height: 15 },
