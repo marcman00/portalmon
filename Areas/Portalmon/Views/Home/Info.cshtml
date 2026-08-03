@@ -1,0 +1,139 @@
+<div class="px-3 pb-3">
+
+	<h5 class="text-body fw-bold mb-3">Game Mechanics</h5>
+
+	<!-- Battle Flow -->
+	<h6 class="text-body-secondary text-uppercase small fw-bold">Battle Flow</h6>
+	<p class="small text-body mb-1">
+		Each encounter gives you four options: <strong>Fight</strong> (use a move), <strong>Contain</strong> (attempt to catch),
+		<strong>Party</strong> (swap active creature), or <strong>Run</strong> (flee the battle).
+	</p>
+	<p class="small text-body mb-1">
+		<strong>Turn order</strong> is determined by speed (SPD). The faster creature acts first each turn.
+	</p>
+	<p class="small text-body mb-3">
+		<strong>Damage formula:</strong> <code>(Move Power + ATK) - DEF + variance</code> &times; type multiplier.
+	</p>
+
+	<!-- Type Effectiveness -->
+	<h6 class="text-body-secondary text-uppercase small fw-bold">Type Effectiveness</h6>
+	<p class="small text-body mb-1">
+		Every move and creature has a type. When a move's type is strong against the defender's type, it deals <strong>2&times;</strong> damage.
+		When weak, it deals <strong>&frac12;&times;</strong> damage. Same-type or neutral matchups deal normal damage.
+	</p>
+	<table class="table table-sm table-bordered small text-body mb-1" style="max-width: 380px;">
+		<thead>
+			<tr class="text-body-secondary">
+				<th>Move Type</th>
+				<th>Strong vs (2&times;)</th>
+				<th>Weak vs (&frac12;&times;)</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr><td>Availability</td><td>Performance</td><td>Security</td></tr>
+			<tr><td>Manageable</td><td>Security</td><td>Performance</td></tr>
+			<tr><td>Performance</td><td>Manageable</td><td>Availability</td></tr>
+			<tr><td>Security</td><td>Availability</td><td>Manageable</td></tr>
+		</tbody>
+	</table>
+	<p class="small text-body mb-3">
+		The cycle: <strong>Availability</strong> &rarr; <strong>Performance</strong> &rarr; <strong>Manageable</strong> &rarr; <strong>Security</strong> &rarr; Availability
+	</p>
+
+	<!-- Move Cooldown -->
+	<h6 class="text-body-secondary text-uppercase small fw-bold">Move Cooldown</h6>
+	<p class="small text-body mb-1">
+		You <strong>cannot use the same move twice in a row</strong>. After using a move, it will appear
+		<span style="text-decoration: line-through; opacity: 0.5;">greyed out</span> and disabled on your next turn.
+	</p>
+	<p class="small text-body mb-3">
+		The cooldown <strong>resets</strong> when you swap creatures or start a new battle. Enemies follow the same rule.
+	</p>
+
+	<!-- Containment (Catching) -->
+	<h6 class="text-body-secondary text-uppercase small fw-bold">Containment (Catching)</h6>
+	<p class="small text-body mb-1">
+		Lower enemy HP increases the chance of a successful containment.
+	</p>
+	<p class="small text-body mb-3">
+		A successfully contained creature is <strong>fully healed</strong> on capture.
+	</p>
+
+	<!-- Healing Rewards -->
+	<h6 class="text-body-secondary text-uppercase small fw-bold">Healing Rewards</h6>
+	<p class="small text-body mb-1">
+		HP <strong>persists</strong> between battles &mdash; your party does not automatically heal after combat.
+	</p>
+	<ul class="small text-body mb-3">
+		<li><strong>Wild Victory:</strong> All party members recover <strong>50%</strong> of their max HP (including fainted creatures), benched creatures heal 10%.</li>
+		<li><strong>Containment:</strong> The caught creature is fully healed, benched creatures heal 10%.</li>
+		<li><strong>Gym Victory:</strong> All party members are <strong>fully healed</strong>.</li>
+		<li><strong>Run / Defeat:</strong> No healing is applied.</li>
+	</ul>
+
+	<!-- Status Effects -->
+	<h6 class="text-body-secondary text-uppercase small fw-bold">Status Effects</h6>
+	<table class="table table-sm table-bordered small text-body mb-3">
+		<thead>
+			<tr class="text-body-secondary">
+				<th>Effect</th>
+				<th>Type</th>
+				<th>Description</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr><td>Contaminated</td><td>Negative</td><td>System compromised. Takes damage each turn.</td></tr>
+			<tr><td>Throttled</td><td>Negative</td><td>All systems rate-limited. Reduced ATK, DEF, and SPD.</td></tr>
+			<tr><td>Disrupted</td><td>Negative</td><td>System disrupted. Next move accuracy severely reduced.</td></tr>
+			<tr><td>Optimized</td><td>Positive</td><td>Operating at peak efficiency. Boosted ATK, DEF, and SPD.</td></tr>
+			<tr><td>SelfHealing</td><td>Positive</td><td>Auto-repair enabled. Heals HP each turn.</td></tr>
+			<tr><td>LockOn</td><td>Positive</td><td>Target acquired. Guaranteed accuracy and boosted damage.</td></tr>
+			<tr><td>Cascading</td><td>Positive</td><td>Cascading effect active. Next move hits significantly harder.</td></tr>
+		</tbody>
+	</table>
+
+	<!-- Party Management -->
+	<h6 class="text-body-secondary text-uppercase small fw-bold">Party Management</h6>
+	<p class="small text-body mb-1">
+		Your active party holds up to <strong>3 creatures</strong>. You can manage your roster from the <strong>DEX</strong> screen.
+	</p>
+	<p class="small text-body mb-1">
+		Swapping during battle <strong>costs your turn</strong> &mdash; the enemy will attack after the swap.
+	</p>
+	<p class="small text-body mb-3">
+		If your active creature faints, the next available party member is <strong>auto-deployed</strong>. If all three faint, the battle is lost.
+	</p>
+
+	<!-- Unlock Paths (Evolution) -->
+	<h6 class="text-body-secondary text-uppercase small fw-bold">Unlock Paths (Evolutions)</h6>
+	<p class="small text-body mb-1">
+		Some Portalmon have stronger follow-up forms that are <strong>unlocked through battle activity</strong>. This is an unlock system,
+		not a live battle evolution.
+	</p>
+	<p class="small text-body mb-1">
+		When a form is unlocked, it is <strong>added to the encounter pool</strong>. It does not replace the creature you already caught.
+	</p>
+	<p class="small text-body mb-3">
+		The <strong>DEX</strong> tracks progress toward these unlocks for eligible Portalmon so you can see how close the next form is.
+	</p>
+
+	<!-- Battery Power -->
+	<h6 class="text-body-secondary text-uppercase small fw-bold">On the Topic of Battery Power</h6>
+	<p class="small text-body mb-1">
+		Your Portalmon device runs on a <strong>rechargeable battery</strong>. Each wild encounter drains a segment of power.
+		When the battery is depleted, you'll need to wait for it to recharge before continuing.
+	</p>
+	<p class="small text-body mb-1">
+		The battery recharges <strong>automatically over time</strong> &mdash; one segment every few minutes. You don't need to
+		keep the page open; any recharge that accrued while you were away will be applied when you return.
+	</p>
+	<p class="small text-body mb-1">
+		<strong>After-hours perk:</strong> Outside of standard work hours, the battery doesn't drain at all.
+		GLaDOS has been known to mutter something about "unsanctioned overtime" but hasn't found the config to block it.
+	</p>
+	<p class="small text-body mb-0">
+		<em>The Enrichment Center reminds you that the battery mechanic exists for your own protection.
+		And for the protection of the network. Mostly the network.</em>
+	</p>
+
+</div>

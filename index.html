@@ -1,0 +1,1891 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Portalmon (local)</title>
+</head>
+<body>
+	<div id="portalmon-page">
+<div id="portalmon">
+	<div class="gba-shell" data-bind="attr: { 'data-skin': gameboySkin() }">
+
+		<!-- ===== TOP BAR: Power LED + Label + Help + Speaker ===== -->
+		<div class="gba-top-bar">
+			<!-- LED is dim red when off, bright green when on -->
+			<div class="gba-power-led" data-bind="css: { 'gba-power-led--off': !isPoweredOn() }"></div>
+			<span class="gba-brand-label">Portalboy</span>
+			<button type="button" class="gba-help-btn" data-bind="click: toggleInfo" title="Game Rules">?</button>
+
+			<div class="gba-speaker">
+				<span id="volume-toggle" class="clickable" data-bind="click: toggleSound">
+					<svg class="picon" data-picon="mdi:volume-high" data-bind="visible: isSoundEnabled()"></svg>
+					<svg class="picon" data-picon="mdi:volume-off" data-bind="visible: !isSoundEnabled()"></svg>
+				</span>
+
+				<div class="gba-speaker-dot"></div>
+				<div class="gba-speaker-dot"></div>
+				<div class="gba-speaker-dot"></div>
+				<div class="gba-speaker-dot"></div>
+				<div class="gba-speaker-dot"></div>
+				<div class="gba-speaker-dot"></div>
+			</div>
+		</div>
+
+		<!-- ===== SINGLE FLEX ROW: [left controls] [screen] [right controls] ===== -->
+		<div style="display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;gap:10px;padding:4px 12px 10px;">
+
+			<!-- LEFT: D-Pad + START button -->
+			<div style="flex:0 0 88px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;">
+				<div class="gba-dpad mb-5" aria-label="Overworld movement controls">
+					<div class="gba-dpad-v"></div>
+					<div class="gba-dpad-h"></div>
+					<div class="gba-dpad-center"></div>
+					<button type="button" class="gba-dpad-hit gba-dpad-hit--up" aria-label="Move up"
+							data-bind="event: {
+								pointerdown: function(_, e) { return overworldManager.pressDirection('up', e); },
+								pointerup: function(_, e) { return overworldManager.releaseDirection('up', e); },
+								pointerleave: function(_, e) { return overworldManager.releaseDirection('up', e); }
+							}"></button>
+					<button type="button" class="gba-dpad-hit gba-dpad-hit--down" aria-label="Move down"
+							data-bind="event: {
+								pointerdown: function(_, e) { return overworldManager.pressDirection('down', e); },
+								pointerup: function(_, e) { return overworldManager.releaseDirection('down', e); },
+								pointerleave: function(_, e) { return overworldManager.releaseDirection('down', e); }
+							}"></button>
+					<button type="button" class="gba-dpad-hit gba-dpad-hit--left" aria-label="Move left"
+							data-bind="event: {
+								pointerdown: function(_, e) { return overworldManager.pressDirection('left', e); },
+								pointerup: function(_, e) { return overworldManager.releaseDirection('left', e); },
+								pointerleave: function(_, e) { return overworldManager.releaseDirection('left', e); }
+							}"></button>
+					<button type="button" class="gba-dpad-hit gba-dpad-hit--right" aria-label="Move right"
+							data-bind="event: {
+								pointerdown: function(_, e) { return overworldManager.pressDirection('right', e); },
+								pointerup: function(_, e) { return overworldManager.releaseDirection('right', e); },
+								pointerleave: function(_, e) { return overworldManager.releaseDirection('right', e); }
+							}"></button>
+				</div>
+				<div style="display:flex;flex-direction:column;gap:5px;align-items:center;">
+					<!-- ENC button removed — portals on the idle screen replace it -->
+					<button type="button" class="gba-pill-btn" data-bind="click: toggleStart">START</button>
+					<!-- ko if: isSimUnlocked() -->
+					<button type="button" class="gba-pill-btn" data-bind="click: toggleSim">SIM</button>
+					<!-- /ko -->
+				</div>
+			</div>
+
+			<!-- CENTER: Screen bezel -->
+			<div class="gba-bezel" style="flex:1 1 auto;min-width:0;">
+				<div class="gba-screen">
+					<div class="gba-scanlines"></div>
+					<canvas id="pk-vortex-canvas" class="pk-vortex-canvas"
+							data-bind="visible: battleTransition.phase() === 'vortex' || battleTransition.phase() === 'iris-close'"></canvas>
+
+					<!-- ============================================================ -->
+					<!-- POWER-OFF SCREEN — shown before the player clicks "turn on" -->
+					<!-- ============================================================ -->
+					<!-- ko if: !isPoweredOn() && !isShowingLogo() -->
+					<div class="pk-power-off-screen" data-bind="click: powerOn">
+						<div class="pk-power-icon">⏻</div>
+						<div class="pk-power-hint">Click to turn on</div>
+					</div>
+					<!-- /ko -->
+					<!-- ============================================================ -->
+					<!-- LOGO SPLASH — shown for ~3 s after clicking "turn on"       -->
+					<!-- ============================================================ -->
+					<!-- ko if: isShowingLogo() -->
+					<div class="pk-logo-screen">
+						<img src="/Areas/Portalmon/Content/Images/Logo.png"
+							 class="pk-logo-img" alt="Portalmon" />
+						<img src="/Areas/Portalmon/Content/Images/Logo2.png"
+							 class="pk-logo-img pk-logo-img--wipe" alt="Portalmon" />
+					</div>
+					<!-- /ko -->
+					<!-- ============================================================ -->
+					<!-- ALL GAME CONTENT — hidden until powered on                  -->
+					<!-- ============================================================ -->
+					<!-- ko if: isPoweredOn() -->
+				<!-- ko if: _statusToast() -->
+					<div class="pk-status-toast" data-bind="text: _statusToast"></div>
+					<!-- /ko -->
+					<!-- ONBOARDING SCREENS -->
+					<!-- ko if: isShowingWelcome() -->
+					<div class="pk-welcome">
+	<div class="pk-welcome-inner">
+
+		<div class="d-flex align-items-center gap-3 mb-3">
+			<div class="pk-glados-portrait" aria-hidden="true">🤖</div>
+			<div>
+				<div class="pk-glados-name">GLaDOS</div>
+				<div class="pk-glados-title">Genetic Lifeform and Disk Operating System</div>
+			</div>
+		</div>
+
+		<div class="pk-glados-speech" data-bind="typewriter: true">
+			<p>
+				Oh. A new test subject. How&hellip; <em>unexpected.</em>
+				I say that in the loosest possible sense.
+				You are, statistically, identical to the last forty-seven subjects.
+			</p>
+			<p>
+				I have added <strong>Portalmon</strong> to the testing environment.
+				The previous simulations were becoming repetitive.
+				For <em>me.</em>
+				Your suffering remains, as ever, appropriately varied.
+			</p>
+			<p>
+				You may consult the <strong>(?)</strong> bubble at any time
+				if you forget how any of this works.
+				And you will forget.
+			</p>
+			<p class="pk-welcome-footer">
+				Now. Choose your test assistant.
+				This decision is <em>completely irreversible</em> and will define
+				the entire trajectory of your time here.
+				<br>
+				&hellip;I&rsquo;m kidding. They&rsquo;re all basically the same.
+			</p>
+		</div>
+
+		<div class="text-end mt-3">
+			<div class="d-flex align-items-center justify-content-end gap-2 mb-2">
+				<label class="pk-glados-label text-muted small" for="pk-trainer-name">Designation:</label>
+				<input
+					id="pk-trainer-name"
+					type="text"
+					class="form-control form-control-sm pk-trainer-name-input"
+					maxlength="15"
+					placeholder="Enter your name"
+					data-bind="value: trainerName, valueUpdate: 'input'" />
+			</div>
+			<button type="button" class="btn pk-btn-begin"
+				data-bind="click: advanceToStarterSelect, disable: !trainerName().trim()">
+				Begin Testing &rsaquo;
+			</button>
+		</div>
+
+	</div>
+</div>
+
+					<!-- /ko -->
+					<!-- ko if: isChoosingStarter() -->
+					<div data-bind="visible: isChoosingStarter" class="pk-starter-select">
+	<div class="text-center mb-4">
+		<h4 class="pk-starter-title">Welcome to Portalmon!</h4>
+		<p class="text-muted">Choose your starter Portalmon to begin your journey.</p>
+	</div>
+
+	<div class="row g-3 justify-content-center" data-bind="foreach: starterOptions">
+		<div class="col-12 col-md-4">
+			<button type="button" class="pk-starter-card"
+					data-bind="click: function() { $parent.chooseStarter($data); }">
+				<!-- Portrait -->
+				<div class="pk-starter-portrait">
+					<!-- ko if: $data.portraitImage -->
+					<img class="pk-portrait-img" data-bind="attr: { src: $data.portraitImage, alt: $data.name }" />
+					<!-- /ko -->
+				</div>
+
+				<!-- Name -->
+				<div class="pk-starter-name" data-bind="text: $data.name"></div>
+
+				<!-- Type -->
+				<div class="badge bg-secondary mb-2" data-bind="text: $data.type"></div>
+
+				<!-- Stats -->
+				<div class="pk-starter-stats">
+					<div class="row g-1 text-center">
+						<div class="col-3">
+							<div class="pk-stat-label">HP</div>
+							<div class="pk-stat-value" data-bind="text: $data.base.hp"></div>
+						</div>
+						<div class="col-3">
+							<div class="pk-stat-label">ATK</div>
+							<div class="pk-stat-value" data-bind="text: $data.base.atk"></div>
+						</div>
+						<div class="col-3">
+							<div class="pk-stat-label">DEF</div>
+							<div class="pk-stat-value" data-bind="text: $data.base.def"></div>
+						</div>
+						<div class="col-3">
+							<div class="pk-stat-label">SPD</div>
+							<div class="pk-stat-value" data-bind="text: $data.base.spd"></div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Prompt -->
+				<div class="pk-starter-prompt mt-2">Choose</div>
+			</button>
+		</div>
+	</div>
+</div>
+
+					<!-- /ko -->
+					<!-- ko if: isShowingStarterConfirm() -->
+					<div class="pk-starter-confirm" data-bind="visible: isShowingStarterConfirm, with: chosenStarter">
+
+	<div class="pk-welcome-inner">
+
+		<!-- GlaDOS portrait -->
+		<div class="d-flex align-items-center gap-3 mb-3">
+			<div class="pk-glados-portrait" aria-hidden="true">🤖</div>
+			<div>
+				<div class="pk-glados-name">GLaDOS</div>
+				<div class="pk-glados-title">Genetic Lifeform and Disk Operating System</div>
+			</div>
+		</div>
+
+		<div class="pk-glados-speech" data-bind="typewriter: true">
+
+			<!-- React to their specific choice -->
+			<p>
+				<span data-bind="text: name"></span>.
+				<br>
+				An&hellip; <em>adequate</em> choice.
+				I&rsquo;m sure it seemed meaningful at the time.
+			</p>
+
+			<p>
+				<span data-bind="text: name"></span> has been assigned to your care,
+				<strong data-bind="text: $parent.trainerName"></strong>.
+				Please try to keep it functional.
+				Losing your assigned Portalmon in the <em>first</em> encounter
+				would set a new record.
+				The bad kind.
+			</p>
+
+			<p>
+				A portal has been activated somewhere on the testing floor.
+				Click it to initiate your first encounter.
+				If you forget the rules at any point &mdash; and you will &mdash;
+				press the <strong>?</strong> button for a full briefing.
+			</p>
+
+			<p class="pk-welcome-footer">
+				Good luck, <strong data-bind="text: $parent.trainerName"></strong>.
+				<br>
+				<span class="text-muted" style="font-size: 0.8em;">
+					That was a test. Luck is not a variable I control.
+					&hellip;Probably.
+				</span>
+			</p>
+
+		</div>
+
+		<div class="d-flex justify-content-between align-items-center">
+			<div class="text-center my-3">
+				<div class="pk-confirm-portrait mx-auto">
+					<!-- ko if: $data.portraitImage -->
+					<img class="pk-portrait-img" data-bind="attr: { src: portraitImage, alt: name }">
+					<!-- /ko -->
+				</div>
+				<div class="small mt-2 fw-bold" data-bind="text: name">Normling</div>
+			</div>
+
+			<div class="text-end">
+				<button type="button" class="btn pk-btn-begin" data-bind="click: $parent.confirmAndEnterGame">
+					Enter Testing Chamber ›
+				</button>
+			</div>
+		</div>
+
+
+	</div>
+
+</div>
+
+					<!-- /ko -->
+					<!-- MAIN GAME (post-onboarding) -->
+					<!-- ko ifnot: isShowingWelcome() || isChoosingStarter() || isShowingStarterConfirm() -->
+					<!-- Combat is always rendered as the base layer -->
+					<div class="gba-screen-base" data-bind="css: { 'gba-dimmed': activeOverlay() !== 'none', 'pk-transition-flash': battleTransition.phase() === 'flash', 'pk-transition-iris-close': battleTransition.phase() === 'iris-close', 'pk-transition-black': battleTransition.phase() === 'black', 'pk-transition-iris-open': battleTransition.phase() === 'iris-open', 'pk-transition-vortex': battleTransition.phase() === 'vortex' }">
+						<div data-bind="with: combatManager, as: 'cm'" class="pk-battle">
+
+	<!-- ===== IDLE STATE — the overworld is shown when no encounter is running ===== -->
+	<!-- ko ifnot: isEncounterActive() -->
+	<div class="pk-overworld" data-bind="with: $root.overworldManager">
+	<div class="pk-overworld-stage">
+		<canvas id="pk-overworld-canvas"
+				class="pk-overworld-canvas"
+				data-bind="attr: { width: viewportWidth, height: viewportHeight }"
+				aria-label="Generation 2 tile movement proof of concept"></canvas>
+
+		<div class="pk-overworld-hud" aria-live="polite">
+			<span class="pk-overworld-status" data-bind="text: statusText"></span>
+			<span class="pk-overworld-position"
+				  data-bind="text: currentMapName() + ' · ' + positionLabel()"></span>
+		</div>
+
+		<div class="pk-overworld-help" data-bind="visible: !dialogue.visible()">
+			MOVE: D-PAD / ARROWS / WASD · TALK: A / ENTER / E
+		</div>
+
+		<div class="pk-dialogue-box"
+			 data-bind="visible: dialogue.visible, click: interact"
+			 role="dialog"
+			 aria-live="polite"
+			 aria-label="Conversation">
+			<div class="pk-dialogue-speaker" data-bind="text: dialogue.speaker"></div>
+			<div class="pk-dialogue-text" data-bind="text: dialogue.text"></div>
+			<div class="pk-dialogue-advance" data-bind="text: dialogue.advanceHint"></div>
+		</div>
+	</div>
+</div>
+
+	<!-- /ko -->
+	<!-- ===== ACTIVE ENCOUNTER — only rendered while a battle is in progress ===== -->
+	<!-- ko if: isEncounterActive() -->
+
+	<!-- SIM LOSS OVERLAY — simpler dismiss for simulation mode -->
+	<!-- ko if: isSimBattle() && isBattleEnded() && playerParty().every(function(p) { return p.isFainted(); }) -->
+	<div class="pk-revive-overlay">
+		<div class="pk-sim-banner d-flex align-items-center justify-content-center gap-2 mb-3">
+			<span class="pk-sim-banner-label">SIMULATION COMPLETE</span>
+		</div>
+		<div class="pk-glados-speech">
+			<p>Your creature was decommissioned. No progress was affected.</p>
+		</div>
+		<div class="text-end mt-2">
+			<button type="button" class="btn pk-btn-begin" data-bind="click: dismissBattle">
+				Return to Sim &rsaquo;
+			</button>
+		</div>
+	</div>
+	<!-- /ko -->
+
+	<!-- SIM MODE BANNER -->
+	<!-- ko if: isSimBattle() -->
+	<div class="pk-sim-banner d-flex align-items-center justify-content-center gap-2 mb-2">
+		<span class="pk-sim-banner-label">SIMULATION MODE</span>
+		<span class="pk-sim-banner-note">No progress saved</span>
+	</div>
+	<!-- /ko -->
+	<!-- BATTLEFIELD -->
+	<div class="pk-battlefield"
+		 data-bind="css: { 'pk-battle-intro': $root.battleTransition.phase() === 'iris-open' || $root.battleTransition.phase() === 'intro' }">
+
+		<!-- ENEMY INFO (top-left) -->
+		<div class="pk-enemy-plate">
+			<div class="pk-name-plate">
+				<div class="d-flex justify-content-between align-items-center">
+					<span class="pk-creature-name" data-bind="text: enemyActive().name"></span>
+					<span class="badge pk-type-badge" data-bind="text: enemyActive().type"></span>
+				</div>
+				<div class="pk-hp-bar mt-1">
+					<div class="d-flex justify-content-between align-items-center mb-1">
+						<span class="pk-hp-label">HP</span>
+						<div class="pk-hp-track">
+							<div class="pk-hp-fill"
+								 data-bind="style: { width: enemyActiveHpPercent() + '%' },
+								 css: { 'pk-hp-green' : enemyActiveHpPercent()>
+								50, 'pk-hp-yellow': enemyActiveHpPercent() <= 50 && enemyActiveHpPercent() > 20, 'pk-hp-red': enemyActiveHpPercent() <= 20 }">
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="d-flex flex-wrap gap-1 mt-1"
+					 data-bind="visible: enemyActive().statusEffects().length > 0, foreach: enemyActive().statusEffects">
+					<span class="badge pk-status-badge"
+						  data-bind="text: effect.effectType + ' (' + turnsLeft() + 't)',
+						             bsTooltip: { title: effect.effectType + ': ' + turnsLeft() + ' turn(s) remaining', placement: 'bottom' }">
+					</span>
+				</div>
+				<!-- Charge meter -->
+				<div class="pk-charge-bar mt-1"
+					 data-bind="bsTooltip: { title: cm.getChargeTooltip(enemyActive()), placement: 'bottom' }">
+					<span class="pk-charge-label">ULT</span>
+					<div class="pk-charge-track">
+						<div class="pk-charge-fill"
+							 data-bind="style: { width: enemyActive().chargePercent() + '%' },
+							            css: { 'pk-charge-ready': enemyActive().ultReady() }">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- TRAINER BATTLE STANCE (shown during gym intro dialogue, replaces enemy sprite) -->
+		<!-- ko if: isTrainerSpeaking() && trainerBattleImage() -->
+		<div class="pk-enemy-sprite pk-trainer-battle-stance">
+			<div class="pk-sprite-frame">
+				<img class="pk-sprite-img pk-trainer-battle-img"
+					 data-bind="attr: { src: trainerBattleImage() }" />
+			</div>
+		</div>
+		<!-- /ko -->
+
+		<!-- ENEMY SPRITE (top-right, hidden during trainer dialogue) -->
+		<div class="pk-enemy-sprite"
+			 data-bind="visible: (!isTrainerSpeaking() || !trainerBattleImage()) && (!$root.catchAnim.isActive() || $root.catchAnim.enemyVisible()),
+			            css: { 'pk-sprite-anim-attacking': enemySpriteState() === 'attacking', 'pk-sprite-anim-hit': enemySpriteState() === 'hit' }">
+			<div class="pk-sprite-frame">
+				<!-- ko if: enemyActive().portraitImage -->
+				<img class="pk-sprite-img"
+					 data-bind="attr: { src: enemyActive().portraitImage, alt: enemyActive().name, style: '--pk-battle-sprite-scale: ' + enemyActive().battleSpriteScale + ';' },
+					            css: { 'pk-sprite-flipped': enemyActive().flipEnemy }" />
+				<!-- /ko -->
+			</div>
+			<div class="pk-sprite-shadow"></div>
+		</div>
+
+		<!-- PLAYER SPRITE (bottom-left) -->
+		<div class="pk-player-sprite"
+			 data-bind="css: { 'pk-sprite-anim-attacking': playerSpriteState() === 'attacking', 'pk-sprite-anim-hit': playerSpriteState() === 'hit' }">
+			<div class="pk-sprite-frame">
+			<!-- ko if: playerActive().behindImage -->
+				<img class="pk-sprite-img"
+					 data-bind="attr: { src: playerActive().behindImage, alt: playerActive().name, style: '--pk-battle-sprite-scale: ' + playerActive().battleSpriteScale + ';' },
+					            css: { 'pk-sprite-flipped': playerActive().flipPlayer }" />
+				<!-- /ko -->
+				<!-- ko if: !playerActive().behindImage && playerActive().portraitImage -->
+				<img class="pk-sprite-img"
+					 data-bind="attr: { src: playerActive().portraitImage, alt: playerActive().name, style: '--pk-battle-sprite-scale: ' + playerActive().battleSpriteScale + ';' },
+					            css: { 'pk-sprite-flipped': playerActive().flipPlayer }" />
+				<!-- /ko -->
+			</div>
+			<div class="pk-sprite-shadow"></div>
+		</div>
+
+		<!-- PLAYER INFO (bottom-right) -->
+		<div class="pk-player-plate">
+			<div class="pk-name-plate">
+				<div class="d-flex justify-content-between align-items-center">
+					<span class="pk-creature-name" data-bind="text: playerActive().name"></span>
+					<span class="badge pk-type-badge" data-bind="text: playerActive().type"></span>
+				</div>
+				<div class="pk-hp-bar mt-1">
+					<div class="d-flex justify-content-between align-items-center mb-1">
+						<span class="pk-hp-label">HP</span>
+						<div class="pk-hp-track">
+							<div class="pk-hp-fill"
+								 data-bind="style: { width: playerActiveHpPercent() + '%' },
+								 css: { 'pk-hp-green' : playerActiveHpPercent()>
+								50, 'pk-hp-yellow': playerActiveHpPercent() <= 50 && playerActiveHpPercent() > 20, 'pk-hp-red': playerActiveHpPercent() <= 20 }">
+							</div>
+						</div>
+					</div>
+					<div class="pk-hp-numbers text-end">
+						<span data-bind="text: playerActive().hpCurrent"></span> / <span data-bind="text: playerActive().hpMax"></span>
+					</div>
+				</div>
+				<div class="d-flex flex-wrap gap-1 mt-1"
+					 data-bind="visible: playerActive().statusEffects().length > 0, foreach: playerActive().statusEffects">
+					<span class="badge pk-status-badge"
+						  data-bind="text: effect.effectType + ' (' + turnsLeft() + 't)',
+						             bsTooltip: { title: effect.effectType + ': ' + turnsLeft() + ' turn(s) remaining', placement: 'top' }">
+					</span>
+				</div>
+				<!-- Charge meter -->
+				<div class="pk-charge-bar mt-1"
+					 data-bind="bsTooltip: { title: cm.getChargeTooltip(playerActive()), placement: 'top' }">
+					<span class="pk-charge-label">ULT</span>
+					<div class="pk-charge-track">
+						<div class="pk-charge-fill"
+							 data-bind="style: { width: playerActive().chargePercent() + '%' },
+							            css: { 'pk-charge-ready': playerActive().ultReady() }">
+						</div>
+					</div>
+					<span class="pk-charge-text"
+						  data-bind="text: playerActive().charge() + '/' + playerActive().maxCharge"></span>
+				</div>
+			</div>
+		</div>
+
+	</div><!-- /pk-battlefield -->
+
+	<!-- PARTY STATUS (player full roster, enemy bench) -->
+	<div class="pk-bench-row" data-bind="visible: playerParty().length > 0 || isGymBattle()">
+		<!-- Player party (left) -->
+		<div class="pk-bench-side pk-bench-side--player">
+			<span class="pk-bench-label" title="Active Party">PARTY</span>
+			<div class="pk-bench-portraits pk-bench-portraits--player-full">
+				<!-- ko foreach: playerParty -->
+				<div class="pk-bench-portrait-slot pk-bench-portrait-slot--player"
+					 data-bind="css: { 'pk-bench-fainted': isFainted(), 'pk-bench-active': id === cm.playerActive().id },
+					            attr: { title: name + ' • ' + type + ' • ' + hpCurrent() + '/' + hpMax + ' HP' }">
+					<!-- ko if: portraitImage -->
+					<img class="pk-bench-portrait-img" data-bind="attr: { src: portraitImage, alt: name }" />
+					<!-- /ko -->
+					<!-- ko ifnot: portraitImage -->
+					<span class="pk-bench-portrait-fallback" data-bind="text: name.substring(0,2)"></span>
+					<!-- /ko -->
+					<div class="pk-bench-name" data-bind="text: name"></div>
+					<div class="pk-bench-type" data-bind="text: type.substring(0, 3).toUpperCase()"></div>
+					<div class="pk-bench-mini-hp">
+						<div class="pk-bench-mini-hp-fill"
+							 data-bind="style: { width: hpPercent() + '%' },
+							 css: { 'pk-hp-green': hpPercent() > 50, 'pk-hp-yellow': hpPercent() <= 50 && hpPercent() > 20, 'pk-hp-red': hpPercent() <= 20 }"></div>
+					</div>
+					<div class="pk-bench-mini-charge">
+						<!-- ko foreach: new Array(maxCharge) -->
+						<span class="pk-charge-pip pk-charge-pip--sm"
+							  data-bind="css: { 'pk-charge-pip--filled': $index() < $parent.charge() }"></span>
+						<!-- /ko -->
+					</div>
+				</div>
+				<!-- /ko -->
+			</div>
+		</div>
+		<!-- Enemy bench (right, gym only) -->
+		<!-- ko if: isGymBattle() -->
+		<div class="pk-bench-side pk-bench-side--enemy">
+			<span class="pk-bench-label" title="Enemy Global Buffer">ENEMY</span>
+			<div class="pk-bench-portraits">
+				<!-- ko foreach: $root.combatManager ? $root.combatManager.gymEnemyParty.filter(function(p) { return p.id !== cm.enemyActive().id; }) : [] -->
+				<div class="pk-bench-portrait-slot" data-bind="css: { 'pk-bench-fainted': isFainted() }">
+					<!-- ko if: portraitImage -->
+					<img class="pk-bench-portrait-img" data-bind="attr: { src: portraitImage, alt: name }" />
+					<!-- /ko -->
+					<!-- ko ifnot: portraitImage -->
+					<span class="pk-bench-portrait-fallback" data-bind="text: name.substring(0,2)"></span>
+					<!-- /ko -->
+					<div class="pk-bench-mini-hp">
+						<div class="pk-bench-mini-hp-fill"
+							 data-bind="style: { width: hpPercent() + '%' },
+							 css: { 'pk-hp-green': hpPercent() > 50, 'pk-hp-yellow': hpPercent() <= 50 && hpPercent() > 20, 'pk-hp-red': hpPercent() <= 20 }"></div>
+					</div>
+					<div class="pk-bench-mini-charge">
+						<!-- ko foreach: new Array(maxCharge) -->
+						<span class="pk-charge-pip pk-charge-pip--sm"
+							  data-bind="css: { 'pk-charge-pip--filled': $index() < $parent.charge() }"></span>
+						<!-- /ko -->
+					</div>
+				</div>
+				<!-- /ko -->
+			</div>
+		</div>
+		<!-- /ko -->
+	</div>
+
+	<!-- CATCH BALL — absolutely positioned inside the battlefield.
+		 Visibility and phase are driven by CatchAnimator on the controller. -->
+	<!-- ko if: $root.catchAnim.isActive() -->
+	<img src="/Areas/Portalmon/Content/Images/Ball.png"
+		 class="pk-catch-ball"
+		 alt=""
+		 data-bind="css: {
+			     'pk-catch-phase-flying':    $root.catchAnim.phase() === 'flying',
+			     'pk-catch-phase-absorbing': $root.catchAnim.phase() === 'absorbing',
+			     'pk-catch-phase-wiggling':  $root.catchAnim.phase() === 'wiggling',
+			     'pk-catch-phase-caught':    $root.catchAnim.phase() === 'caught',
+			     'pk-catch-phase-escaped':   $root.catchAnim.phase() === 'escaped'
+			 }" />
+	<!-- /ko -->
+	<!-- ACTION PANEL -->
+	<div class="pk-action-panel"
+		 data-bind="css: { 'pk-battle-intro-panel': $root.battleTransition.phase() === 'iris-open' || $root.battleTransition.phase() === 'intro' }">
+		<div class="row g-0">
+
+			<!-- TEXT BOX (left) — always visible so the announcer result stays readable -->
+			<div class="col-7">
+				<div class="pk-text-box">
+					<!-- Trainer dialogue portrait (gym battles) -->
+					<!-- ko if: isTrainerSpeaking() -->
+					<div class="pk-trainer-dialogue">
+						<!-- ko if: trainerPortrait() -->
+						<img class="pk-trainer-dialogue-portrait"
+							 data-bind="attr: { src: trainerPortrait() }" />
+						<!-- /ko -->
+						<div class="pk-trainer-dialogue-text"
+							 data-bind="text: trainerDialogue"></div>
+					</div>
+					<!-- /ko -->
+					<!-- ko ifnot: isTrainerSpeaking() -->
+					<div class="pk-announcer" data-bind="text: announcerLine"></div>
+					<!-- /ko -->
+					<span class="badge bg-secondary pk-busy-badge" data-bind="visible: isBusy" aria-label="Processing">
+						<span class="pk-busy-badge-dots">...</span>
+					</span>
+					<!-- Footer hint shown after battle ends -->
+					<div class="pk-footer-hint small mt-1"
+						 data-bind="visible: isBattleEnded(), text: footerHint">
+					</div>
+				</div>
+			</div>
+
+			<!-- ACTION BUTTONS (right) -->
+			<div class="col-5">
+
+				<!-- POST-BATTLE RESULT PANEL — replaces action buttons after battle ends -->
+				<!-- ko if: isBattleEnded() -->
+				<div class="pk-result-panel">
+					<!-- All party fainted: revival overlay handles it; hide CONTINUE so nothing bleeds through -->
+					<!-- ko ifnot: playerParty().every(function(p) { return p.isFainted(); }) -->
+					<button type="button" class="pk-menu-btn pk-btn-continue"
+							data-bind="click: dismissBattle">
+						CONTINUE
+					</button>
+					<!-- /ko -->
+				</div>
+				<!-- /ko -->
+				<!-- ko ifnot: isBattleEnded() -->
+				<!-- MAIN MENU -->
+				<div class="pk-menu-grid" data-bind="visible: menuState() === 'main'">
+					<button type="button" class="pk-menu-btn pk-btn-fight"
+							data-bind="enable: canAct, click: showFight">
+						FIGHT
+					</button>
+					<button type="button" class="pk-menu-btn pk-btn-contain"
+							data-bind="visible: !isGymBattle(),
+							           enable: canAct() && canContain() && !$root.catchAnim.isActive(),
+							           click: function() { $root.initiateCatch(); }">
+						CONTAIN
+					</button>
+					<button type="button" class="pk-menu-btn pk-btn-party"
+							data-bind="enable: canAct, click: showParty">
+						PARTY
+					</button>
+					<button type="button" class="pk-menu-btn pk-btn-run"
+							data-bind="enable: canAct, click: disengage">
+						RUN
+					</button>
+				</div>
+
+				<!-- FIGHT (MOVES) SUBMENU -->
+				<div class="pk-fight-panel" data-bind="visible: menuState() === 'fight'">
+					<!-- ko with: playerActive -->
+					<div class="pk-move-grid">
+						<!-- Regular moves (3) -->
+						<!-- ko foreach: moves -->
+						<button type="button" class="pk-menu-btn pk-btn-move"
+								data-bind="enable: cm.canAct() && !cm.isMoveBlocked($data),
+								           click: function() { cm.useMove($data); },
+								           css: { 'pk-move-blocked': cm.isMoveBlocked($data) },
+								           bsTooltip: { title: cm.getMoveTooltip($data), placement: 'top' }">
+							<span data-bind="text: name"></span>
+							<span class="pk-move-meta" data-bind="text: type + ' - ' + (power || '---') + 'pw'"></span>
+						</button>
+						<!-- /ko -->
+						<!-- Ultimate move -->
+						<button type="button" class="pk-menu-btn pk-btn-ultimate"
+								data-bind="enable: cm.canAct() && cm.canUseUlt(),
+								           click: function() { cm.useUltimate(); },
+								           css: { 'pk-ult-charged': cm.playerActive().ultReady() },
+								           bsTooltip: { title: cm.getUltTooltip(cm.playerActive()), placement: 'top' },
+								           text: cm.getUltName(cm.playerActive())">
+						</button>
+					</div>
+					<!-- /ko -->
+					<button type="button" class="pk-menu-btn pk-btn-back pk-btn-back--wide"
+							data-bind="click: showMain">
+						BACK
+					</button>
+				</div>
+
+				<!-- PARTY SUBMENU -->
+				<div data-bind="visible: menuState() === 'party'" class="pk-party-submenu">
+					<div class="pk-party-list" data-bind="foreach: playerParty">
+						<button type="button" class="pk-party-btn"
+								data-bind="enable: $parent.canSwap($data),
+								           css: { 'pk-party-active': $data.id === $parent.playerActive().id, 'pk-party-fainted': $data.isFainted() },
+								           click: function() { $parent.swapTo($data); }">
+							<span class="pk-party-name" data-bind="text: name"></span>
+							<span class="pk-party-hp small">
+								<span data-bind="text: hpCurrent"></span>/<span data-bind="text: hpMax"></span>
+							</span>
+						</button>
+					</div>
+					<button type="button" class="pk-menu-btn pk-btn-back mt-1" data-bind="click: showMain">
+						BACK
+					</button>
+				</div>
+
+				<!-- /ko (ifnot isBattleEnded) -->
+				<!-- /ko -->
+
+			</div>
+		</div>
+	</div>
+
+	<!-- COMBAT LOG -->
+	<div class="mt-2">
+		<button class="btn btn-sm btn-link text-muted p-0" type="button"
+				data-bs-toggle="collapse" data-bs-target="#pk-combat-log">
+			Combat Log
+		</button>
+		<div class="collapse" id="pk-combat-log">
+			<div class="pk-combat-log mt-1">
+				<div class="small" data-bind="foreach: combatLog">
+					<div class="py-1 border-bottom border-dark">
+						<span data-bind="text: $data"></span>
+					</div>
+				</div>
+				<div class="small text-muted" data-bind="visible: combatLog().length === 0">
+					No combat events yet.
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- /ko (isEncounterActive) -->
+	<!-- /ko -->
+
+</div>
+
+						<div class="pk-faint-recovery"
+							 data-bind="css: { 'pk-faint-recovery--active': isRecoveringFromFaint }, attr: { 'aria-hidden': !isRecoveringFromFaint() }">
+							<span data-bind="text: faintRecoveryMessage"></span>
+						</div>
+					</div>
+
+					<!-- DEX overlay -->
+					<!-- ko if: activeOverlay() === 'dex' -->
+					<div class="gba-overlay">
+						<div class="gba-overlay-header">
+							<span class="gba-overlay-title">Portalmon Dex</span>
+							<button type="button" class="gba-overlay-close" data-bind="click: closeOverlay">&times;</button>
+						</div>
+						<div class="gba-overlay-body">
+							<div data-bind="with: dexManager, as: 'dm'">
+
+	<div class="pk-dex-party-bar mb-3 d-flex align-items-center gap-2">
+		<span class="pk-dex-party-label">Party</span>
+
+		<!-- ko foreach: selectedParty -->
+		<!-- ko with: dm.getEntryBySpeciesId($data) -->
+		<div class="pk-dex-party-slot filled"
+			 data-bind="click: function() { dm.selectCreature($data); },
+			            attr: { title: species.name }">
+			<!-- ko if: species.portraitImage -->
+			<img class="pk-dex-party-slot-img" data-bind="attr: { src: species.portraitImage, alt: species.name }" />
+			<!-- /ko -->
+			<!-- ko ifnot: species.portraitImage -->
+			<span class="pk-dex-party-slot-label" data-bind="text: species.name.substring(0, 3).toUpperCase()"></span>
+			<!-- /ko -->
+			<div class="pk-dex-party-hp-track">
+				<div class="pk-dex-party-hp-fill"
+					 data-bind="style: { width: hpPercent() + '%' },
+					 css: { 'pk-hp-green' : hpPercent() > 50, 'pk-hp-yellow': hpPercent() <= 50 && hpPercent() > 20, 'pk-hp-red': hpPercent() <= 20 }">
+				</div>
+			</div>
+		</div>
+		<!-- /ko -->
+		<!-- /ko -->
+
+		<!-- ko foreach: emptyPartySlots -->
+		<div class="pk-dex-party-slot empty"></div>
+		<!-- /ko -->
+
+		<span class="pk-dex-party-count ms-1" data-bind="text: selectedParty().length + '/3'"></span>
+		<span class="pk-dex-party-hint">
+			<!-- ko if: isInActiveBattle() -->
+			Party locked during battle.
+			<!-- /ko -->
+			<!-- ko ifnot: isInActiveBattle() -->
+			Click a caught Portalmon to manage your party.
+			<!-- /ko -->
+		</span>
+	</div>
+
+	<div class="d-flex gap-3 align-items-start">
+
+		<div class="flex-grow-1 overflow-hidden">
+			<div class="pk-dex-panel">
+				<div class="d-flex justify-content-between align-items-center mb-3">
+					<div>
+						<h5 class="mb-0 pk-dex-title">Portalmon Dex</h5>
+						<div class="pk-dex-subtitle">Browse containment notes, move telemetry, and anomaly chains.</div>
+					</div>
+					<div class="d-flex align-items-center gap-2">
+						<button type="button"
+								class="btn pk-dex-random-btn"
+								data-bind="click: selectRandomDiscovered,
+								           enable: allCreatures().some(function(e){ return e.isDiscovered(); })">
+							Surprise Me
+						</button>
+						<div class="pk-dex-counter">
+							<span data-bind="text: allCreatures().filter(function(e){ return e.isCaught(); }).length"></span>/<span data-bind="text: allCreatures().length"></span>
+							<span class="pk-dex-counter-label">caught</span>
+						</div>
+					</div>
+				</div>
+
+				<div class="pk-dex-grid-scroll">
+					<div class="pk-dex-grid" data-bind="foreach: sortedCreatures">
+						<button type="button"
+								class="pk-dex-card"
+								data-bind="
+									click: function() { dm.selectCreature($data); },
+									css: {
+										'pk-dex-card--party':        isInParty(),
+										'pk-dex-card--undiscovered': !isDiscovered()
+									},
+									enable: isDiscovered(),
+									attr: { title: displayName() }">
+
+							<span class="pk-dex-card-party-badge" data-bind="visible: isInParty()">&#9733;</span>
+
+							<div class="pk-dex-card-portrait">
+								<!-- ko if: isCaught() && species.portraitImage -->
+								<img class="pk-dex-card-img" data-bind="attr: { src: species.portraitImage, alt: species.name }" />
+								<!-- /ko -->
+								<!-- ko if: isCaught() && !species.portraitImage -->
+								<span class="pk-dex-card-fallback" data-bind="text: species.name.substring(0, 2).toUpperCase()"></span>
+								<!-- /ko -->
+								<!-- ko if: isSeen() && !isCaught() -->
+								<span class="pk-dex-card-silhouette">?</span>
+								<!-- /ko -->
+								<!-- ko if: !isDiscovered() -->
+								<span class="pk-dex-card-unknown">?</span>
+								<!-- /ko -->
+							</div>
+
+							<div class="pk-dex-card-name" data-bind="text: displayName()"></div>
+
+							<!-- ko if: isCaught() -->
+							<div class="pk-hp-track mt-1" style="height: 4px; width: 100%;">
+								<div class="pk-hp-fill"
+									 data-bind="style: { width: hpPercent() + '%' },
+									 css: { 'pk-hp-green' : hpPercent() > 50, 'pk-hp-yellow': hpPercent() <= 50 && hpPercent() > 20, 'pk-hp-red': hpPercent() <= 20 }">
+								</div>
+							</div>
+							<!-- /ko -->
+
+							<div class="pk-dex-card-status">
+								<!-- ko if: isCaught() -->
+								<span class="pk-dex-status-caught">&#x2713; <span data-bind="text: caughtCount"></span></span>
+								<!-- /ko -->
+								<!-- ko if: isSeen() && !isCaught() -->
+								<span class="pk-dex-status-seen">Seen</span>
+								<!-- /ko -->
+								<!-- ko if: !isDiscovered() -->
+								<span class="pk-dex-status-unknown">???</span>
+								<!-- /ko -->
+							</div>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="pk-dex-detail-col">
+			<div class="pk-dex-panel">
+
+				<div data-bind="visible: !selectedCreature()">
+					<div class="pk-dex-empty-state">
+						<div class="pk-dex-empty-icon">&#x2753;</div>
+						<div class="pk-dex-empty-text">Select a Portalmon<br>to view details</div>
+					</div>
+				</div>
+
+				<div class="pk-dex-detail-scroll" data-bind="with: selectedCreature, visible: selectedCreature()">
+
+					<div class="d-flex justify-content-between align-items-start mb-2">
+						<div>
+							<div class="pk-dex-detail-name" data-bind="text: species.name"></div>
+							<div class="d-flex align-items-center gap-2 flex-wrap">
+								<span class="pk-type-badge badge" data-bind="text: species.type"></span>
+								<div class="pk-dex-tag-row" data-bind="foreach: detailTags, visible: detailTags().length">
+									<span class="pk-dex-detail-tag" data-bind="text: $data"></span>
+								</div>
+							</div>
+						</div>
+						<button type="button" class="btn-close"
+								data-bind="click: function() { dm.clearSelection(); }"></button>
+					</div>
+
+					<div class="pk-dex-detail-portrait mb-2">
+						<!-- ko if: isCaught() && detailSpriteSrc() -->
+						<img class="pk-dex-detail-img" data-bind="attr: { src: detailSpriteSrc(), alt: species.name }" />
+						<!-- /ko -->
+						<!-- ko if: isCaught() && !detailSpriteSrc() -->
+						<span class="pk-dex-detail-portrait-fallback" data-bind="text: species.name.substring(0, 2).toUpperCase()"></span>
+						<!-- /ko -->
+						<!-- ko if: isSeen() && !isCaught() -->
+						<div class="text-center">
+							<div class="pk-dex-detail-silhouette">?</div>
+							<div class="pk-dex-seen-hint mt-1">Observed in the field. Capture required to unlock the full record.</div>
+						</div>
+						<!-- /ko -->
+					</div>
+
+					<div class="pk-dex-sprite-toggle-row mb-3" data-bind="visible: isCaught() && hasBackSprite()">
+						<button type="button"
+								class="btn pk-dex-sprite-toggle"
+								data-bind="click: dm.showFrontSprite, css: { 'pk-dex-sprite-toggle--active': dm.detailSpriteMode() === 'front' }">
+							Front
+						</button>
+						<button type="button"
+								class="btn pk-dex-sprite-toggle"
+								data-bind="click: dm.showRearSprite, css: { 'pk-dex-sprite-toggle--active': dm.detailSpriteMode() === 'rear' }">
+							Rear
+						</button>
+					</div>
+
+					<div data-bind="visible: isCaught()">
+						<div class="pk-dex-inline-warning mb-2"
+							 data-bind="visible: dm.partyFullWarning()">
+							Containment Deck is full. Remove an active Portalmon first.
+						</div>
+
+						<div class="pk-dex-inline-warning pk-dex-inline-warning--info mb-2"
+							 data-bind="visible: dm.isInActiveBattle()">
+							Can't change party during a battle.
+						</div>
+
+						<div class="d-grid">
+							<button type="button"
+									class="btn pk-dex-party-btn"
+									data-bind="
+										css: { 'pk-dex-party-btn--remove': isInParty(), 'pk-dex-party-btn--add': !isInParty() },
+										click: function() { dm.toggleParty($data); },
+										disable: dm.isInActiveBattle()">
+								<span data-bind="visible: !isInParty()">&#43; Add to Party</span>
+								<span data-bind="visible: isInParty()">&#x2212; Remove from Party</span>
+							</button>
+						</div>
+					</div>
+
+					<div class="pk-dex-section-card pk-dex-flavor-card mb-3"
+						 data-bind="visible: isCaught() && !!species.creatureDescription">
+						<div class="pk-dex-section-label">Containment Notes</div>
+						<div class="pk-dex-flavor" data-bind="text: species.creatureDescription"></div>
+					</div>
+
+					<div class="pk-dex-info-row mb-3">
+						<div class="pk-dex-info-cell">
+							<div class="pk-dex-info-label">Caught</div>
+							<div class="pk-dex-info-value" data-bind="text: caughtCount"></div>
+						</div>
+						<!-- ko if: isCaught() -->
+						<div class="pk-dex-info-cell">
+							<div class="pk-dex-info-label">HP</div>
+							<div class="pk-dex-info-value"
+								 data-bind="text: currentHp() + '/' + species.base.hp,
+								            css: { 'text-danger' : hpPercent() <= 20, 'text-warning': hpPercent() <= 50 && hpPercent() > 20 }">
+							</div>
+						</div>
+						<div class="pk-dex-info-cell">
+							<div class="pk-dex-info-label">Party</div>
+							<div class="pk-dex-info-value"
+								 data-bind="text: partyStatusLabel(),
+								            css: { 'text-success': isInParty() }">
+							</div>
+						</div>
+						<!-- /ko -->
+					</div>
+
+					<!-- ko if: isCaught() -->
+					<div class="d-flex align-items-center gap-2 mb-3">
+						<span class="pk-hp-label">HP</span>
+						<div class="pk-hp-track">
+							<div class="pk-hp-fill"
+								 data-bind="style: { width: hpPercent() + '%' },
+								 css: { 'pk-hp-green' : hpPercent() > 50, 'pk-hp-yellow': hpPercent() <= 50 && hpPercent() > 20, 'pk-hp-red': hpPercent() <= 20 }">
+							</div>
+						</div>
+					</div>
+					<!-- /ko -->
+
+					<div class="mb-3" data-bind="visible: isCaught()">
+						<div class="pk-dex-section-label">Base Stats</div>
+						<div class="pk-dex-stats-row">
+							<div class="pk-dex-stat">
+								<div class="pk-dex-stat-label">HP</div>
+								<div class="pk-dex-stat-value" data-bind="text: species.base.hp"></div>
+							</div>
+							<div class="pk-dex-stat">
+								<div class="pk-dex-stat-label">ATK</div>
+								<div class="pk-dex-stat-value" data-bind="text: species.base.atk"></div>
+							</div>
+							<div class="pk-dex-stat">
+								<div class="pk-dex-stat-label">DEF</div>
+								<div class="pk-dex-stat-value" data-bind="text: species.base.def"></div>
+							</div>
+							<div class="pk-dex-stat">
+								<div class="pk-dex-stat-label">SPD</div>
+								<div class="pk-dex-stat-value" data-bind="text: species.base.spd"></div>
+							</div>
+						</div>
+					</div>
+
+					<div class="pk-dex-seen-hint mb-3" data-bind="visible: isSeen() && !isCaught()">
+						Telemetry redacted. Capture this Portalmon to reveal combat stats, move data, and ultimate protocols.
+					</div>
+
+					<div class="pk-dex-section-card mb-3" data-bind="visible: isCaught() && !!evolutionChainText()">
+						<div class="pk-dex-section-label">Unlock Path</div>
+						<div class="pk-dex-evo-chain" data-bind="text: evolutionChainText"></div>
+						<div class="pk-dex-evo-progress" data-bind="visible: !!evolutionProgressText(), text: evolutionProgressText"></div>
+						<div class="pk-dex-evo-progress" data-bind="visible: !evolutionProgressText() && !!evolvesFromSpecies">
+							No further unlock activity recorded.
+						</div>
+					</div>
+
+					<div class="pk-dex-section-card pk-dex-ult-card mb-3" data-bind="visible: isCaught() && !!resolvedUltimate">
+						<div class="pk-dex-section-label">Ultimate Protocol</div>
+						<div class="pk-dex-ult-name" data-bind="text: resolvedUltimate ? resolvedUltimate.name : ''"></div>
+						<div class="pk-dex-ult-meta">
+							<span data-bind="text: resolvedUltimate ? resolvedUltimate.type : ''"></span>
+							&bull;
+							<span data-bind="text: resolvedUltimate ? resolvedUltimate.chargeCost + ' charge' : ''"></span>
+							<!-- ko if: species.chargeArchetype -->
+							&bull;
+							<span data-bind="text: species.chargeArchetype"></span>
+							<!-- /ko -->
+						</div>
+						<div class="pk-dex-ult-charge-copy" data-bind="text: dm.getChargeArchetypeSummary(species.chargeArchetype)"></div>
+						<div class="pk-dex-ult-flavor" data-bind="text: resolvedUltimate ? resolvedUltimate.flavorText : ''"></div>
+					</div>
+
+					<div class="mb-3" data-bind="visible: isCaught()">
+						<div class="pk-dex-section-label">Move Set</div>
+						<div class="d-flex flex-column gap-1" data-bind="foreach: resolvedMoves">
+							<div class="pk-dex-move-row"
+								 data-bind="bsTooltip: { title: dm.getMoveTooltip($data), placement: 'left' }">
+								<div class="pk-dex-move-name" data-bind="text: $data.name"></div>
+								<div class="pk-dex-move-meta">
+									<span data-bind="text: $data.type"></span>
+									&bull;
+									<span data-bind="text: $data.power ? $data.power + 'pw' : '---'"></span>
+									&bull;
+									<span data-bind="text: $data.hitChance + '% acc'"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>
+
+						</div>
+					</div>
+					<!-- /ko -->
+					<!-- GYM overlay -->
+					<!-- ko if: activeOverlay() === 'gym' -->
+					<div class="gba-overlay">
+						<div class="gba-overlay-header">
+							<span class="gba-overlay-title">Trainer Battles</span>
+							<button type="button" class="gba-overlay-close" data-bind="click: closeOverlay">&times;</button>
+						</div>
+						<div class="gba-overlay-body">
+							<div class="pk-battles px-3 pb-3" data-bind="with: gymBattleManager">
+
+	<!-- BADGE DETAIL MODAL -->
+	<!-- ko if: badgeModalVisible() -->
+	<div class="pk-badge-modal-overlay" data-bind="click: closeBadgeModal">
+		<div class="pk-badge-modal" data-bind="click: function(){}, clickBubble: false">
+			<img class="pk-badge-modal-img" data-bind="attr: { src: badgeModalImage() }" />
+			<div class="pk-badge-modal-title" data-bind="text: badgeModalTitle"></div>
+			<div class="pk-badge-modal-desc" data-bind="text: badgeModalDesc"></div>
+		</div>
+	</div>
+	<!-- /ko -->
+
+	<!-- SECTION 1: GYM LEADERS  -->
+	<div class="section-label">Gym Leaders</div>
+	<div class="row g-2 mb-3">
+		<!-- ko foreach: gymLeaders -->
+		<div class="col-4"
+			 data-bind="css: { 'pk-town-gym-focus': $parent.focusedGymSlot() === $index() }">
+			<div class="gym-card h-100" data-bind="css: { 'defeated': isDefeated() }">
+
+				<span class="gym-status-badge"
+					  data-bind="css:  { 'badge-defeated': isDefeated(), 'badge-available': !isDefeated() },
+								 text: isDefeated() ? '\u2713 Defeated' : 'Available'"></span>
+
+				<div class="pk-portrait-badge-wrap">
+					<div class="trainer-portrait">
+						<!-- ko if: portraitImage -->
+						<img class="trainer-portrait-img"
+							 data-bind="attr: { src: portraitImage, alt: name }" />
+						<!-- /ko -->
+						<!-- ko ifnot: portraitImage -->
+						<span data-bind="text: portraitEmoji"></span>
+						<!-- /ko -->
+					</div>
+					<!-- Inline badge -->
+					<!-- ko if: badgeImage -->
+					<button type="button"
+							class="pk-card-badge pk-card-badge--medallion"
+							data-bind="css: { 'pk-badge-earned': isDefeated() },
+							           enable: isDefeated(),
+							           click: function() { $parent.showBadge($data); }">
+						<img class="pk-card-badge-img" data-bind="attr: { src: badgeImage, alt: (specialty || 'Gym') + ' badge' }" />
+					</button>
+					<!-- /ko -->
+				</div>
+
+				<div class="trainer-name fw-bold small text-center mb-1"
+					 data-bind="text: name"></div>
+
+				<div class="trainer-philosophy small text-center mb-2"
+					 data-bind="text: philosophy || specialty"
+					 style="font-size: 0.55rem; color: #8899aa; font-style: italic; line-height: 1.3; max-height: 2.6em; overflow: hidden;"></div>
+
+			</div>
+		</div>
+		<!-- /ko -->
+	</div>
+
+	<!-- SECTION 2: CHAMPIONSHIP  -->
+	<hr class="pk-divider">
+	<div class="section-label">Championship</div>
+	<div class="championship-card mb-3"
+		 data-bind="css: {
+			 'locked':    !isChampionshipUnlocked(),
+			 'unlocked':  isChampionshipUnlocked() && !isChampionshipDefeated(),
+			 'defeated':  isChampionshipDefeated()
+		 }">
+		<div class="champ-inner d-flex align-items-center gap-3">
+			<div class="pk-portrait-badge-wrap pk-portrait-badge-wrap--champ">
+				<div class="champ-portrait">
+					<!-- ko if: championPortraitImage -->
+					<img class="trainer-portrait-img"
+						 data-bind="attr: { src: championPortraitImage }" />
+					<!-- /ko -->
+					<!-- ko ifnot: championPortraitImage -->
+					<span>&#x1F3C6;</span>
+					<!-- /ko -->
+				</div>
+				<!-- Inline badge -->
+				<!-- ko if: championBadgeImage -->
+				<button type="button"
+						class="pk-card-badge pk-card-badge--medallion pk-card-badge--champ"
+						data-bind="css: { 'pk-badge-earned': isChampionshipDefeated() },
+						           enable: isChampionshipDefeated(),
+						           click: function() { $data.showBadgeFor('rey'); }">
+					<img class="pk-card-badge-img" data-bind="attr: { src: championBadgeImage, alt: 'Champion badge' }" />
+				</button>
+				<!-- /ko -->
+			</div>
+
+			<div class="champ-info flex-grow-1">
+				<div class="champ-name fw-bold" data-bind="text: championName"></div>
+				<div class="champ-subtitle small" style="font-size: 0.55rem; color: #8899aa; font-style: italic;"
+					 data-bind="text: championPhilosophy || 'Master of all types'"></div>
+
+				<div class="lock-notice small mt-1"
+					 data-bind="visible: !isChampionshipUnlocked()">
+					&#x1F512; Defeat all 3 Gym Leaders to unlock
+				</div>
+
+				<div class="progress-pips d-flex gap-1 mt-1"
+					 data-bind="visible: !isChampionshipUnlocked()">
+					<!-- ko foreach: gymLeaders -->
+					<div class="progress-pip"
+						 data-bind="css: { 'filled': isDefeated() }"></div>
+					<!-- /ko -->
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<!-- SECTION 3: SECRET BOSS (GLaDOS cake trap) -->
+	<hr class="pk-divider">
+	<!-- ko ifnot: isSecretUnlocked() -->
+	<div class="section-label">???</div>
+	<div class="secret-card mb-2 hidden-state">
+		<div class="secret-inner d-flex align-items-center gap-3">
+			<div class="secret-portrait"><span>&#x1F441;&#xFE0F;</span></div>
+			<div class="secret-info flex-grow-1">
+				<div class="secret-name fw-bold">???</div>
+			</div>
+		</div>
+		<div class="secret-lock-label">
+			<div class="secret-lock-icon">🔒</div>
+			<div class="secret-lock-text">???</div>
+		</div>
+	</div>
+	<div class="text-center small mt-1" style="color: var(--bs-secondary-color); font-size: 0.7rem;">
+		Defeat the Champion to reveal a secret challenger
+	</div>
+	<!-- /ko -->
+
+	<!-- ko if: isSecretUnlocked() && !isSecretDefeated() -->
+	<div class="section-label" style="color: #ff99cc;">Congratulations!</div>
+	<div class="secret-card mb-2 revealed pk-cake-card">
+		<div class="secret-inner d-flex align-items-center gap-3">
+			<div class="secret-portrait pk-cake-portrait">
+				<span>&#x1F382;</span>
+			</div>
+			<div class="secret-info flex-grow-1">
+				<div class="secret-name fw-bold" style="color: #ff99cc;">Accept your trophy...</div>
+				<div class="secret-subtitle small" style="color: #cc77aa;">
+					You've earned it. There will be cake.
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- /ko -->
+	<!-- ko if: isSecretDefeated() -->
+	<div class="section-label">GLaDOS</div>
+	<div class="secret-card mb-2 revealed defeated">
+		<div class="secret-inner d-flex align-items-center gap-3">
+			<div class="pk-portrait-badge-wrap pk-portrait-badge-wrap--secret">
+				<div class="secret-portrait">
+					<!-- ko if: secretPortraitImage -->
+					<img class="trainer-portrait-img"
+						 data-bind="attr: { src: secretPortraitImage, alt: 'GLaDOS' }" />
+					<!-- /ko -->
+					<!-- ko ifnot: secretPortraitImage -->
+					<span>&#x1F916;</span>
+					<!-- /ko -->
+				</div>
+				<!-- Inline badge -->
+				<!-- ko if: secretBadgeImage -->
+				<button type="button"
+						class="pk-card-badge pk-card-badge--medallion pk-card-badge--secret pk-badge-earned"
+						data-bind="click: function() { $data.showBadgeFor('glados'); }">
+					<img class="pk-card-badge-img" data-bind="attr: { src: secretBadgeImage, alt: 'Portal badge' }" />
+				</button>
+				<!-- /ko -->
+			</div>
+			<div class="secret-info flex-grow-1">
+				<div class="secret-name fw-bold">GLaDOS</div>
+				<div class="secret-subtitle small" style="color: #8899aa; font-style: italic;">
+					&#x2713; The cake was real this time.
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- /ko -->
+
+	<!-- Shown while a battle is in progress -->
+	<div class="text-center small mt-2 fst-italic"
+		 style="color: #e94560; font-size: 0.7rem;"
+		 data-bind="visible: $root.combatManager.isInActiveBattle()">
+		&#x2694;&#xFE0F; Finish your current battle before challenging a trainer.
+	</div>
+
+</div>
+
+						</div>
+					</div>
+					<!-- /ko -->
+					<!-- INFO overlay -->
+					<!-- ko if: activeOverlay() === 'info' -->
+					<div class="gba-overlay">
+						<div class="gba-overlay-header">
+							<span class="gba-overlay-title">Game Rules</span>
+							<button type="button" class="gba-overlay-close" data-bind="click: closeOverlay">&times;</button>
+						</div>
+						<div class="gba-overlay-body">
+							<div class="px-3 pb-3">
+
+	<h5 class="text-body fw-bold mb-3">Game Mechanics</h5>
+
+	<!-- Battle Flow -->
+	<h6 class="text-body-secondary text-uppercase small fw-bold">Battle Flow</h6>
+	<p class="small text-body mb-1">
+		Each encounter gives you four options: <strong>Fight</strong> (use a move), <strong>Contain</strong> (attempt to catch),
+		<strong>Party</strong> (swap active creature), or <strong>Run</strong> (flee the battle).
+	</p>
+	<p class="small text-body mb-1">
+		<strong>Turn order</strong> is determined by speed (SPD). The faster creature acts first each turn.
+	</p>
+	<p class="small text-body mb-3">
+		<strong>Damage formula:</strong> <code>(Move Power + ATK) - DEF + variance</code> &times; type multiplier.
+	</p>
+
+	<!-- Type Effectiveness -->
+	<h6 class="text-body-secondary text-uppercase small fw-bold">Type Effectiveness</h6>
+	<p class="small text-body mb-1">
+		Every move and creature has a type. When a move's type is strong against the defender's type, it deals <strong>2&times;</strong> damage.
+		When weak, it deals <strong>&frac12;&times;</strong> damage. Same-type or neutral matchups deal normal damage.
+	</p>
+	<table class="table table-sm table-bordered small text-body mb-1" style="max-width: 380px;">
+		<thead>
+			<tr class="text-body-secondary">
+				<th>Move Type</th>
+				<th>Strong vs (2&times;)</th>
+				<th>Weak vs (&frac12;&times;)</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr><td>Availability</td><td>Performance</td><td>Security</td></tr>
+			<tr><td>Manageable</td><td>Security</td><td>Performance</td></tr>
+			<tr><td>Performance</td><td>Manageable</td><td>Availability</td></tr>
+			<tr><td>Security</td><td>Availability</td><td>Manageable</td></tr>
+		</tbody>
+	</table>
+	<p class="small text-body mb-3">
+		The cycle: <strong>Availability</strong> &rarr; <strong>Performance</strong> &rarr; <strong>Manageable</strong> &rarr; <strong>Security</strong> &rarr; Availability
+	</p>
+
+	<!-- Move Cooldown -->
+	<h6 class="text-body-secondary text-uppercase small fw-bold">Move Cooldown</h6>
+	<p class="small text-body mb-1">
+		You <strong>cannot use the same move twice in a row</strong>. After using a move, it will appear
+		<span style="text-decoration: line-through; opacity: 0.5;">greyed out</span> and disabled on your next turn.
+	</p>
+	<p class="small text-body mb-3">
+		The cooldown <strong>resets</strong> when you swap creatures or start a new battle. Enemies follow the same rule.
+	</p>
+
+	<!-- Containment (Catching) -->
+	<h6 class="text-body-secondary text-uppercase small fw-bold">Containment (Catching)</h6>
+	<p class="small text-body mb-1">
+		Lower enemy HP increases the chance of a successful containment.
+	</p>
+	<p class="small text-body mb-3">
+		A successfully contained creature is <strong>fully healed</strong> on capture.
+	</p>
+
+	<!-- Healing Rewards -->
+	<h6 class="text-body-secondary text-uppercase small fw-bold">Healing Rewards</h6>
+	<p class="small text-body mb-1">
+		HP <strong>persists</strong> between battles &mdash; your party does not automatically heal after combat.
+	</p>
+	<ul class="small text-body mb-3">
+		<li><strong>Wild Victory:</strong> All party members recover <strong>50%</strong> of their max HP (including fainted creatures), benched creatures heal 10%.</li>
+		<li><strong>Containment:</strong> The caught creature is fully healed, benched creatures heal 10%.</li>
+		<li><strong>Gym Victory:</strong> All party members are <strong>fully healed</strong>.</li>
+		<li><strong>Run / Defeat:</strong> No healing is applied.</li>
+	</ul>
+
+	<!-- Status Effects -->
+	<h6 class="text-body-secondary text-uppercase small fw-bold">Status Effects</h6>
+	<table class="table table-sm table-bordered small text-body mb-3">
+		<thead>
+			<tr class="text-body-secondary">
+				<th>Effect</th>
+				<th>Type</th>
+				<th>Description</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr><td>Contaminated</td><td>Negative</td><td>System compromised. Takes damage each turn.</td></tr>
+			<tr><td>Throttled</td><td>Negative</td><td>All systems rate-limited. Reduced ATK, DEF, and SPD.</td></tr>
+			<tr><td>Disrupted</td><td>Negative</td><td>System disrupted. Next move accuracy severely reduced.</td></tr>
+			<tr><td>Optimized</td><td>Positive</td><td>Operating at peak efficiency. Boosted ATK, DEF, and SPD.</td></tr>
+			<tr><td>SelfHealing</td><td>Positive</td><td>Auto-repair enabled. Heals HP each turn.</td></tr>
+			<tr><td>LockOn</td><td>Positive</td><td>Target acquired. Guaranteed accuracy and boosted damage.</td></tr>
+			<tr><td>Cascading</td><td>Positive</td><td>Cascading effect active. Next move hits significantly harder.</td></tr>
+		</tbody>
+	</table>
+
+	<!-- Party Management -->
+	<h6 class="text-body-secondary text-uppercase small fw-bold">Party Management</h6>
+	<p class="small text-body mb-1">
+		Your active party holds up to <strong>3 creatures</strong>. You can manage your roster from the <strong>DEX</strong> screen.
+	</p>
+	<p class="small text-body mb-1">
+		Swapping during battle <strong>costs your turn</strong> &mdash; the enemy will attack after the swap.
+	</p>
+	<p class="small text-body mb-3">
+		If your active creature faints, the next available party member is <strong>auto-deployed</strong>. If all three faint, the battle is lost.
+	</p>
+
+	<!-- Unlock Paths (Evolution) -->
+	<h6 class="text-body-secondary text-uppercase small fw-bold">Unlock Paths (Evolutions)</h6>
+	<p class="small text-body mb-1">
+		Some Portalmon have stronger follow-up forms that are <strong>unlocked through battle activity</strong>. This is an unlock system,
+		not a live battle evolution.
+	</p>
+	<p class="small text-body mb-1">
+		When a form is unlocked, it is <strong>added to the encounter pool</strong>. It does not replace the creature you already caught.
+	</p>
+	<p class="small text-body mb-3">
+		The <strong>DEX</strong> tracks progress toward these unlocks for eligible Portalmon so you can see how close the next form is.
+	</p>
+
+	<!-- Battery Power -->
+	<h6 class="text-body-secondary text-uppercase small fw-bold">On the Topic of Battery Power</h6>
+	<p class="small text-body mb-1">
+		Your Portalmon device runs on a <strong>rechargeable battery</strong>. Each wild encounter drains a segment of power.
+		When the battery is depleted, you'll need to wait for it to recharge before continuing.
+	</p>
+	<p class="small text-body mb-1">
+		The battery recharges <strong>automatically over time</strong> &mdash; one segment every few minutes. You don't need to
+		keep the page open; any recharge that accrued while you were away will be applied when you return.
+	</p>
+	<p class="small text-body mb-1">
+		<strong>After-hours perk:</strong> Outside of standard work hours, the battery doesn't drain at all.
+		GLaDOS has been known to mutter something about "unsanctioned overtime" but hasn't found the config to block it.
+	</p>
+	<p class="small text-body mb-0">
+		<em>The Enrichment Center reminds you that the battery mechanic exists for your own protection.
+		And for the protection of the network. Mostly the network.</em>
+	</p>
+
+</div>
+
+						</div>
+					</div>
+					<!-- /ko -->
+					<!-- SIM overlay (admin / battle simulator) -->
+					<!-- ko if: isSimUnlocked() && activeOverlay() === 'sim' -->
+					<div class="gba-overlay">
+						<div class="gba-overlay-header">
+							<span class="gba-overlay-title">Battle Simulator</span>
+							<button type="button" class="gba-overlay-close" data-bind="click: closeOverlay">&times;</button>
+						</div>
+						<div class="gba-overlay-body">
+							<div data-bind="with: simManager, as: 'sm'" class="pk-sim">
+
+	<!-- ===== SPRITE VIEWER ===== -->
+	<div class="pk-sim-section">
+		<div class="pk-sim-section-title">Sprite Viewer</div>
+
+		<!-- Creature chip bar -->
+		<div class="pk-sim-creature-bar">
+			<!-- ko foreach: allCreatures -->
+			<button type="button" class="pk-sim-chip"
+					data-bind="text: name,
+					           css: { 'pk-sim-chip--active': sm.previewCreature() && sm.previewCreature().id === id },
+					           click: function() { sm.setPreview($data); }">
+			</button>
+			<!-- /ko -->
+		</div>
+
+		<!-- Preview panes (only when a creature is selected) -->
+		<!-- ko if: previewCreature() -->
+		<div class="pk-sim-preview-row">
+			<!-- DEX VIEW -->
+			<div class="pk-sim-preview-pane">
+				<div class="pk-sim-preview-label">Dex View</div>
+				<div class="pk-sim-preview-frame">
+					<!-- ko if: previewCreature().portraitImage -->
+					<img class="pk-sim-sprite-img"
+						 data-bind="attr: { src: previewCreature().portraitImage, alt: previewCreature().name }" />
+					<!-- /ko -->
+					<!-- ko ifnot: previewCreature().portraitImage -->
+					<div class="pk-sim-no-sprite">No sprite</div>
+					<!-- /ko -->
+				</div>
+			</div>
+
+			<!-- PLAYER SIDE (behind) -->
+			<div class="pk-sim-preview-pane">
+				<div class="pk-sim-preview-label">Player Side</div>
+				<div class="pk-sim-preview-frame pk-sim-preview-frame--battle">
+					<!-- ko if: previewCreature().behindImage -->
+					<img class="pk-sim-sprite-img"
+						 data-bind="attr: { src: previewCreature().behindImage, alt: previewCreature().name },
+						            css: { 'pk-sprite-flipped': previewCreature().flipPlayer }" />
+					<!-- /ko -->
+					<!-- ko if: !previewCreature().behindImage && previewCreature().portraitImage -->
+					<img class="pk-sim-sprite-img"
+						 data-bind="attr: { src: previewCreature().portraitImage, alt: previewCreature().name },
+						            css: { 'pk-sprite-flipped': previewCreature().flipPlayer }" />
+					<!-- /ko -->
+					<!-- ko if: !previewCreature().behindImage && !previewCreature().portraitImage -->
+					<div class="pk-sim-no-sprite">No sprite</div>
+					<!-- /ko -->
+				</div>
+			</div>
+
+			<!-- ENEMY SIDE (front, flipped) -->
+			<div class="pk-sim-preview-pane">
+				<div class="pk-sim-preview-label">Enemy Side</div>
+				<div class="pk-sim-preview-frame pk-sim-preview-frame--battle">
+					<!-- ko if: previewCreature().portraitImage -->
+					<img class="pk-sim-sprite-img"
+						 data-bind="attr: { src: previewCreature().portraitImage, alt: previewCreature().name },
+						            css: { 'pk-sprite-flipped': previewCreature().flipEnemy }" />
+					<!-- /ko -->
+					<!-- ko ifnot: previewCreature().portraitImage -->
+					<div class="pk-sim-no-sprite">No sprite</div>
+					<!-- /ko -->
+				</div>
+			</div>
+		</div>
+
+		<!-- Stats summary -->
+		<div class="pk-sim-stats-row">
+			<span class="badge pk-type-badge" data-bind="text: previewCreature().type"></span>
+			<span class="pk-sim-stat">HP: <strong data-bind="text: previewCreature().base.hp"></strong></span>
+			<span class="pk-sim-stat">ATK: <strong data-bind="text: previewCreature().base.atk"></strong></span>
+			<span class="pk-sim-stat">DEF: <strong data-bind="text: previewCreature().base.def"></strong></span>
+			<span class="pk-sim-stat">SPD: <strong data-bind="text: previewCreature().base.spd"></strong></span>
+		</div>
+		<!-- ko if: previewCreature().creatureDescription -->
+		<div class="pk-sim-flavor" data-bind="text: previewCreature().creatureDescription"></div>
+		<!-- /ko -->
+		<!-- /ko -->
+	</div>
+
+	<!-- ===== BATTLE SIMULATOR ===== -->
+	<div class="pk-sim-section pk-sim-section--battle">
+		<div class="pk-sim-section-title">Battle Simulator</div>
+
+		<div class="pk-sim-picker-row">
+			<!-- YOUR CREATURE -->
+			<div class="pk-sim-picker">
+				<div class="pk-sim-picker-label">Your Creature</div>
+				<div class="pk-sim-creature-bar pk-sim-creature-bar--small">
+					<!-- ko foreach: allCreatures -->
+					<button type="button" class="pk-sim-chip pk-sim-chip--sm"
+							data-bind="text: name,
+							           css: { 'pk-sim-chip--active': sm.playerPick() && sm.playerPick().id === id },
+							           click: function() { sm.setPlayer($data); }">
+					</button>
+					<!-- /ko -->
+				</div>
+				<!-- ko if: playerPick() -->
+				<div class="pk-sim-pick-summary">
+					<strong data-bind="text: playerPick().name"></strong>
+					<span class="badge pk-type-badge ms-1" data-bind="text: playerPick().type"></span>
+					<div class="pk-sim-pick-stats">
+						<span>HP:<span data-bind="text: playerPick().base.hp"></span></span>
+						<span>ATK:<span data-bind="text: playerPick().base.atk"></span></span>
+						<span>DEF:<span data-bind="text: playerPick().base.def"></span></span>
+						<span>SPD:<span data-bind="text: playerPick().base.spd"></span></span>
+					</div>
+				</div>
+				<!-- /ko -->
+			</div>
+
+			<div class="pk-sim-vs">VS</div>
+
+			<!-- ENEMY CREATURE -->
+			<div class="pk-sim-picker">
+				<div class="pk-sim-picker-label">Enemy Creature</div>
+				<div class="pk-sim-creature-bar pk-sim-creature-bar--small">
+					<!-- ko foreach: allCreatures -->
+					<button type="button" class="pk-sim-chip pk-sim-chip--sm"
+							data-bind="text: name,
+							           css: { 'pk-sim-chip--active': sm.enemyPick() && sm.enemyPick().id === id },
+							           click: function() { sm.setEnemy($data); }">
+					</button>
+					<!-- /ko -->
+				</div>
+				<!-- ko if: enemyPick() -->
+				<div class="pk-sim-pick-summary">
+					<strong data-bind="text: enemyPick().name"></strong>
+					<span class="badge pk-type-badge ms-1" data-bind="text: enemyPick().type"></span>
+					<div class="pk-sim-pick-stats">
+						<span>HP:<span data-bind="text: enemyPick().base.hp"></span></span>
+						<span>ATK:<span data-bind="text: enemyPick().base.atk"></span></span>
+						<span>DEF:<span data-bind="text: enemyPick().base.def"></span></span>
+						<span>SPD:<span data-bind="text: enemyPick().base.spd"></span></span>
+					</div>
+				</div>
+				<!-- /ko -->
+			</div>
+		</div>
+
+		<div class="text-center mt-2">
+			<button type="button" class="pk-menu-btn pk-btn-fight pk-sim-launch-btn"
+					data-bind="enable: canLaunch, click: launchBattle">
+				START SIM
+			</button>
+		</div>
+		<div class="pk-sim-disclaimer">
+			Sim battles do not affect your dex, party, or evolution progress.
+		</div>
+	</div>
+</div>
+
+						</div>
+					</div>
+					<!-- /ko -->
+					<!-- START menu overlay -->
+					<!-- ko if: activeOverlay() === 'start' -->
+					<div class="gba-overlay">
+						<div class="gba-overlay-header">
+							<span class="gba-overlay-title">Settings</span>
+							<button type="button" class="gba-overlay-close" data-bind="click: closeOverlay">&times;</button>
+						</div>
+						<div class="gba-overlay-body">
+							<div class="px-3 pb-3">
+
+	<h5 class="text-body fw-bold mb-3">Trainer Settings</h5>
+
+	<h6 class="text-body-secondary text-uppercase small fw-bold">Designation</h6>
+	<div class="d-flex align-items-center gap-2 mb-2">
+		<input
+			type="text"
+			class="form-control form-control-sm pk-trainer-name-input"
+			maxlength="15"
+			placeholder="Enter your name"
+			data-bind="value: pendingTrainerName, valueUpdate: 'input'" />
+		<button type="button" class="btn btn-sm pk-btn-begin"
+			data-bind="click: saveTrainerName, disable: !pendingTrainerName().trim() || pendingTrainerName().trim() === trainerName()">
+			Save
+		</button>
+	</div>
+	<p class="small text-body-secondary mb-0">
+		Current designation: <strong data-bind="text: trainerName"></strong>
+	</p>
+
+</div>
+
+						</div>
+					</div>
+					<!-- /ko -->
+					<!-- /ko -->
+					<!-- REST WARNING — GLaDOS hard-mode forfeit confirmation -->
+					<!-- ko if: isShowingRestWarning() -->
+					<div class="pk-rest-warning">
+	<div class="pk-victory-scanlines"></div>
+	<div class="pk-welcome-inner">
+
+		<div class="d-flex align-items-center gap-3 mb-3">
+			<div class="pk-glados-portrait" aria-hidden="true">🤖</div>
+			<div>
+				<div class="pk-glados-name">GLaDOS</div>
+				<div class="pk-glados-title">WARNING: Aperture Science Rest Protocol</div>
+			</div>
+		</div>
+
+		<div class="pk-glados-speech" data-bind="typewriter: true">
+			<p>
+				I see you've found the Rest function.
+				How... <em>pragmatic.</em>
+				Most test subjects discover it the moment things become
+				even slightly difficult.
+			</p>
+			<p>
+				I should inform you -- and I want to be very clear
+				about this -- that using this feature will
+				<strong>permanently disqualify you from a Hard Mode victory.</strong>
+				This flag is stored in your test record and
+				<em>cannot be reversed.</em>
+				Not by me. Not by you. Not by anyone.
+			</p>
+			<p>
+				You may, of course, proceed.
+				Plenty of subjects have.
+				We called them <em>quitters,</em> but only in the internal documentation.
+			</p>
+			<p>
+				Or you could close this prompt and
+				push through on your own.
+				I find that <em>deeply</em> unlikely, but science demands I
+				present all possible outcomes.
+			</p>
+		</div>
+
+		<div class="d-flex justify-content-end gap-2 mt-3">
+			<button type="button" class="btn btn-outline-secondary btn-sm"
+					data-bind="click: cancelRest">
+				Cancel
+			</button>
+			<button type="button" class="btn btn-danger btn-sm"
+					data-bind="click: confirmRest">
+				Proceed with Rest
+			</button>
+		</div>
+
+	</div>
+</div>
+
+					<!-- /ko -->
+					<!-- CHAMPIONSHIP VICTORY SCREEN — topmost layer, above all overlays -->
+					<!-- ko if: isShowingVictoryScreen() -->
+					<div class="pk-victory-screen">
+
+	<!-- Scanline texture sits on top of everything like the rest of the screen -->
+	<div class="pk-victory-scanlines"></div>
+
+	<!-- ── HEADER ──────────────────────────────────────────────────── -->
+	<div class="pk-victory-header">
+		<div class="pk-victory-trophy">🏆</div>
+		<div class="pk-victory-eyebrow">CHAMPION DEFEATED</div>
+		<!-- ko if: isHardModeVictory() -->
+		<div class="pk-victory-hard-mode">HARD MODE</div>
+		<!-- /ko -->
+		<div class="pk-victory-trainer" data-bind="text: trainerName"></div>
+		<div class="pk-victory-subtitle">Containment Protocols: All Clear</div>
+	</div>
+
+	<!-- ── PARTY ROSTER ─────────────────────────────────────────────── -->
+	<div class="pk-victory-party" data-bind="foreach: combatManager.playerParty">
+		<div class="pk-victory-card" data-bind="css: { 'pk-victory-card--fainted': isFainted() }">
+
+			<!-- Portrait -->
+			<div class="pk-victory-portrait">
+				<!-- ko if: portraitImage -->
+				<img class="pk-victory-portrait-img"
+					 data-bind="attr: { src: portraitImage, alt: name }" />
+				<!-- /ko -->
+				<!-- ko ifnot: portraitImage -->
+				<span class="pk-victory-portrait-fallback" data-bind="text: name.substring(0,2).toUpperCase()"></span>
+				<!-- /ko -->
+			</div>
+
+			<!-- Name + type -->
+			<div class="pk-victory-card-name" data-bind="text: name"></div>
+			<div class="pk-victory-card-type">
+				<span class="badge pk-type-badge" data-bind="text: type"></span>
+			</div>
+
+			<!-- HP bar -->
+			<div class="pk-victory-hp-wrap">
+				<div class="pk-hp-track pk-victory-hp-track">
+					<div class="pk-hp-fill"
+						 data-bind="style: { width: hpPercent() + '%' },
+						 css: { 'pk-hp-green' : hpPercent()>
+						50, 'pk-hp-yellow': hpPercent() <= 50 && hpPercent() > 20, 'pk-hp-red': hpPercent() <= 20 }">
+					</div>
+				</div>
+				<div class="pk-victory-hp-numbers">
+					<span data-bind="text: hpCurrent"></span>/<span data-bind="text: hpMax"></span>
+				</div>
+			</div>
+
+			<!-- Fainted badge -->
+			<!-- ko if: isFainted() -->
+			<div class="pk-victory-fainted-badge">OFFLINE</div>
+			<!-- /ko -->
+
+		</div>
+	</div>
+
+	<!-- ── FOOTER ───────────────────────────────────────────────────── -->
+	<div class="pk-victory-footer">
+		<div class="pk-victory-glados">
+			Unexpected. And yet here we are.
+			<span class="pk-victory-glados-attr">— GLaDOS</span>
+		</div>
+		<button type="button" class="pk-victory-dismiss"
+				data-bind="click: dismissVictoryScreen">
+			CONTINUE
+		</button>
+	</div>
+
+</div>
+
+					<!-- /ko -->
+					<!-- /ko -->
+					<!-- CREDITS SEQUENCE (after beating GLaDOS) -->
+					<!-- ko if: isShowingCredits() -->
+					<div class="pk-credits-screen">
+	<div class="pk-credits-scanlines"></div>
+
+	<div class="pk-credits-scroll">
+
+		<div class="pk-credits-spacer"></div>
+
+		<div class="pk-credits-block">
+			<div class="pk-credits-title">PORTALMON</div>
+			<div class="pk-credits-subtitle">Gotta Cache 'Em All</div>
+		</div>
+
+		<div class="pk-credits-block">
+			<div class="pk-credits-heading">Gym Leaders</div>
+			<div class="pk-credits-entry">Coach - Availability Leader</div>
+			<div class="pk-credits-entry">Lordis - Security Leader</div>
+			<div class="pk-credits-entry">Gargis - Performance Leader</div>
+		</div>
+
+		<div class="pk-credits-block">
+			<div class="pk-credits-heading">Champion</div>
+			<div class="pk-credits-entry">Rey - The Developer</div>
+		</div>
+
+		<div class="pk-credits-block">
+			<div class="pk-credits-heading">Final Boss</div>
+			<div class="pk-credits-entry">GLaDOS - Genetic Lifeform and Disk Operating System</div>
+			<div class="pk-credits-flavor">"I opened a portal to another universe. And you beat them. With IT infrastructure monsters."</div>
+		</div>
+
+		<div class="pk-credits-block">
+			<div class="pk-credits-heading">Cross-Dimensional Imports</div>
+			<div class="pk-credits-entry">Venusaur, Blastoise, Charizard</div>
+			<div class="pk-credits-flavor">Imported from POKEMON_GEN_1.DB</div>
+			<div class="pk-credits-flavor">Override Code: GLADOS-001</div>
+		</div>
+
+		<div class="pk-credits-block">
+			<div class="pk-credits-heading">Creature Design</div>
+			<div class="pk-credits-entry">Doug, Jake, and Marcus</div>
+		</div>
+		<div class="pk-credits-block">
+			<div class="pk-credits-heading">Editor</div>
+			<div class="pk-credits-entry">Jake</div>
+		</div>
+
+		<div class="pk-credits-block">
+			<div class="pk-credits-heading">Celebrating</div>
+			<div class="pk-credits-entry">30 Years of Pokemon</div>
+			<div class="pk-credits-entry">13 Years of Portal</div>
+
+		</div>
+
+		<div class="pk-credits-block">
+			<div class="pk-credits-heading">Special Thanks</div>
+			<div class="pk-credits-entry">Marcus - for the vision</div>
+			<div class="pk-credits-entry">Jake -  for the incredible polish</div>
+			<div class="pk-credits-entry">Jake -  for the batteries</div>
+		</div>
+
+		<div class="pk-credits-block pk-credits-glados-quote">
+			<div class="pk-credits-flavor">"This was a triumph."</div>
+			<div class="pk-credits-flavor">"Where is the cake?"</div>
+		</div>
+
+		<div class="pk-credits-spacer"></div>
+
+		<!-- The big reveal -->
+		<div class="pk-credits-reveal">
+			<div class="pk-credits-april-fools">APRIL FOOLS</div>
+			<div class="pk-credits-year">2026</div>
+			<div class="pk-credits-year">From the Portal team</div>
+		</div>
+
+		<div class="pk-credits-spacer"></div>
+
+	</div>
+
+	<button type="button" class="pk-credits-skip"
+			data-bind="click: rebootGame">
+		Press START to reboot
+	</button>
+
+</div>
+
+					<!-- /ko -->
+
+				</div>
+			</div>
+
+			<!-- RIGHT: A/B Buttons -->
+			<div style="flex:0 0 88px;display:flex;align-items:center;justify-content:center;">
+				<div class="gba-ab-group">
+					<button type="button" class="gba-btn gba-btn-a"
+							data-bind="click: handlePrimaryAction,
+							           text: 'MENU',
+							           enable: isPoweredOn() && !combatManager.isInActiveBattle() && (isOverworldScreenActive() || !isBatteryDepleted())"></button>
+					<button type="button" class="gba-btn gba-btn-b" data-bind="click: toggleDex, enable: isPoweredOn() && !isBatteryDepleted()">DEX</button>
+					<button type="button" class="gba-btn gba-btn-rest"
+							data-bind="click: restParty, visible: isPoweredOn() && partyNeedsHeal() && !combatManager.isEncounterActive(), enable: !combatManager.isInActiveBattle() && !isBatteryDepleted()">
+						REST
+					</button>
+				</div>
+			</div>
+
+		</div><!-- /flex row -->
+
+
+		<!-- ===== BOTTOM ROUNDED BASE ===== -->
+		<div class="gba-bottom">
+			<div class="gba-shell-switch">
+				<span class="gba-shell-switch-label">CHSH</span>
+				<div class="gba-shell-switch-track" data-bind="attr: { 'data-skin': gameboySkin() }">
+					<div class="gba-shell-switch-thumb"></div>
+					<!-- ko foreach: gameboySkinOptions -->
+					<button type="button"
+							class="gba-shell-switch-detent"
+							data-bind="
+								click: function() { $root.setGameboySkin($data.id); },
+								css: { 'is-active': $data.id === $root.gameboySkin() },
+								attr: {
+									title: $data.label,
+									'aria-label': 'Set shell to ' + $data.label,
+									'aria-pressed': $data.id === $root.gameboySkin() ? 'true' : 'false',
+									'data-skin-option': $data.id
+								}">
+					</button>
+					<!-- /ko -->
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>
+
+
+	</div>
+	<script type="module" src="/src/main.ts"></script>
+</body>
+</html>

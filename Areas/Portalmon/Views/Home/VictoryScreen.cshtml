@@ -1,0 +1,72 @@
+﻿<div class="pk-victory-screen">
+
+	<!-- Scanline texture sits on top of everything like the rest of the screen -->
+	<div class="pk-victory-scanlines"></div>
+
+	<!-- ── HEADER ──────────────────────────────────────────────────── -->
+	<div class="pk-victory-header">
+		<div class="pk-victory-trophy">🏆</div>
+		<div class="pk-victory-eyebrow">CHAMPION DEFEATED</div>
+		<!-- ko if: isHardModeVictory() -->
+		<div class="pk-victory-hard-mode">HARD MODE</div>
+		<!-- /ko -->
+		<div class="pk-victory-trainer" data-bind="text: trainerName"></div>
+		<div class="pk-victory-subtitle">Containment Protocols: All Clear</div>
+	</div>
+
+	<!-- ── PARTY ROSTER ─────────────────────────────────────────────── -->
+	<div class="pk-victory-party" data-bind="foreach: combatManager.playerParty">
+		<div class="pk-victory-card" data-bind="css: { 'pk-victory-card--fainted': isFainted() }">
+
+			<!-- Portrait -->
+			<div class="pk-victory-portrait">
+				<!-- ko if: portraitImage -->
+				<img class="pk-victory-portrait-img"
+					 data-bind="attr: { src: portraitImage, alt: name }" />
+				<!-- /ko -->
+				<!-- ko ifnot: portraitImage -->
+				<span class="pk-victory-portrait-fallback" data-bind="text: name.substring(0,2).toUpperCase()"></span>
+				<!-- /ko -->
+			</div>
+
+			<!-- Name + type -->
+			<div class="pk-victory-card-name" data-bind="text: name"></div>
+			<div class="pk-victory-card-type">
+				<span class="badge pk-type-badge" data-bind="text: type"></span>
+			</div>
+
+			<!-- HP bar -->
+			<div class="pk-victory-hp-wrap">
+				<div class="pk-hp-track pk-victory-hp-track">
+					<div class="pk-hp-fill"
+						 data-bind="style: { width: hpPercent() + '%' },
+						 css: { 'pk-hp-green' : hpPercent()>
+						50, 'pk-hp-yellow': hpPercent() <= 50 && hpPercent() > 20, 'pk-hp-red': hpPercent() <= 20 }">
+					</div>
+				</div>
+				<div class="pk-victory-hp-numbers">
+					<span data-bind="text: hpCurrent"></span>/<span data-bind="text: hpMax"></span>
+				</div>
+			</div>
+
+			<!-- Fainted badge -->
+			<!-- ko if: isFainted() -->
+			<div class="pk-victory-fainted-badge">OFFLINE</div>
+			<!-- /ko -->
+
+		</div>
+	</div>
+
+	<!-- ── FOOTER ───────────────────────────────────────────────────── -->
+	<div class="pk-victory-footer">
+		<div class="pk-victory-glados">
+			Unexpected. And yet here we are.
+			<span class="pk-victory-glados-attr">— GLaDOS</span>
+		</div>
+		<button type="button" class="pk-victory-dismiss"
+				data-bind="click: dismissVictoryScreen">
+			CONTINUE
+		</button>
+	</div>
+
+</div>

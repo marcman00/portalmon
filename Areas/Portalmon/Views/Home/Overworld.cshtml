@@ -1,0 +1,28 @@
+<div class="pk-overworld" data-bind="with: $root.overworldManager">
+	<div class="pk-overworld-stage">
+		<canvas id="pk-overworld-canvas"
+				class="pk-overworld-canvas"
+				data-bind="attr: { width: viewportWidth, height: viewportHeight }"
+				aria-label="Generation 2 tile movement proof of concept"></canvas>
+
+		<div class="pk-overworld-hud" aria-live="polite">
+			<span class="pk-overworld-status" data-bind="text: statusText"></span>
+			<span class="pk-overworld-position"
+				  data-bind="text: currentMapName() + ' · ' + positionLabel()"></span>
+		</div>
+
+		<div class="pk-overworld-help" data-bind="visible: !dialogue.visible()">
+			MOVE: D-PAD / ARROWS / WASD · TALK: A / ENTER / E
+		</div>
+
+		<div class="pk-dialogue-box"
+			 data-bind="visible: dialogue.visible, click: interact"
+			 role="dialog"
+			 aria-live="polite"
+			 aria-label="Conversation">
+			<div class="pk-dialogue-speaker" data-bind="text: dialogue.speaker"></div>
+			<div class="pk-dialogue-text" data-bind="text: dialogue.text"></div>
+			<div class="pk-dialogue-advance" data-bind="text: dialogue.advanceHint"></div>
+		</div>
+	</div>
+</div>

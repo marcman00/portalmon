@@ -1,0 +1,541 @@
+// =========================================
+// ONBOARDING (Welcome + StarterConfirm)
+// =========================================
+.pk-welcome,
+.pk-starter-confirm {
+    padding: 1.25rem 1.5rem 1rem;
+}
+
+.pk-welcome-inner {
+    max-width: 520px;
+    margin: 0 auto;
+}
+
+.pk-glados-portrait {
+    @include pk-circle-portrait(48px, 1.4rem);
+    background: $pk-border;
+    border: 2px solid #1a4a7a;
+    flex-shrink: 0;
+}
+
+.pk-glados-name  { font-weight: 700; font-size: 0.82rem; color: $pk-orange; letter-spacing: 0.06em; }
+.pk-glados-title { font-size: 0.62rem; color: $pk-muted; letter-spacing: 0.03em; }
+
+.pk-glados-speech {
+    background: $s-bg-mid;
+    border: 1px solid $s-border;
+    border-left: 3px solid $pk-orange;
+    border-radius: 0 7px 7px 0;
+    padding: 0.9rem 1.1rem;
+    font-size: 0.84rem;
+    line-height: 1.6;
+    color: $s-text;
+
+    p             { margin-bottom: 0.65rem; }
+    p:last-child  { margin-bottom: 0; }
+    em            { color: $pk-orange; font-style: italic; }
+    strong        { color: $s-text; }
+}
+
+.pk-welcome-footer {
+    margin-top: 0.65rem !important;
+    color: $pk-muted;
+    font-size: 0.8rem;
+}
+
+.pk-btn-begin {
+    background: transparent;
+    border: 2px solid $pk-red;
+    color: $pk-red;
+    font-weight: 700;
+    font-size: 0.82rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.35rem 1.1rem;
+    border-radius: 5px;
+    transition: background-color 150ms, color 150ms;
+    &:hover { background: $pk-red; color: #fff; }
+}
+
+.pk-confirm-portrait {
+    @include pk-circle-portrait(66px, 2rem);
+    background: $s-bg-dark;
+    border: 2px solid $s-border;
+}
+
+.pk-glados-speech.pk-typing {
+    cursor: pointer;
+    &::after {
+        content: '|';
+        color: $pk-orange;
+        animation: pk-cursor-blink 0.7s step-end infinite;
+        font-weight: 300;
+    }
+}
+
+@keyframes pk-cursor-blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0; }
+}
+
+// =========================================
+// STARTER SELECT
+// =========================================
+.pk-starter-select {
+    padding: 1.25rem;
+}
+
+.pk-starter-title {
+    color: $s-text;
+}
+
+.pk-starter-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 0.9rem;
+    background: $s-bg-mid;
+    border: 2px solid $s-border;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 200ms, box-shadow 200ms;
+    &:hover { border-color: $pk-red; box-shadow: 0 0 10px rgba(233,69,96,0.2); }
+}
+
+.pk-starter-portrait {
+    @include pk-circle-portrait(72px, 2.2rem);
+    background: $s-bg-dark;
+    border: 2px solid $s-border;
+    margin-bottom: 0.65rem;
+}
+
+.pk-starter-name  { font-weight: 700; font-size: 0.95rem; color: $s-text; margin-bottom: 0.2rem; }
+.pk-starter-stats { width: 100%; }
+.pk-stat-label    { font-size: 0.58rem; text-transform: uppercase; color: $s-text-muted; }
+.pk-stat-value    { font-size: 0.82rem; font-weight: 700; color: $s-accent; font-family: monospace; }
+.pk-starter-prompt { font-size: 0.72rem; font-weight: 700; color: $pk-red; text-transform: uppercase; letter-spacing: 0.05em; }
+.pk-trainer-name-input { max-width: 180px; }
+.pk-glados-label { white-space: nowrap; }
+
+
+// =========================================
+// DEX TAB
+// =========================================
+.pk-dex-party-bar {
+    background: $s-bg-mid;
+    border: 1px solid $s-border;
+    border-radius: 7px;
+    padding: 0.45rem 0.65rem;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.pk-dex-party-label {
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: $s-text-muted;
+    margin-right: 0.2rem;
+}
+
+.pk-dex-party-count {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: $s-accent;
+    font-family: monospace;
+}
+
+.pk-dex-party-hint {
+    font-size: 0.66rem;
+    color: $s-text-muted;
+    margin-left: auto;
+}
+
+.pk-dex-party-slot {
+    width: 34px;
+    height: 34px;
+    border-radius: 5px;
+    border: 1px solid $s-border;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 150ms;
+
+    &.filled { background: $s-bg-dark; border-color: $pk-green; &:hover { border-color: $s-accent; } }
+    &.empty  { background: transparent; border-style: dashed; cursor: default; }
+}
+
+.pk-dex-party-slot-label { font-size: 0.58rem; font-weight: 700; color: $s-accent; line-height: 1; }
+
+.pk-dex-party-hp-track {
+    width: 26px;
+    height: 3px;
+    background: $s-border;
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.pk-dex-party-hp-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 400ms ease;
+}
+
+.pk-dex-panel {
+    background: $s-bg;
+    border: 1px solid $s-border;
+    border-radius: 7px;
+    padding: 0.85rem;
+}
+
+.pk-dex-title    { font-size: 0.9rem;  font-weight: 700; color: $s-text; }
+.pk-dex-subtitle { font-size: 0.68rem; color: $s-text-muted; }
+
+.pk-dex-counter {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: $s-accent;
+    font-family: monospace;
+    text-align: right;
+}
+
+.pk-dex-counter-label { font-size: 0.62rem; font-weight: 400; color: $s-text-muted; margin-left: 2px; }
+
+.pk-dex-random-btn {
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: $pk-orange;
+    border: 1px solid rgba(240, 160, 48, 0.45);
+    background: rgba(240, 160, 48, 0.08);
+    border-radius: 5px;
+    padding: 0.24rem 0.5rem;
+
+    &:hover:not(:disabled) { background: rgba(240, 160, 48, 0.15); color: #ffc66d; }
+    &:disabled { opacity: 0.35; cursor: default; }
+}
+
+.pk-dex-grid-scroll {
+    max-height: 340px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 2px;
+    @include pk-thin-scrollbar;
+}
+
+.pk-dex-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+}
+
+.pk-dex-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 0.4rem 0.25rem 0.3rem;
+    background: $s-bg-mid;
+    border: 1px solid $s-border;
+    border-radius: 5px;
+    color: $s-text;
+    cursor: pointer;
+    transition: border-color 150ms, box-shadow 150ms;
+
+    &:hover:not(:disabled) { border-color: $s-accent; box-shadow: 0 0 6px rgba(240, 160, 48, 0.15); }
+    &:disabled { cursor: default; opacity: 0.4; }
+    &.pk-dex-card--party { border-color: $pk-green; background: $s-bg-dark; &:hover:not(:disabled) { border-color: #6aee6a; } }
+    &.pk-dex-card--undiscovered { opacity: 0.35; }
+}
+
+.pk-dex-card-party-badge { position: absolute; top: 2px; right: 3px; font-size: 0.52rem; color: $pk-green; line-height: 1; }
+
+.pk-dex-card-portrait {
+    width: 36px;
+    height: 36px;
+    border-radius: 4px;
+    background: $s-bg-dark;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-bottom: 3px;
+}
+
+.pk-dex-card-img        { width: 100%; height: 100%; object-fit: cover; image-rendering: auto; display: block; }
+.pk-dex-party-slot-img  { width: 100%; height: calc(100% - 5px); object-fit: cover; display: block; }
+.pk-dex-detail-img      { max-width: 100%; max-height: 100%; object-fit: contain; image-rendering: auto; display: block; }
+.pk-dex-card-fallback   { font-size: 0.65rem; font-weight: 700; color: $s-accent; }
+.pk-dex-card-silhouette { font-size: 1.2rem; opacity: 0.35; color: $s-text-muted; }
+.pk-dex-card-unknown    { font-size: 0.9rem; color: $s-text-muted; opacity: 0.5; }
+
+.pk-dex-card-name {
+    font-size: 0.6rem;
+    font-weight: 600;
+    text-align: center;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: $s-text;
+    line-height: 1.2;
+    margin-bottom: 2px;
+}
+
+.pk-dex-card-status      { font-size: 0.55rem; margin-top: 2px; }
+.pk-dex-status-caught    { color: $pk-green; }
+.pk-dex-status-seen      { color: $pk-orange; }
+.pk-dex-status-unknown   { color: $s-text-muted; }
+
+.pk-dex-detail-col {
+    flex: 0 0 220px;
+    width: 220px;
+}
+
+.pk-dex-detail-scroll {
+    max-height: 420px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 2px;
+    @include pk-thin-scrollbar;
+}
+
+.pk-dex-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    gap: 0.45rem;
+}
+
+.pk-dex-empty-icon { font-size: 1.8rem; opacity: 0.22; color: $s-text-muted; }
+.pk-dex-empty-text { font-size: 0.74rem; color: $s-text-muted; text-align: center; line-height: 1.5; }
+
+.pk-dex-detail-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: $s-text-em;
+    margin-bottom: 3px;
+}
+
+.pk-dex-tag-row {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+.pk-dex-detail-tag {
+    display: inline-flex;
+    align-items: center;
+    height: 18px;
+    padding: 0 0.35rem;
+    border-radius: 999px;
+    background: rgba(62, 101, 160, 0.2);
+    border: 1px solid rgba(62, 101, 160, 0.35);
+    color: #8bb4ff;
+    font-size: 0.54rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.pk-dex-detail-portrait {
+    width: 100%;
+    height: 104px;
+    background:
+        radial-gradient(circle at top, rgba(86, 151, 255, 0.14), transparent 55%),
+        linear-gradient(180deg, rgba(10, 17, 30, 0.9), rgba(8, 14, 24, 1));
+    border: 1px solid $s-border;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.pk-dex-detail-portrait-fallback { font-size: 2rem; font-weight: 700; color: $s-accent; opacity: 0.5; }
+.pk-dex-detail-silhouette        { font-size: 2.2rem; color: $s-text-muted; opacity: 0.2; }
+
+.pk-dex-sprite-toggle-row {
+    display: flex;
+    justify-content: center;
+    gap: 0.35rem;
+}
+
+.pk-dex-sprite-toggle {
+    min-width: 56px;
+    padding: 0.18rem 0.45rem;
+    border-radius: 999px;
+    border: 1px solid $s-border;
+    background: $s-bg-dark;
+    color: $s-text-muted;
+    font-size: 0.58rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+
+    &.pk-dex-sprite-toggle--active {
+        color: $s-accent;
+        border-color: rgba(240, 160, 48, 0.4);
+        background: rgba(240, 160, 48, 0.08);
+    }
+}
+
+.pk-dex-section-card {
+    background: rgba(12, 20, 33, 0.72);
+    border: 1px solid rgba(72, 98, 140, 0.3);
+    border-radius: 6px;
+    padding: 0.55rem 0.6rem;
+}
+
+.pk-dex-flavor {
+    font-size: 0.72rem;
+    color: #d5deef;
+    line-height: 1.5;
+    font-style: italic;
+}
+
+.pk-dex-flavor-card {
+    background:
+        linear-gradient(180deg, rgba(25, 35, 56, 0.92), rgba(12, 18, 29, 0.92));
+    border-color: rgba(104, 143, 211, 0.35);
+}
+
+.pk-dex-info-row  { display: flex; gap: 0.45rem; }
+
+.pk-dex-info-cell {
+    flex: 1;
+    background: $s-bg-dark;
+    border: 1px solid $s-border;
+    border-radius: 4px;
+    padding: 0.2rem 0.35rem;
+}
+
+.pk-dex-info-label { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.06em; color: $s-text-muted; }
+.pk-dex-info-value { font-size: 0.78rem; font-weight: 700; color: $s-text; font-family: monospace; }
+
+.pk-dex-section-label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: $s-text-muted;
+    margin-bottom: 0.3rem;
+}
+
+.pk-dex-stats-row { display: flex; gap: 0.35rem; }
+
+.pk-dex-stat {
+    flex: 1;
+    background: $s-bg-dark;
+    border: 1px solid $s-border;
+    border-radius: 4px;
+    padding: 0.2rem 0.25rem;
+    text-align: center;
+}
+
+.pk-dex-stat-label { font-size: 0.55rem; text-transform: uppercase; color: $s-text-muted; }
+.pk-dex-stat-value { font-size: 0.8rem; font-weight: 700; color: $s-accent; font-family: monospace; }
+.pk-dex-seen-hint  { font-size: 0.68rem; color: $s-text-muted; font-style: italic; }
+
+.pk-dex-evo-chain {
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: $s-text-em;
+}
+
+.pk-dex-evo-progress {
+    margin-top: 0.25rem;
+    font-size: 0.64rem;
+    color: $s-text-muted;
+    line-height: 1.45;
+}
+
+.pk-dex-ult-card {
+    background:
+        linear-gradient(180deg, rgba(48, 21, 74, 0.9), rgba(17, 12, 28, 0.92));
+    border-color: rgba(164, 94, 255, 0.35);
+}
+
+.pk-dex-ult-name {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #d4a8ff;
+}
+
+.pk-dex-ult-meta {
+    font-size: 0.62rem;
+    color: #b5a4cc;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.pk-dex-ult-charge-copy {
+    margin-top: 0.3rem;
+    font-size: 0.66rem;
+    color: #e2d4f5;
+    line-height: 1.45;
+}
+
+.pk-dex-ult-flavor {
+    margin-top: 0.35rem;
+    font-size: 0.67rem;
+    color: #bfb2d6;
+    font-style: italic;
+    line-height: 1.45;
+}
+
+.pk-dex-move-row {
+    background: $s-bg-dark;
+    border: 1px solid $s-border;
+    border-radius: 4px;
+    padding: 0.28rem 0.45rem;
+    cursor: default;
+}
+
+.pk-dex-move-name { font-size: 0.74rem; font-weight: 600; color: $pk-orange; }
+.pk-dex-move-meta { font-size: 0.6rem; color: $s-text-muted; }
+
+.pk-dex-inline-warning {
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 0.28rem 0.45rem;
+    border-radius: 4px;
+    text-align: center;
+    background: rgba(233,69,96,0.08);
+    border: 1px solid rgba(233,69,96,0.3);
+    color: $pk-red;
+
+    &.pk-dex-inline-warning--info {
+        background: $s-bg-dark;
+        border-color: $s-border;
+        color: $s-text-muted;
+    }
+}
+
+.pk-dex-party-btn {
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border: 2px solid;
+    border-radius: 5px;
+    padding: 0.3rem;
+    background: transparent;
+    transition: background-color 150ms, color 150ms;
+
+    &.pk-dex-party-btn--add    { border-color: $pk-green; color: $pk-green; &:hover:not(:disabled) { background: rgba(72,216,72,0.1);   } }
+    &.pk-dex-party-btn--remove { border-color: $pk-red;   color: $pk-red;   &:hover:not(:disabled) { background: rgba(233,69,96,0.1);  } }
+    &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+

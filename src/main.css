@@ -1,0 +1,16 @@
+/* Local dev shell — not part of the Portalmon excerpt. Fills in the couple
+   of site-wide rules the excerpt assumes exist elsewhere. */
+html, body {
+	margin: 0;
+	min-height: 100%;
+	background: #0a0a12;
+}
+body {
+	padding: 24px 12px;
+}
+.picon {
+	width: 14px;
+	height: 14px;
+	display: inline-block;
+	color: inherit;
+}

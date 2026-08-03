@@ -1,0 +1,129 @@
+// =========================================
+// GENERATION 2 OVERWORLD PROOF OF CONCEPT
+// =========================================
+.pk-battle:has(.pk-overworld) {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+}
+
+.pk-overworld {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    background: #071018;
+}
+
+.pk-overworld-stage {
+    position: relative;
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
+    background: #67b94c;
+    box-shadow: 0 0 18px rgba(0, 0, 0, 0.8);
+}
+
+.pk-overworld-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+.pk-overworld-hud {
+    position: absolute;
+    top: 7px;
+    left: 7px;
+    right: 7px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 6px;
+    color: #f4f7ef;
+    background: rgba(7, 16, 24, 0.84);
+    border: 2px solid #d7e4ce;
+    box-shadow: 2px 2px 0 rgba(7, 16, 24, 0.7);
+    font-family: monospace;
+    font-size: 0.58rem;
+    line-height: 1.1;
+    pointer-events: none;
+}
+
+.pk-overworld-status {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pk-overworld-position {
+    flex: 0 0 auto;
+    color: #8dd7ff;
+}
+
+.pk-overworld-help {
+    position: absolute;
+    left: 7px;
+    bottom: 7px;
+    padding: 3px 5px;
+    color: #193221;
+    background: rgba(232, 244, 218, 0.84);
+    border: 1px solid rgba(25, 50, 33, 0.6);
+    max-width: calc(100% - 14px);
+    font: 700 0.44rem/1 monospace;
+    pointer-events: none;
+}
+
+.pk-dialogue-box {
+    position: absolute;
+    z-index: 4;
+    left: 7px;
+    right: 7px;
+    bottom: 7px;
+    min-height: 58px;
+    padding: 10px 10px 8px;
+    color: #17231b;
+    background: #f4f7ef;
+    border: 3px double #243a2b;
+    box-shadow:
+        0 0 0 2px #e0ead8,
+        3px 3px 0 rgba(7, 16, 24, 0.7);
+    font-family: monospace;
+    cursor: pointer;
+}
+
+.pk-dialogue-speaker {
+    position: absolute;
+    top: -11px;
+    left: 8px;
+    padding: 2px 7px;
+    color: #f4f7ef;
+    background: #17304c;
+    border: 2px solid #e0ead8;
+    font-size: 0.55rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.pk-dialogue-text {
+    min-height: 34px;
+    font-size: 0.62rem;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.pk-dialogue-advance {
+    position: absolute;
+    right: 7px;
+    bottom: 4px;
+    color: #245d86;
+    font-size: 0.48rem;
+    font-weight: 700;
+}

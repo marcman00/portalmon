@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "tileSize": 16,
+  "width": 56,
+  "height": 40,
+  "defaultSpawn": [28, 37],
+  "defaultFacing": "up",
+  "points": {
+    "centerReturn": [27, 27],
+    "maintenanceTech": [21, 27]
+  },
+  "roads": [
+    { "kind": "stone", "x": 9, "y": 14, "width": 36, "height": 4 },
+    { "kind": "path", "x": 26, "y": 6, "width": 4, "height": 34 },
+    { "kind": "path", "x": 3, "y": 24, "width": 50, "height": 4 },
+    { "kind": "stone", "x": 19, "y": 18, "width": 16, "height": 12 },
+    { "kind": "path", "x": 10, "y": 20, "width": 9, "height": 3 },
+    { "kind": "path", "x": 10, "y": 29, "width": 9, "height": 3 },
+    { "kind": "path", "x": 35, "y": 24, "width": 18, "height": 3 },
+    { "kind": "technical", "x": 34, "y": 31, "width": 18, "height": 7 }
+  ],
+  "buildings": [
+    { "id": "champion-hall", "kind": "champion", "x": 24, "y": 1, "width": 9, "height": 6, "theme": "gold", "label": "Champion Hall" },
+    { "id": "gym-west", "kind": "gym", "x": 16, "y": 8, "width": 7, "height": 6, "theme": "blue", "label": "West Gym", "gymSlot": 0 },
+    { "id": "gym-center", "kind": "gym", "x": 24, "y": 8, "width": 7, "height": 6, "theme": "gold", "label": "Center Gym", "gymSlot": 1 },
+    { "id": "gym-east", "kind": "gym", "x": 32, "y": 8, "width": 7, "height": 6, "theme": "orange", "label": "East Gym", "gymSlot": 2 },
+    { "id": "portalmon-center", "kind": "center", "x": 23, "y": 20, "width": 9, "height": 7, "theme": "clinic", "label": "Portalmon Center", "warpTarget": "center_building" },
+    { "id": "home-1", "kind": "house", "x": 4, "y": 17, "width": 6, "height": 5, "theme": "aqua", "label": "townhouse" },
+    { "id": "home-2", "kind": "house", "x": 12, "y": 18, "width": 6, "height": 5, "theme": "sand", "label": "townhouse" },
+    { "id": "home-3", "kind": "house", "x": 4, "y": 29, "width": 6, "height": 5, "theme": "green", "label": "townhouse" },
+    { "id": "home-4", "kind": "house", "x": 12, "y": 30, "width": 6, "height": 5, "theme": "rose", "label": "townhouse" }
+  ],
+  "ponds": [
+    { "id": "park-pond", "x": 39, "y": 19, "width": 12, "height": 10, "bridgeY": 24, "bridgeHeight": 2, "label": "park pond" }
+  ],
+  "trees": [
+    { "x": 1, "y": 2, "variant": "green" },
+    { "x": 5, "y": 3, "variant": "yellow" },
+    { "x": 46, "y": 3, "variant": "green" },
+    { "x": 51, "y": 5, "variant": "yellow" },
+    { "x": 1, "y": 10, "variant": "green" },
+    { "x": 48, "y": 12, "variant": "green" },
+    { "x": 52, "y": 16, "variant": "green" },
+    { "x": 35, "y": 19, "variant": "yellow" },
+    { "x": 52, "y": 27, "variant": "yellow" },
+    { "x": 1, "y": 35, "variant": "green" },
+    { "x": 6, "y": 35, "variant": "yellow" },
+    { "x": 47, "y": 35, "variant": "green" },
+    { "x": 52, "y": 34, "variant": "green" }
+  ],
+  "decorations": [
+    { "kind": "fountain", "x": 20, "y": 19, "label": "town fountain", "blocking": true },
+    { "kind": "gym-sign", "x": 14, "y": 14, "theme": "blue", "blocking": true },
+    { "kind": "gym-sign", "x": 22, "y": 14, "theme": "gold", "blocking": true },
+    { "kind": "gym-sign", "x": 40, "y": 14, "theme": "orange", "blocking": true },
+    { "kind": "center-sign", "x": 33, "y": 23, "blocking": true },
+    { "kind": "flower-bed", "x": 3, "y": 22, "width": 7, "height": 1 },
+    { "kind": "flower-bed", "x": 11, "y": 23, "width": 7, "height": 1 },
+    { "kind": "flower-bed", "x": 3, "y": 34, "width": 7, "height": 1 },
+    { "kind": "flower-bed", "x": 11, "y": 35, "width": 7, "height": 1 },
+    { "kind": "cargo", "x": 36, "y": 32, "width": 6, "height": 4, "blocking": true },
+    { "kind": "machinery", "x": 44, "y": 32, "width": 5, "height": 4, "blocking": true }
+  ],
+  "boundaryCollision": [
+    { "x": 0, "y": 0, "width": 2, "height": 40, "label": "tree line" },
+    { "x": 54, "y": 0, "width": 2, "height": 40, "label": "tree line" },
+    { "x": 2, "y": 0, "width": 22, "height": 1, "label": "tree line" },
+    { "x": 33, "y": 0, "width": 21, "height": 1, "label": "tree line" },
+    { "x": 2, "y": 39, "width": 25, "height": 1, "label": "tree line" },
+    { "x": 30, "y": 39, "width": 24, "height": 1, "label": "tree line" }
+  ]
+}

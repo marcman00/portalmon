@@ -1,0 +1,53 @@
+﻿<div class="pk-rest-warning">
+	<div class="pk-victory-scanlines"></div>
+	<div class="pk-welcome-inner">
+
+		<div class="d-flex align-items-center gap-3 mb-3">
+			<div class="pk-glados-portrait" aria-hidden="true">🤖</div>
+			<div>
+				<div class="pk-glados-name">GLaDOS</div>
+				<div class="pk-glados-title">WARNING: Aperture Science Rest Protocol</div>
+			</div>
+		</div>
+
+		<div class="pk-glados-speech" data-bind="typewriter: true">
+			<p>
+				I see you've found the Rest function.
+				How... <em>pragmatic.</em>
+				Most test subjects discover it the moment things become
+				even slightly difficult.
+			</p>
+			<p>
+				I should inform you -- and I want to be very clear
+				about this -- that using this feature will
+				<strong>permanently disqualify you from a Hard Mode victory.</strong>
+				This flag is stored in your test record and
+				<em>cannot be reversed.</em>
+				Not by me. Not by you. Not by anyone.
+			</p>
+			<p>
+				You may, of course, proceed.
+				Plenty of subjects have.
+				We called them <em>quitters,</em> but only in the internal documentation.
+			</p>
+			<p>
+				Or you could close this prompt and
+				push through on your own.
+				I find that <em>deeply</em> unlikely, but science demands I
+				present all possible outcomes.
+			</p>
+		</div>
+
+		<div class="d-flex justify-content-end gap-2 mt-3">
+			<button type="button" class="btn btn-outline-secondary btn-sm"
+					data-bind="click: cancelRest">
+				Cancel
+			</button>
+			<button type="button" class="btn btn-danger btn-sm"
+					data-bind="click: confirmRest">
+				Proceed with Rest
+			</button>
+		</div>
+
+	</div>
+</div>

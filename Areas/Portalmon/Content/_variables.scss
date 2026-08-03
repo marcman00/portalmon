@@ -1,0 +1,77 @@
+// =========================================
+// PALETTE — game-specific colour constants
+// =========================================
+$pk-red: #e94560;
+$pk-green: #48d848;
+$pk-orange: #f0a030;
+$pk-hp-yellow: #f0c030;
+$pk-dark-bg: #1a1a2e;
+$pk-mid-bg: #16213e;
+$pk-border: #0f3460;
+$pk-muted: #8899aa;
+
+// Screen palette — fixed dark, never theme-aware (screen bg is always black)
+$s-bg:         #12181f;   // panel/overlay backgrounds
+$s-bg-mid:     #1a2230;   // secondary panel / header
+$s-bg-dark:    #0c1018;   // recessed / tertiary areas
+$s-text:       #c8d0dc;   // primary body text
+$s-text-muted: #8899aa;   // muted text (same as $pk-muted)
+$s-text-em:    #eef0f8;   // emphasis / headings
+$s-border:     #1e3050;   // borders
+$s-accent:     #f0a030;   // accent color (same as $pk-orange)
+
+// =========================================
+// GBA SHELL — SCSS colour variables
+// (Using SCSS vars, not CSS custom properties, because this file
+//  is @import-ed inside #portalmon { } in style.scss and :root
+//  rules would be incorrectly scoped.)
+// =========================================
+$gba-purple: #644d8c;
+$gba-purple-light: #7661a3;
+$gba-purple-dark: #4c396d;
+$gba-purple-mid: #58437d;
+$gba-purple-highlight: #4a357a;
+$gba-purple-shadow:    #140a28;
+$gba-bezel:            #0a0a14;
+$gba-bezel-inner:      #0d0d18;
+$gba-btn-a:            #c62828;
+$gba-btn-b:            #1565c0;
+$gba-shell-max-width:  900px;
+
+// =========================================
+// SHARED MIXINS
+// =========================================
+
+@mixin pk-thin-scrollbar {
+    &::-webkit-scrollbar {
+        width: 4px;
+    }
+    &::-webkit-scrollbar-track {
+        background: $s-bg-dark;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: $s-border;
+        border-radius: 2px;
+    }
+}
+
+@mixin pk-circle-portrait($size, $font-size) {
+    width: $size;
+    height: $size;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: $font-size;
+
+    .pk-portrait-img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        border-radius: 50%;
+    }
+}
+
+#portalmon {
+    width: 100%;
+}

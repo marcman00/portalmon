@@ -1,0 +1,22 @@
+<div class="px-3 pb-3">
+
+	<h5 class="text-body fw-bold mb-3">Trainer Settings</h5>
+
+	<h6 class="text-body-secondary text-uppercase small fw-bold">Designation</h6>
+	<div class="d-flex align-items-center gap-2 mb-2">
+		<input
+			type="text"
+			class="form-control form-control-sm pk-trainer-name-input"
+			maxlength="15"
+			placeholder="Enter your name"
+			data-bind="value: pendingTrainerName, valueUpdate: 'input'" />
+		<button type="button" class="btn btn-sm pk-btn-begin"
+			data-bind="click: saveTrainerName, disable: !pendingTrainerName().trim() || pendingTrainerName().trim() === trainerName()">
+			Save
+		</button>
+	</div>
+	<p class="small text-body-secondary mb-0">
+		Current designation: <strong data-bind="text: trainerName"></strong>
+	</p>
+
+</div>

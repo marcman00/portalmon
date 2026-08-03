@@ -1,0 +1,191 @@
+﻿<div class="pk-battles px-3 pb-3" data-bind="with: gymBattleManager">
+
+	<!-- BADGE DETAIL MODAL -->
+	<!-- ko if: badgeModalVisible() -->
+	<div class="pk-badge-modal-overlay" data-bind="click: closeBadgeModal">
+		<div class="pk-badge-modal" data-bind="click: function(){}, clickBubble: false">
+			<img class="pk-badge-modal-img" data-bind="attr: { src: badgeModalImage() }" />
+			<div class="pk-badge-modal-title" data-bind="text: badgeModalTitle"></div>
+			<div class="pk-badge-modal-desc" data-bind="text: badgeModalDesc"></div>
+		</div>
+	</div>
+	<!-- /ko -->
+
+	<!-- SECTION 1: GYM LEADERS  -->
+	<div class="section-label">Gym Leaders</div>
+	<div class="row g-2 mb-3">
+		<!-- ko foreach: gymLeaders -->
+		<div class="col-4"
+			 data-bind="css: { 'pk-town-gym-focus': $parent.focusedGymSlot() === $index() }">
+			<div class="gym-card h-100" data-bind="css: { 'defeated': isDefeated() }">
+
+				<span class="gym-status-badge"
+					  data-bind="css:  { 'badge-defeated': isDefeated(), 'badge-available': !isDefeated() },
+								 text: isDefeated() ? '\u2713 Defeated' : 'Available'"></span>
+
+				<div class="pk-portrait-badge-wrap">
+					<div class="trainer-portrait">
+						<!-- ko if: portraitImage -->
+						<img class="trainer-portrait-img"
+							 data-bind="attr: { src: portraitImage, alt: name }" />
+						<!-- /ko -->
+						<!-- ko ifnot: portraitImage -->
+						<span data-bind="text: portraitEmoji"></span>
+						<!-- /ko -->
+					</div>
+					<!-- Inline badge -->
+					<!-- ko if: badgeImage -->
+					<button type="button"
+							class="pk-card-badge pk-card-badge--medallion"
+							data-bind="css: { 'pk-badge-earned': isDefeated() },
+							           enable: isDefeated(),
+							           click: function() { $parent.showBadge($data); }">
+						<img class="pk-card-badge-img" data-bind="attr: { src: badgeImage, alt: (specialty || 'Gym') + ' badge' }" />
+					</button>
+					<!-- /ko -->
+				</div>
+
+				<div class="trainer-name fw-bold small text-center mb-1"
+					 data-bind="text: name"></div>
+
+				<div class="trainer-philosophy small text-center mb-2"
+					 data-bind="text: philosophy || specialty"
+					 style="font-size: 0.55rem; color: #8899aa; font-style: italic; line-height: 1.3; max-height: 2.6em; overflow: hidden;"></div>
+
+			</div>
+		</div>
+		<!-- /ko -->
+	</div>
+
+	<!-- SECTION 2: CHAMPIONSHIP  -->
+	<hr class="pk-divider">
+	<div class="section-label">Championship</div>
+	<div class="championship-card mb-3"
+		 data-bind="css: {
+			 'locked':    !isChampionshipUnlocked(),
+			 'unlocked':  isChampionshipUnlocked() && !isChampionshipDefeated(),
+			 'defeated':  isChampionshipDefeated()
+		 }">
+		<div class="champ-inner d-flex align-items-center gap-3">
+			<div class="pk-portrait-badge-wrap pk-portrait-badge-wrap--champ">
+				<div class="champ-portrait">
+					<!-- ko if: championPortraitImage -->
+					<img class="trainer-portrait-img"
+						 data-bind="attr: { src: championPortraitImage }" />
+					<!-- /ko -->
+					<!-- ko ifnot: championPortraitImage -->
+					<span>&#x1F3C6;</span>
+					<!-- /ko -->
+				</div>
+				<!-- Inline badge -->
+				<!-- ko if: championBadgeImage -->
+				<button type="button"
+						class="pk-card-badge pk-card-badge--medallion pk-card-badge--champ"
+						data-bind="css: { 'pk-badge-earned': isChampionshipDefeated() },
+						           enable: isChampionshipDefeated(),
+						           click: function() { $data.showBadgeFor('rey'); }">
+					<img class="pk-card-badge-img" data-bind="attr: { src: championBadgeImage, alt: 'Champion badge' }" />
+				</button>
+				<!-- /ko -->
+			</div>
+
+			<div class="champ-info flex-grow-1">
+				<div class="champ-name fw-bold" data-bind="text: championName"></div>
+				<div class="champ-subtitle small" style="font-size: 0.55rem; color: #8899aa; font-style: italic;"
+					 data-bind="text: championPhilosophy || 'Master of all types'"></div>
+
+				<div class="lock-notice small mt-1"
+					 data-bind="visible: !isChampionshipUnlocked()">
+					&#x1F512; Defeat all 3 Gym Leaders to unlock
+				</div>
+
+				<div class="progress-pips d-flex gap-1 mt-1"
+					 data-bind="visible: !isChampionshipUnlocked()">
+					<!-- ko foreach: gymLeaders -->
+					<div class="progress-pip"
+						 data-bind="css: { 'filled': isDefeated() }"></div>
+					<!-- /ko -->
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<!-- SECTION 3: SECRET BOSS (GLaDOS cake trap) -->
+	<hr class="pk-divider">
+	<!-- ko ifnot: isSecretUnlocked() -->
+	<div class="section-label">???</div>
+	<div class="secret-card mb-2 hidden-state">
+		<div class="secret-inner d-flex align-items-center gap-3">
+			<div class="secret-portrait"><span>&#x1F441;&#xFE0F;</span></div>
+			<div class="secret-info flex-grow-1">
+				<div class="secret-name fw-bold">???</div>
+			</div>
+		</div>
+		<div class="secret-lock-label">
+			<div class="secret-lock-icon">🔒</div>
+			<div class="secret-lock-text">???</div>
+		</div>
+	</div>
+	<div class="text-center small mt-1" style="color: var(--bs-secondary-color); font-size: 0.7rem;">
+		Defeat the Champion to reveal a secret challenger
+	</div>
+	<!-- /ko -->
+
+	<!-- ko if: isSecretUnlocked() && !isSecretDefeated() -->
+	<div class="section-label" style="color: #ff99cc;">Congratulations!</div>
+	<div class="secret-card mb-2 revealed pk-cake-card">
+		<div class="secret-inner d-flex align-items-center gap-3">
+			<div class="secret-portrait pk-cake-portrait">
+				<span>&#x1F382;</span>
+			</div>
+			<div class="secret-info flex-grow-1">
+				<div class="secret-name fw-bold" style="color: #ff99cc;">Accept your trophy...</div>
+				<div class="secret-subtitle small" style="color: #cc77aa;">
+					You've earned it. There will be cake.
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- /ko -->
+	<!-- ko if: isSecretDefeated() -->
+	<div class="section-label">GLaDOS</div>
+	<div class="secret-card mb-2 revealed defeated">
+		<div class="secret-inner d-flex align-items-center gap-3">
+			<div class="pk-portrait-badge-wrap pk-portrait-badge-wrap--secret">
+				<div class="secret-portrait">
+					<!-- ko if: secretPortraitImage -->
+					<img class="trainer-portrait-img"
+						 data-bind="attr: { src: secretPortraitImage, alt: 'GLaDOS' }" />
+					<!-- /ko -->
+					<!-- ko ifnot: secretPortraitImage -->
+					<span>&#x1F916;</span>
+					<!-- /ko -->
+				</div>
+				<!-- Inline badge -->
+				<!-- ko if: secretBadgeImage -->
+				<button type="button"
+						class="pk-card-badge pk-card-badge--medallion pk-card-badge--secret pk-badge-earned"
+						data-bind="click: function() { $data.showBadgeFor('glados'); }">
+					<img class="pk-card-badge-img" data-bind="attr: { src: secretBadgeImage, alt: 'Portal badge' }" />
+				</button>
+				<!-- /ko -->
+			</div>
+			<div class="secret-info flex-grow-1">
+				<div class="secret-name fw-bold">GLaDOS</div>
+				<div class="secret-subtitle small" style="color: #8899aa; font-style: italic;">
+					&#x2713; The cake was real this time.
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- /ko -->
+
+	<!-- Shown while a battle is in progress -->
+	<div class="text-center small mt-2 fst-italic"
+		 style="color: #e94560; font-size: 0.7rem;"
+		 data-bind="visible: $root.combatManager.isInActiveBattle()">
+		&#x2694;&#xFE0F; Finish your current battle before challenging a trainer.
+	</div>
+
+</div>

@@ -1,0 +1,48 @@
+﻿Portalmon Sprite Generation Prompt
+
+  Style Reference (use this preamble for every creature)
+
+  Generate a single creature sprite in the style of a Game Boy Advance-era
+  Pokemon sprite (Pokemon Ruby/Sapphire/Emerald generation). The art style
+  should be:
+
+  - Clean pixel art, roughly 96x96 pixels
+  - Sprite-sheet framing rule: bottom-aligned. The creature’s lowest pixel touches the bottom edge of the canvas (y=95). Crop/position so there are 0–1 px of empty space below the feet/body. Any extra padding must be only above the head, not below.
+  - 3/4 front view with rightward yaw: classic Pokemon encounter angle — facing toward the viewer, turned ~10–20° toward screen-right with a clear face direction
+  - Limited but vibrant color palette (12-16 colors max per creature, with
+    clear shading — a base color, a highlight, and a shadow tone per region)
+  - Transparent background (PNG with alpha). No ground, no shadow, no effects.
+  - Black or very dark outline (1px), with the creature fully self-contained
+    within the frame
+  - The creature should look like a cute/cool fictional monster that could
+    plausibly exist in a Pokemon game — expressive eyes, simple but readable
+    silhouette, and a clear "face" direction
+  - The creature's design should visually hint at its IT infrastructure theme
+    without being too literal — think "what if a Pokemon was inspired by [concept]"
+    not "a cartoon drawing of [concept]"
+  - If there is visible empty space under the creature, the image is incorrect.
+
+  DO NOT include: text, labels, names, UI elements, multiple angles,
+  background scenery, drop shadows, glow effects, or excess bottom padding under the creature when grounded.
+
+  Per-Creature Section (fill in the TODOs)
+
+  CREATURE NAME: [TODO: e.g. "Normlet"]
+  TYPE/THEME: [TODO: e.g. "Performance — system baselines, metrics, optimization"]
+
+  VISUAL CONCEPT: [TODO: Describe the creature's physical form in 2-3 sentences.
+    What animal/object/shape is it based on? What IT concept does its design
+    reference? Examples below.]
+
+  COLOR PALETTE: [TODO: Primary body color, accent color, eye color. Should
+    contrast well against a dark navy-to-forest-green gradient background
+    (#0f3460 → #16213e → #1a472a → #2d5a27). Avoid very dark creatures that
+    disappear into the background. Bright, saturated accent colors work best.]
+
+  SIZE/SHAPE: [TODO: Compact/round, tall/thin, wide/bulky? Should fit
+    comfortably in a 96x96 pixel area with a clear, readable silhouette
+    even at small sizes.]
+
+  DISTINGUISHING FEATURE: [TODO: One memorable visual detail that makes this
+    creature instantly recognizable at 120px — e.g. a glowing antenna,
+    jagged tail, pulsing core, etc.]

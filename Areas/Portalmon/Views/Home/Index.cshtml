@@ -1,0 +1,247 @@
+﻿<div id="portalmon">
+	<div class="gba-shell" data-bind="attr: { 'data-skin': gameboySkin() }">
+
+		<!-- ===== TOP BAR: Power LED + Label + Help + Speaker ===== -->
+		<div class="gba-top-bar">
+			<!-- LED is dim red when off, bright green when on -->
+			<div class="gba-power-led" data-bind="css: { 'gba-power-led--off': !isPoweredOn() }"></div>
+			<span class="gba-brand-label">Portalboy</span>
+			<button type="button" class="gba-help-btn" data-bind="click: toggleInfo" title="Game Rules">?</button>
+
+			<div class="gba-speaker">
+				<span id="volume-toggle" class="clickable" data-bind="click: toggleSound">
+					<svg class="picon" data-picon="mdi:volume-high" data-bind="visible: isSoundEnabled()"></svg>
+					<svg class="picon" data-picon="mdi:volume-off" data-bind="visible: !isSoundEnabled()"></svg>
+				</span>
+
+				<div class="gba-speaker-dot"></div>
+				<div class="gba-speaker-dot"></div>
+				<div class="gba-speaker-dot"></div>
+				<div class="gba-speaker-dot"></div>
+				<div class="gba-speaker-dot"></div>
+				<div class="gba-speaker-dot"></div>
+			</div>
+		</div>
+
+		<!-- ===== SINGLE FLEX ROW: [left controls] [screen] [right controls] ===== -->
+		<div style="display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;gap:10px;padding:4px 12px 10px;">
+
+			<!-- LEFT: D-Pad + START button -->
+			<div style="flex:0 0 88px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;">
+				<div class="gba-dpad mb-5" aria-label="Overworld movement controls">
+					<div class="gba-dpad-v"></div>
+					<div class="gba-dpad-h"></div>
+					<div class="gba-dpad-center"></div>
+					<button type="button" class="gba-dpad-hit gba-dpad-hit--up" aria-label="Move up"
+							data-bind="event: {
+								pointerdown: function(_, e) { return overworldManager.pressDirection('up', e); },
+								pointerup: function(_, e) { return overworldManager.releaseDirection('up', e); },
+								pointerleave: function(_, e) { return overworldManager.releaseDirection('up', e); }
+							}"></button>
+					<button type="button" class="gba-dpad-hit gba-dpad-hit--down" aria-label="Move down"
+							data-bind="event: {
+								pointerdown: function(_, e) { return overworldManager.pressDirection('down', e); },
+								pointerup: function(_, e) { return overworldManager.releaseDirection('down', e); },
+								pointerleave: function(_, e) { return overworldManager.releaseDirection('down', e); }
+							}"></button>
+					<button type="button" class="gba-dpad-hit gba-dpad-hit--left" aria-label="Move left"
+							data-bind="event: {
+								pointerdown: function(_, e) { return overworldManager.pressDirection('left', e); },
+								pointerup: function(_, e) { return overworldManager.releaseDirection('left', e); },
+								pointerleave: function(_, e) { return overworldManager.releaseDirection('left', e); }
+							}"></button>
+					<button type="button" class="gba-dpad-hit gba-dpad-hit--right" aria-label="Move right"
+							data-bind="event: {
+								pointerdown: function(_, e) { return overworldManager.pressDirection('right', e); },
+								pointerup: function(_, e) { return overworldManager.releaseDirection('right', e); },
+								pointerleave: function(_, e) { return overworldManager.releaseDirection('right', e); }
+							}"></button>
+				</div>
+				<div style="display:flex;flex-direction:column;gap:5px;align-items:center;">
+					<!-- ENC button removed — portals on the idle screen replace it -->
+					<button type="button" class="gba-pill-btn" data-bind="click: toggleStart">START</button>
+					<!-- ko if: isSimUnlocked() -->
+					<button type="button" class="gba-pill-btn" data-bind="click: toggleSim">SIM</button>
+					<!-- /ko -->
+				</div>
+			</div>
+
+			<!-- CENTER: Screen bezel -->
+			<div class="gba-bezel" style="flex:1 1 auto;min-width:0;">
+				<div class="gba-screen">
+					<div class="gba-scanlines"></div>
+					<canvas id="pk-vortex-canvas" class="pk-vortex-canvas"
+							data-bind="visible: battleTransition.phase() === 'vortex' || battleTransition.phase() === 'iris-close'"></canvas>
+
+					<!-- ============================================================ -->
+					<!-- POWER-OFF SCREEN — shown before the player clicks "turn on" -->
+					<!-- ============================================================ -->
+					<!-- ko if: !isPoweredOn() && !isShowingLogo() -->
+					<div class="pk-power-off-screen" data-bind="click: powerOn">
+						<div class="pk-power-icon">⏻</div>
+						<div class="pk-power-hint">Click to turn on</div>
+					</div>
+					<!-- /ko -->
+					<!-- ============================================================ -->
+					<!-- LOGO SPLASH — shown for ~3 s after clicking "turn on"       -->
+					<!-- ============================================================ -->
+					<!-- ko if: isShowingLogo() -->
+					<div class="pk-logo-screen">
+						<img src="/Areas/Portalmon/Content/Images/Logo.png"
+							 class="pk-logo-img" alt="Portalmon" />
+						<img src="/Areas/Portalmon/Content/Images/Logo2.png"
+							 class="pk-logo-img pk-logo-img--wipe" alt="Portalmon" />
+					</div>
+					<!-- /ko -->
+					<!-- ============================================================ -->
+					<!-- ALL GAME CONTENT — hidden until powered on                  -->
+					<!-- ============================================================ -->
+					<!-- ko if: isPoweredOn() -->
+				<!-- ko if: _statusToast() -->
+					<div class="pk-status-toast" data-bind="text: _statusToast"></div>
+					<!-- /ko -->
+					<!-- ONBOARDING SCREENS -->
+					<!-- ko if: isShowingWelcome() -->
+					@Html.Partial("~/Areas/Portalmon/Views/Home/Welcome.cshtml")
+					<!-- /ko -->
+					<!-- ko if: isChoosingStarter() -->
+					@Html.Partial("~/Areas/Portalmon/Views/Home/StarterSelect.cshtml")
+					<!-- /ko -->
+					<!-- ko if: isShowingStarterConfirm() -->
+					@Html.Partial("~/Areas/Portalmon/Views/Home/StarterConfirm.cshtml")
+					<!-- /ko -->
+					<!-- MAIN GAME (post-onboarding) -->
+					<!-- ko ifnot: isShowingWelcome() || isChoosingStarter() || isShowingStarterConfirm() -->
+					<!-- Combat is always rendered as the base layer -->
+					<div class="gba-screen-base" data-bind="css: { 'gba-dimmed': activeOverlay() !== 'none', 'pk-transition-flash': battleTransition.phase() === 'flash', 'pk-transition-iris-close': battleTransition.phase() === 'iris-close', 'pk-transition-black': battleTransition.phase() === 'black', 'pk-transition-iris-open': battleTransition.phase() === 'iris-open', 'pk-transition-vortex': battleTransition.phase() === 'vortex' }">
+						@Html.Partial("~/Areas/Portalmon/Views/Home/Encounter.cshtml")
+						<div class="pk-faint-recovery"
+							 data-bind="css: { 'pk-faint-recovery--active': isRecoveringFromFaint }, attr: { 'aria-hidden': !isRecoveringFromFaint() }">
+							<span data-bind="text: faintRecoveryMessage"></span>
+						</div>
+					</div>
+
+					<!-- DEX overlay -->
+					<!-- ko if: activeOverlay() === 'dex' -->
+					<div class="gba-overlay">
+						<div class="gba-overlay-header">
+							<span class="gba-overlay-title">Portalmon Dex</span>
+							<button type="button" class="gba-overlay-close" data-bind="click: closeOverlay">&times;</button>
+						</div>
+						<div class="gba-overlay-body">
+							@Html.Partial("~/Areas/Portalmon/Views/Home/Dex.cshtml")
+						</div>
+					</div>
+					<!-- /ko -->
+					<!-- GYM overlay -->
+					<!-- ko if: activeOverlay() === 'gym' -->
+					<div class="gba-overlay">
+						<div class="gba-overlay-header">
+							<span class="gba-overlay-title">Trainer Battles</span>
+							<button type="button" class="gba-overlay-close" data-bind="click: closeOverlay">&times;</button>
+						</div>
+						<div class="gba-overlay-body">
+							@Html.Partial("~/Areas/Portalmon/Views/Home/Battles.cshtml")
+						</div>
+					</div>
+					<!-- /ko -->
+					<!-- INFO overlay -->
+					<!-- ko if: activeOverlay() === 'info' -->
+					<div class="gba-overlay">
+						<div class="gba-overlay-header">
+							<span class="gba-overlay-title">Game Rules</span>
+							<button type="button" class="gba-overlay-close" data-bind="click: closeOverlay">&times;</button>
+						</div>
+						<div class="gba-overlay-body">
+							@Html.Partial("~/Areas/Portalmon/Views/Home/Info.cshtml")
+						</div>
+					</div>
+					<!-- /ko -->
+					<!-- SIM overlay (admin / battle simulator) -->
+					<!-- ko if: isSimUnlocked() && activeOverlay() === 'sim' -->
+					<div class="gba-overlay">
+						<div class="gba-overlay-header">
+							<span class="gba-overlay-title">Battle Simulator</span>
+							<button type="button" class="gba-overlay-close" data-bind="click: closeOverlay">&times;</button>
+						</div>
+						<div class="gba-overlay-body">
+							@Html.Partial("~/Areas/Portalmon/Views/Home/Sim.cshtml")
+						</div>
+					</div>
+					<!-- /ko -->
+					<!-- START menu overlay -->
+					<!-- ko if: activeOverlay() === 'start' -->
+					<div class="gba-overlay">
+						<div class="gba-overlay-header">
+							<span class="gba-overlay-title">Settings</span>
+							<button type="button" class="gba-overlay-close" data-bind="click: closeOverlay">&times;</button>
+						</div>
+						<div class="gba-overlay-body">
+							@Html.Partial("~/Areas/Portalmon/Views/Home/Settings.cshtml")
+						</div>
+					</div>
+					<!-- /ko -->
+					<!-- /ko -->
+					<!-- REST WARNING — GLaDOS hard-mode forfeit confirmation -->
+					<!-- ko if: isShowingRestWarning() -->
+					@Html.Partial("~/Areas/Portalmon/Views/Home/RestWarning.cshtml")
+					<!-- /ko -->
+					<!-- CHAMPIONSHIP VICTORY SCREEN — topmost layer, above all overlays -->
+					<!-- ko if: isShowingVictoryScreen() -->
+					@Html.Partial("~/Areas/Portalmon/Views/Home/VictoryScreen.cshtml")
+					<!-- /ko -->
+					<!-- /ko -->
+					<!-- CREDITS SEQUENCE (after beating GLaDOS) -->
+					<!-- ko if: isShowingCredits() -->
+					@Html.Partial("~/Areas/Portalmon/Views/Home/Credits.cshtml")
+					<!-- /ko -->
+
+				</div>
+			</div>
+
+			<!-- RIGHT: A/B Buttons -->
+			<div style="flex:0 0 88px;display:flex;align-items:center;justify-content:center;">
+				<div class="gba-ab-group">
+					<button type="button" class="gba-btn gba-btn-a"
+							data-bind="click: handlePrimaryAction,
+							           text: 'MENU',
+							           enable: isPoweredOn() && !combatManager.isInActiveBattle() && (isOverworldScreenActive() || !isBatteryDepleted())"></button>
+					<button type="button" class="gba-btn gba-btn-b" data-bind="click: toggleDex, enable: isPoweredOn() && !isBatteryDepleted()">DEX</button>
+					<button type="button" class="gba-btn gba-btn-rest"
+							data-bind="click: restParty, visible: isPoweredOn() && partyNeedsHeal() && !combatManager.isEncounterActive(), enable: !combatManager.isInActiveBattle() && !isBatteryDepleted()">
+						REST
+					</button>
+				</div>
+			</div>
+
+		</div><!-- /flex row -->
+
+
+		<!-- ===== BOTTOM ROUNDED BASE ===== -->
+		<div class="gba-bottom">
+			<div class="gba-shell-switch">
+				<span class="gba-shell-switch-label">CHSH</span>
+				<div class="gba-shell-switch-track" data-bind="attr: { 'data-skin': gameboySkin() }">
+					<div class="gba-shell-switch-thumb"></div>
+					<!-- ko foreach: gameboySkinOptions -->
+					<button type="button"
+							class="gba-shell-switch-detent"
+							data-bind="
+								click: function() { $root.setGameboySkin($data.id); },
+								css: { 'is-active': $data.id === $root.gameboySkin() },
+								attr: {
+									title: $data.label,
+									'aria-label': 'Set shell to ' + $data.label,
+									'aria-pressed': $data.id === $root.gameboySkin() ? 'true' : 'false',
+									'data-skin-option': $data.id
+								}">
+					</button>
+					<!-- /ko -->
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>
+
+@Html.Partial("~/dist/Portalmon.cshtml")

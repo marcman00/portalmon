@@ -1,0 +1,394 @@
+﻿<div data-bind="with: combatManager, as: 'cm'" class="pk-battle">
+
+	<!-- ===== IDLE STATE — the overworld is shown when no encounter is running ===== -->
+	<!-- ko ifnot: isEncounterActive() -->
+	@Html.Partial("~/Areas/Portalmon/Views/Home/Overworld.cshtml")
+	<!-- /ko -->
+	<!-- ===== ACTIVE ENCOUNTER — only rendered while a battle is in progress ===== -->
+	<!-- ko if: isEncounterActive() -->
+
+	<!-- SIM LOSS OVERLAY — simpler dismiss for simulation mode -->
+	<!-- ko if: isSimBattle() && isBattleEnded() && playerParty().every(function(p) { return p.isFainted(); }) -->
+	<div class="pk-revive-overlay">
+		<div class="pk-sim-banner d-flex align-items-center justify-content-center gap-2 mb-3">
+			<span class="pk-sim-banner-label">SIMULATION COMPLETE</span>
+		</div>
+		<div class="pk-glados-speech">
+			<p>Your creature was decommissioned. No progress was affected.</p>
+		</div>
+		<div class="text-end mt-2">
+			<button type="button" class="btn pk-btn-begin" data-bind="click: dismissBattle">
+				Return to Sim &rsaquo;
+			</button>
+		</div>
+	</div>
+	<!-- /ko -->
+
+	<!-- SIM MODE BANNER -->
+	<!-- ko if: isSimBattle() -->
+	<div class="pk-sim-banner d-flex align-items-center justify-content-center gap-2 mb-2">
+		<span class="pk-sim-banner-label">SIMULATION MODE</span>
+		<span class="pk-sim-banner-note">No progress saved</span>
+	</div>
+	<!-- /ko -->
+	<!-- BATTLEFIELD -->
+	<div class="pk-battlefield"
+		 data-bind="css: { 'pk-battle-intro': $root.battleTransition.phase() === 'iris-open' || $root.battleTransition.phase() === 'intro' }">
+
+		<!-- ENEMY INFO (top-left) -->
+		<div class="pk-enemy-plate">
+			<div class="pk-name-plate">
+				<div class="d-flex justify-content-between align-items-center">
+					<span class="pk-creature-name" data-bind="text: enemyActive().name"></span>
+					<span class="badge pk-type-badge" data-bind="text: enemyActive().type"></span>
+				</div>
+				<div class="pk-hp-bar mt-1">
+					<div class="d-flex justify-content-between align-items-center mb-1">
+						<span class="pk-hp-label">HP</span>
+						<div class="pk-hp-track">
+							<div class="pk-hp-fill"
+								 data-bind="style: { width: enemyActiveHpPercent() + '%' },
+								 css: { 'pk-hp-green' : enemyActiveHpPercent()>
+								50, 'pk-hp-yellow': enemyActiveHpPercent() <= 50 && enemyActiveHpPercent() > 20, 'pk-hp-red': enemyActiveHpPercent() <= 20 }">
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="d-flex flex-wrap gap-1 mt-1"
+					 data-bind="visible: enemyActive().statusEffects().length > 0, foreach: enemyActive().statusEffects">
+					<span class="badge pk-status-badge"
+						  data-bind="text: effect.effectType + ' (' + turnsLeft() + 't)',
+						             bsTooltip: { title: effect.effectType + ': ' + turnsLeft() + ' turn(s) remaining', placement: 'bottom' }">
+					</span>
+				</div>
+				<!-- Charge meter -->
+				<div class="pk-charge-bar mt-1"
+					 data-bind="bsTooltip: { title: cm.getChargeTooltip(enemyActive()), placement: 'bottom' }">
+					<span class="pk-charge-label">ULT</span>
+					<div class="pk-charge-track">
+						<div class="pk-charge-fill"
+							 data-bind="style: { width: enemyActive().chargePercent() + '%' },
+							            css: { 'pk-charge-ready': enemyActive().ultReady() }">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- TRAINER BATTLE STANCE (shown during gym intro dialogue, replaces enemy sprite) -->
+		<!-- ko if: isTrainerSpeaking() && trainerBattleImage() -->
+		<div class="pk-enemy-sprite pk-trainer-battle-stance">
+			<div class="pk-sprite-frame">
+				<img class="pk-sprite-img pk-trainer-battle-img"
+					 data-bind="attr: { src: trainerBattleImage() }" />
+			</div>
+		</div>
+		<!-- /ko -->
+
+		<!-- ENEMY SPRITE (top-right, hidden during trainer dialogue) -->
+		<div class="pk-enemy-sprite"
+			 data-bind="visible: (!isTrainerSpeaking() || !trainerBattleImage()) && (!$root.catchAnim.isActive() || $root.catchAnim.enemyVisible()),
+			            css: { 'pk-sprite-anim-attacking': enemySpriteState() === 'attacking', 'pk-sprite-anim-hit': enemySpriteState() === 'hit' }">
+			<div class="pk-sprite-frame">
+				<!-- ko if: enemyActive().portraitImage -->
+				<img class="pk-sprite-img"
+					 data-bind="attr: { src: enemyActive().portraitImage, alt: enemyActive().name, style: '--pk-battle-sprite-scale: ' + enemyActive().battleSpriteScale + ';' },
+					            css: { 'pk-sprite-flipped': enemyActive().flipEnemy }" />
+				<!-- /ko -->
+			</div>
+			<div class="pk-sprite-shadow"></div>
+		</div>
+
+		<!-- PLAYER SPRITE (bottom-left) -->
+		<div class="pk-player-sprite"
+			 data-bind="css: { 'pk-sprite-anim-attacking': playerSpriteState() === 'attacking', 'pk-sprite-anim-hit': playerSpriteState() === 'hit' }">
+			<div class="pk-sprite-frame">
+			<!-- ko if: playerActive().behindImage -->
+				<img class="pk-sprite-img"
+					 data-bind="attr: { src: playerActive().behindImage, alt: playerActive().name, style: '--pk-battle-sprite-scale: ' + playerActive().battleSpriteScale + ';' },
+					            css: { 'pk-sprite-flipped': playerActive().flipPlayer }" />
+				<!-- /ko -->
+				<!-- ko if: !playerActive().behindImage && playerActive().portraitImage -->
+				<img class="pk-sprite-img"
+					 data-bind="attr: { src: playerActive().portraitImage, alt: playerActive().name, style: '--pk-battle-sprite-scale: ' + playerActive().battleSpriteScale + ';' },
+					            css: { 'pk-sprite-flipped': playerActive().flipPlayer }" />
+				<!-- /ko -->
+			</div>
+			<div class="pk-sprite-shadow"></div>
+		</div>
+
+		<!-- PLAYER INFO (bottom-right) -->
+		<div class="pk-player-plate">
+			<div class="pk-name-plate">
+				<div class="d-flex justify-content-between align-items-center">
+					<span class="pk-creature-name" data-bind="text: playerActive().name"></span>
+					<span class="badge pk-type-badge" data-bind="text: playerActive().type"></span>
+				</div>
+				<div class="pk-hp-bar mt-1">
+					<div class="d-flex justify-content-between align-items-center mb-1">
+						<span class="pk-hp-label">HP</span>
+						<div class="pk-hp-track">
+							<div class="pk-hp-fill"
+								 data-bind="style: { width: playerActiveHpPercent() + '%' },
+								 css: { 'pk-hp-green' : playerActiveHpPercent()>
+								50, 'pk-hp-yellow': playerActiveHpPercent() <= 50 && playerActiveHpPercent() > 20, 'pk-hp-red': playerActiveHpPercent() <= 20 }">
+							</div>
+						</div>
+					</div>
+					<div class="pk-hp-numbers text-end">
+						<span data-bind="text: playerActive().hpCurrent"></span> / <span data-bind="text: playerActive().hpMax"></span>
+					</div>
+				</div>
+				<div class="d-flex flex-wrap gap-1 mt-1"
+					 data-bind="visible: playerActive().statusEffects().length > 0, foreach: playerActive().statusEffects">
+					<span class="badge pk-status-badge"
+						  data-bind="text: effect.effectType + ' (' + turnsLeft() + 't)',
+						             bsTooltip: { title: effect.effectType + ': ' + turnsLeft() + ' turn(s) remaining', placement: 'top' }">
+					</span>
+				</div>
+				<!-- Charge meter -->
+				<div class="pk-charge-bar mt-1"
+					 data-bind="bsTooltip: { title: cm.getChargeTooltip(playerActive()), placement: 'top' }">
+					<span class="pk-charge-label">ULT</span>
+					<div class="pk-charge-track">
+						<div class="pk-charge-fill"
+							 data-bind="style: { width: playerActive().chargePercent() + '%' },
+							            css: { 'pk-charge-ready': playerActive().ultReady() }">
+						</div>
+					</div>
+					<span class="pk-charge-text"
+						  data-bind="text: playerActive().charge() + '/' + playerActive().maxCharge"></span>
+				</div>
+			</div>
+		</div>
+
+	</div><!-- /pk-battlefield -->
+
+	<!-- PARTY STATUS (player full roster, enemy bench) -->
+	<div class="pk-bench-row" data-bind="visible: playerParty().length > 0 || isGymBattle()">
+		<!-- Player party (left) -->
+		<div class="pk-bench-side pk-bench-side--player">
+			<span class="pk-bench-label" title="Active Party">PARTY</span>
+			<div class="pk-bench-portraits pk-bench-portraits--player-full">
+				<!-- ko foreach: playerParty -->
+				<div class="pk-bench-portrait-slot pk-bench-portrait-slot--player"
+					 data-bind="css: { 'pk-bench-fainted': isFainted(), 'pk-bench-active': id === cm.playerActive().id },
+					            attr: { title: name + ' • ' + type + ' • ' + hpCurrent() + '/' + hpMax + ' HP' }">
+					<!-- ko if: portraitImage -->
+					<img class="pk-bench-portrait-img" data-bind="attr: { src: portraitImage, alt: name }" />
+					<!-- /ko -->
+					<!-- ko ifnot: portraitImage -->
+					<span class="pk-bench-portrait-fallback" data-bind="text: name.substring(0,2)"></span>
+					<!-- /ko -->
+					<div class="pk-bench-name" data-bind="text: name"></div>
+					<div class="pk-bench-type" data-bind="text: type.substring(0, 3).toUpperCase()"></div>
+					<div class="pk-bench-mini-hp">
+						<div class="pk-bench-mini-hp-fill"
+							 data-bind="style: { width: hpPercent() + '%' },
+							 css: { 'pk-hp-green': hpPercent() > 50, 'pk-hp-yellow': hpPercent() <= 50 && hpPercent() > 20, 'pk-hp-red': hpPercent() <= 20 }"></div>
+					</div>
+					<div class="pk-bench-mini-charge">
+						<!-- ko foreach: new Array(maxCharge) -->
+						<span class="pk-charge-pip pk-charge-pip--sm"
+							  data-bind="css: { 'pk-charge-pip--filled': $index() < $parent.charge() }"></span>
+						<!-- /ko -->
+					</div>
+				</div>
+				<!-- /ko -->
+			</div>
+		</div>
+		<!-- Enemy bench (right, gym only) -->
+		<!-- ko if: isGymBattle() -->
+		<div class="pk-bench-side pk-bench-side--enemy">
+			<span class="pk-bench-label" title="Enemy Global Buffer">ENEMY</span>
+			<div class="pk-bench-portraits">
+				<!-- ko foreach: $root.combatManager ? $root.combatManager.gymEnemyParty.filter(function(p) { return p.id !== cm.enemyActive().id; }) : [] -->
+				<div class="pk-bench-portrait-slot" data-bind="css: { 'pk-bench-fainted': isFainted() }">
+					<!-- ko if: portraitImage -->
+					<img class="pk-bench-portrait-img" data-bind="attr: { src: portraitImage, alt: name }" />
+					<!-- /ko -->
+					<!-- ko ifnot: portraitImage -->
+					<span class="pk-bench-portrait-fallback" data-bind="text: name.substring(0,2)"></span>
+					<!-- /ko -->
+					<div class="pk-bench-mini-hp">
+						<div class="pk-bench-mini-hp-fill"
+							 data-bind="style: { width: hpPercent() + '%' },
+							 css: { 'pk-hp-green': hpPercent() > 50, 'pk-hp-yellow': hpPercent() <= 50 && hpPercent() > 20, 'pk-hp-red': hpPercent() <= 20 }"></div>
+					</div>
+					<div class="pk-bench-mini-charge">
+						<!-- ko foreach: new Array(maxCharge) -->
+						<span class="pk-charge-pip pk-charge-pip--sm"
+							  data-bind="css: { 'pk-charge-pip--filled': $index() < $parent.charge() }"></span>
+						<!-- /ko -->
+					</div>
+				</div>
+				<!-- /ko -->
+			</div>
+		</div>
+		<!-- /ko -->
+	</div>
+
+	<!-- CATCH BALL — absolutely positioned inside the battlefield.
+		 Visibility and phase are driven by CatchAnimator on the controller. -->
+	<!-- ko if: $root.catchAnim.isActive() -->
+	<img src="/Areas/Portalmon/Content/Images/Ball.png"
+		 class="pk-catch-ball"
+		 alt=""
+		 data-bind="css: {
+			     'pk-catch-phase-flying':    $root.catchAnim.phase() === 'flying',
+			     'pk-catch-phase-absorbing': $root.catchAnim.phase() === 'absorbing',
+			     'pk-catch-phase-wiggling':  $root.catchAnim.phase() === 'wiggling',
+			     'pk-catch-phase-caught':    $root.catchAnim.phase() === 'caught',
+			     'pk-catch-phase-escaped':   $root.catchAnim.phase() === 'escaped'
+			 }" />
+	<!-- /ko -->
+	<!-- ACTION PANEL -->
+	<div class="pk-action-panel"
+		 data-bind="css: { 'pk-battle-intro-panel': $root.battleTransition.phase() === 'iris-open' || $root.battleTransition.phase() === 'intro' }">
+		<div class="row g-0">
+
+			<!-- TEXT BOX (left) — always visible so the announcer result stays readable -->
+			<div class="col-7">
+				<div class="pk-text-box">
+					<!-- Trainer dialogue portrait (gym battles) -->
+					<!-- ko if: isTrainerSpeaking() -->
+					<div class="pk-trainer-dialogue">
+						<!-- ko if: trainerPortrait() -->
+						<img class="pk-trainer-dialogue-portrait"
+							 data-bind="attr: { src: trainerPortrait() }" />
+						<!-- /ko -->
+						<div class="pk-trainer-dialogue-text"
+							 data-bind="text: trainerDialogue"></div>
+					</div>
+					<!-- /ko -->
+					<!-- ko ifnot: isTrainerSpeaking() -->
+					<div class="pk-announcer" data-bind="text: announcerLine"></div>
+					<!-- /ko -->
+					<span class="badge bg-secondary pk-busy-badge" data-bind="visible: isBusy" aria-label="Processing">
+						<span class="pk-busy-badge-dots">...</span>
+					</span>
+					<!-- Footer hint shown after battle ends -->
+					<div class="pk-footer-hint small mt-1"
+						 data-bind="visible: isBattleEnded(), text: footerHint">
+					</div>
+				</div>
+			</div>
+
+			<!-- ACTION BUTTONS (right) -->
+			<div class="col-5">
+
+				<!-- POST-BATTLE RESULT PANEL — replaces action buttons after battle ends -->
+				<!-- ko if: isBattleEnded() -->
+				<div class="pk-result-panel">
+					<!-- All party fainted: revival overlay handles it; hide CONTINUE so nothing bleeds through -->
+					<!-- ko ifnot: playerParty().every(function(p) { return p.isFainted(); }) -->
+					<button type="button" class="pk-menu-btn pk-btn-continue"
+							data-bind="click: dismissBattle">
+						CONTINUE
+					</button>
+					<!-- /ko -->
+				</div>
+				<!-- /ko -->
+				<!-- ko ifnot: isBattleEnded() -->
+				<!-- MAIN MENU -->
+				<div class="pk-menu-grid" data-bind="visible: menuState() === 'main'">
+					<button type="button" class="pk-menu-btn pk-btn-fight"
+							data-bind="enable: canAct, click: showFight">
+						FIGHT
+					</button>
+					<button type="button" class="pk-menu-btn pk-btn-contain"
+							data-bind="visible: !isGymBattle(),
+							           enable: canAct() && canContain() && !$root.catchAnim.isActive(),
+							           click: function() { $root.initiateCatch(); }">
+						CONTAIN
+					</button>
+					<button type="button" class="pk-menu-btn pk-btn-party"
+							data-bind="enable: canAct, click: showParty">
+						PARTY
+					</button>
+					<button type="button" class="pk-menu-btn pk-btn-run"
+							data-bind="enable: canAct, click: disengage">
+						RUN
+					</button>
+				</div>
+
+				<!-- FIGHT (MOVES) SUBMENU -->
+				<div class="pk-fight-panel" data-bind="visible: menuState() === 'fight'">
+					<!-- ko with: playerActive -->
+					<div class="pk-move-grid">
+						<!-- Regular moves (3) -->
+						<!-- ko foreach: moves -->
+						<button type="button" class="pk-menu-btn pk-btn-move"
+								data-bind="enable: cm.canAct() && !cm.isMoveBlocked($data),
+								           click: function() { cm.useMove($data); },
+								           css: { 'pk-move-blocked': cm.isMoveBlocked($data) },
+								           bsTooltip: { title: cm.getMoveTooltip($data), placement: 'top' }">
+							<span data-bind="text: name"></span>
+							<span class="pk-move-meta" data-bind="text: type + ' - ' + (power || '---') + 'pw'"></span>
+						</button>
+						<!-- /ko -->
+						<!-- Ultimate move -->
+						<button type="button" class="pk-menu-btn pk-btn-ultimate"
+								data-bind="enable: cm.canAct() && cm.canUseUlt(),
+								           click: function() { cm.useUltimate(); },
+								           css: { 'pk-ult-charged': cm.playerActive().ultReady() },
+								           bsTooltip: { title: cm.getUltTooltip(cm.playerActive()), placement: 'top' },
+								           text: cm.getUltName(cm.playerActive())">
+						</button>
+					</div>
+					<!-- /ko -->
+					<button type="button" class="pk-menu-btn pk-btn-back pk-btn-back--wide"
+							data-bind="click: showMain">
+						BACK
+					</button>
+				</div>
+
+				<!-- PARTY SUBMENU -->
+				<div data-bind="visible: menuState() === 'party'" class="pk-party-submenu">
+					<div class="pk-party-list" data-bind="foreach: playerParty">
+						<button type="button" class="pk-party-btn"
+								data-bind="enable: $parent.canSwap($data),
+								           css: { 'pk-party-active': $data.id === $parent.playerActive().id, 'pk-party-fainted': $data.isFainted() },
+								           click: function() { $parent.swapTo($data); }">
+							<span class="pk-party-name" data-bind="text: name"></span>
+							<span class="pk-party-hp small">
+								<span data-bind="text: hpCurrent"></span>/<span data-bind="text: hpMax"></span>
+							</span>
+						</button>
+					</div>
+					<button type="button" class="pk-menu-btn pk-btn-back mt-1" data-bind="click: showMain">
+						BACK
+					</button>
+				</div>
+
+				<!-- /ko (ifnot isBattleEnded) -->
+				<!-- /ko -->
+
+			</div>
+		</div>
+	</div>
+
+	<!-- COMBAT LOG -->
+	<div class="mt-2">
+		<button class="btn btn-sm btn-link text-muted p-0" type="button"
+				data-bs-toggle="collapse" data-bs-target="#pk-combat-log">
+			Combat Log
+		</button>
+		<div class="collapse" id="pk-combat-log">
+			<div class="pk-combat-log mt-1">
+				<div class="small" data-bind="foreach: combatLog">
+					<div class="py-1 border-bottom border-dark">
+						<span data-bind="text: $data"></span>
+					</div>
+				</div>
+				<div class="small text-muted" data-bind="visible: combatLog().length === 0">
+					No combat events yet.
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- /ko (isEncounterActive) -->
+	<!-- /ko -->
+
+</div>

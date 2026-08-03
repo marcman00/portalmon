@@ -1,0 +1,315 @@
+<div data-bind="with: dexManager, as: 'dm'">
+
+	<div class="pk-dex-party-bar mb-3 d-flex align-items-center gap-2">
+		<span class="pk-dex-party-label">Party</span>
+
+		<!-- ko foreach: selectedParty -->
+		<!-- ko with: dm.getEntryBySpeciesId($data) -->
+		<div class="pk-dex-party-slot filled"
+			 data-bind="click: function() { dm.selectCreature($data); },
+			            attr: { title: species.name }">
+			<!-- ko if: species.portraitImage -->
+			<img class="pk-dex-party-slot-img" data-bind="attr: { src: species.portraitImage, alt: species.name }" />
+			<!-- /ko -->
+			<!-- ko ifnot: species.portraitImage -->
+			<span class="pk-dex-party-slot-label" data-bind="text: species.name.substring(0, 3).toUpperCase()"></span>
+			<!-- /ko -->
+			<div class="pk-dex-party-hp-track">
+				<div class="pk-dex-party-hp-fill"
+					 data-bind="style: { width: hpPercent() + '%' },
+					 css: { 'pk-hp-green' : hpPercent() > 50, 'pk-hp-yellow': hpPercent() <= 50 && hpPercent() > 20, 'pk-hp-red': hpPercent() <= 20 }">
+				</div>
+			</div>
+		</div>
+		<!-- /ko -->
+		<!-- /ko -->
+
+		<!-- ko foreach: emptyPartySlots -->
+		<div class="pk-dex-party-slot empty"></div>
+		<!-- /ko -->
+
+		<span class="pk-dex-party-count ms-1" data-bind="text: selectedParty().length + '/3'"></span>
+		<span class="pk-dex-party-hint">
+			<!-- ko if: isInActiveBattle() -->
+			Party locked during battle.
+			<!-- /ko -->
+			<!-- ko ifnot: isInActiveBattle() -->
+			Click a caught Portalmon to manage your party.
+			<!-- /ko -->
+		</span>
+	</div>
+
+	<div class="d-flex gap-3 align-items-start">
+
+		<div class="flex-grow-1 overflow-hidden">
+			<div class="pk-dex-panel">
+				<div class="d-flex justify-content-between align-items-center mb-3">
+					<div>
+						<h5 class="mb-0 pk-dex-title">Portalmon Dex</h5>
+						<div class="pk-dex-subtitle">Browse containment notes, move telemetry, and anomaly chains.</div>
+					</div>
+					<div class="d-flex align-items-center gap-2">
+						<button type="button"
+								class="btn pk-dex-random-btn"
+								data-bind="click: selectRandomDiscovered,
+								           enable: allCreatures().some(function(e){ return e.isDiscovered(); })">
+							Surprise Me
+						</button>
+						<div class="pk-dex-counter">
+							<span data-bind="text: allCreatures().filter(function(e){ return e.isCaught(); }).length"></span>/<span data-bind="text: allCreatures().length"></span>
+							<span class="pk-dex-counter-label">caught</span>
+						</div>
+					</div>
+				</div>
+
+				<div class="pk-dex-grid-scroll">
+					<div class="pk-dex-grid" data-bind="foreach: sortedCreatures">
+						<button type="button"
+								class="pk-dex-card"
+								data-bind="
+									click: function() { dm.selectCreature($data); },
+									css: {
+										'pk-dex-card--party':        isInParty(),
+										'pk-dex-card--undiscovered': !isDiscovered()
+									},
+									enable: isDiscovered(),
+									attr: { title: displayName() }">
+
+							<span class="pk-dex-card-party-badge" data-bind="visible: isInParty()">&#9733;</span>
+
+							<div class="pk-dex-card-portrait">
+								<!-- ko if: isCaught() && species.portraitImage -->
+								<img class="pk-dex-card-img" data-bind="attr: { src: species.portraitImage, alt: species.name }" />
+								<!-- /ko -->
+								<!-- ko if: isCaught() && !species.portraitImage -->
+								<span class="pk-dex-card-fallback" data-bind="text: species.name.substring(0, 2).toUpperCase()"></span>
+								<!-- /ko -->
+								<!-- ko if: isSeen() && !isCaught() -->
+								<span class="pk-dex-card-silhouette">?</span>
+								<!-- /ko -->
+								<!-- ko if: !isDiscovered() -->
+								<span class="pk-dex-card-unknown">?</span>
+								<!-- /ko -->
+							</div>
+
+							<div class="pk-dex-card-name" data-bind="text: displayName()"></div>
+
+							<!-- ko if: isCaught() -->
+							<div class="pk-hp-track mt-1" style="height: 4px; width: 100%;">
+								<div class="pk-hp-fill"
+									 data-bind="style: { width: hpPercent() + '%' },
+									 css: { 'pk-hp-green' : hpPercent() > 50, 'pk-hp-yellow': hpPercent() <= 50 && hpPercent() > 20, 'pk-hp-red': hpPercent() <= 20 }">
+								</div>
+							</div>
+							<!-- /ko -->
+
+							<div class="pk-dex-card-status">
+								<!-- ko if: isCaught() -->
+								<span class="pk-dex-status-caught">&#x2713; <span data-bind="text: caughtCount"></span></span>
+								<!-- /ko -->
+								<!-- ko if: isSeen() && !isCaught() -->
+								<span class="pk-dex-status-seen">Seen</span>
+								<!-- /ko -->
+								<!-- ko if: !isDiscovered() -->
+								<span class="pk-dex-status-unknown">???</span>
+								<!-- /ko -->
+							</div>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="pk-dex-detail-col">
+			<div class="pk-dex-panel">
+
+				<div data-bind="visible: !selectedCreature()">
+					<div class="pk-dex-empty-state">
+						<div class="pk-dex-empty-icon">&#x2753;</div>
+						<div class="pk-dex-empty-text">Select a Portalmon<br>to view details</div>
+					</div>
+				</div>
+
+				<div class="pk-dex-detail-scroll" data-bind="with: selectedCreature, visible: selectedCreature()">
+
+					<div class="d-flex justify-content-between align-items-start mb-2">
+						<div>
+							<div class="pk-dex-detail-name" data-bind="text: species.name"></div>
+							<div class="d-flex align-items-center gap-2 flex-wrap">
+								<span class="pk-type-badge badge" data-bind="text: species.type"></span>
+								<div class="pk-dex-tag-row" data-bind="foreach: detailTags, visible: detailTags().length">
+									<span class="pk-dex-detail-tag" data-bind="text: $data"></span>
+								</div>
+							</div>
+						</div>
+						<button type="button" class="btn-close"
+								data-bind="click: function() { dm.clearSelection(); }"></button>
+					</div>
+
+					<div class="pk-dex-detail-portrait mb-2">
+						<!-- ko if: isCaught() && detailSpriteSrc() -->
+						<img class="pk-dex-detail-img" data-bind="attr: { src: detailSpriteSrc(), alt: species.name }" />
+						<!-- /ko -->
+						<!-- ko if: isCaught() && !detailSpriteSrc() -->
+						<span class="pk-dex-detail-portrait-fallback" data-bind="text: species.name.substring(0, 2).toUpperCase()"></span>
+						<!-- /ko -->
+						<!-- ko if: isSeen() && !isCaught() -->
+						<div class="text-center">
+							<div class="pk-dex-detail-silhouette">?</div>
+							<div class="pk-dex-seen-hint mt-1">Observed in the field. Capture required to unlock the full record.</div>
+						</div>
+						<!-- /ko -->
+					</div>
+
+					<div class="pk-dex-sprite-toggle-row mb-3" data-bind="visible: isCaught() && hasBackSprite()">
+						<button type="button"
+								class="btn pk-dex-sprite-toggle"
+								data-bind="click: dm.showFrontSprite, css: { 'pk-dex-sprite-toggle--active': dm.detailSpriteMode() === 'front' }">
+							Front
+						</button>
+						<button type="button"
+								class="btn pk-dex-sprite-toggle"
+								data-bind="click: dm.showRearSprite, css: { 'pk-dex-sprite-toggle--active': dm.detailSpriteMode() === 'rear' }">
+							Rear
+						</button>
+					</div>
+
+					<div data-bind="visible: isCaught()">
+						<div class="pk-dex-inline-warning mb-2"
+							 data-bind="visible: dm.partyFullWarning()">
+							Containment Deck is full. Remove an active Portalmon first.
+						</div>
+
+						<div class="pk-dex-inline-warning pk-dex-inline-warning--info mb-2"
+							 data-bind="visible: dm.isInActiveBattle()">
+							Can't change party during a battle.
+						</div>
+
+						<div class="d-grid">
+							<button type="button"
+									class="btn pk-dex-party-btn"
+									data-bind="
+										css: { 'pk-dex-party-btn--remove': isInParty(), 'pk-dex-party-btn--add': !isInParty() },
+										click: function() { dm.toggleParty($data); },
+										disable: dm.isInActiveBattle()">
+								<span data-bind="visible: !isInParty()">&#43; Add to Party</span>
+								<span data-bind="visible: isInParty()">&#x2212; Remove from Party</span>
+							</button>
+						</div>
+					</div>
+
+					<div class="pk-dex-section-card pk-dex-flavor-card mb-3"
+						 data-bind="visible: isCaught() && !!species.creatureDescription">
+						<div class="pk-dex-section-label">Containment Notes</div>
+						<div class="pk-dex-flavor" data-bind="text: species.creatureDescription"></div>
+					</div>
+
+					<div class="pk-dex-info-row mb-3">
+						<div class="pk-dex-info-cell">
+							<div class="pk-dex-info-label">Caught</div>
+							<div class="pk-dex-info-value" data-bind="text: caughtCount"></div>
+						</div>
+						<!-- ko if: isCaught() -->
+						<div class="pk-dex-info-cell">
+							<div class="pk-dex-info-label">HP</div>
+							<div class="pk-dex-info-value"
+								 data-bind="text: currentHp() + '/' + species.base.hp,
+								            css: { 'text-danger' : hpPercent() <= 20, 'text-warning': hpPercent() <= 50 && hpPercent() > 20 }">
+							</div>
+						</div>
+						<div class="pk-dex-info-cell">
+							<div class="pk-dex-info-label">Party</div>
+							<div class="pk-dex-info-value"
+								 data-bind="text: partyStatusLabel(),
+								            css: { 'text-success': isInParty() }">
+							</div>
+						</div>
+						<!-- /ko -->
+					</div>
+
+					<!-- ko if: isCaught() -->
+					<div class="d-flex align-items-center gap-2 mb-3">
+						<span class="pk-hp-label">HP</span>
+						<div class="pk-hp-track">
+							<div class="pk-hp-fill"
+								 data-bind="style: { width: hpPercent() + '%' },
+								 css: { 'pk-hp-green' : hpPercent() > 50, 'pk-hp-yellow': hpPercent() <= 50 && hpPercent() > 20, 'pk-hp-red': hpPercent() <= 20 }">
+							</div>
+						</div>
+					</div>
+					<!-- /ko -->
+
+					<div class="mb-3" data-bind="visible: isCaught()">
+						<div class="pk-dex-section-label">Base Stats</div>
+						<div class="pk-dex-stats-row">
+							<div class="pk-dex-stat">
+								<div class="pk-dex-stat-label">HP</div>
+								<div class="pk-dex-stat-value" data-bind="text: species.base.hp"></div>
+							</div>
+							<div class="pk-dex-stat">
+								<div class="pk-dex-stat-label">ATK</div>
+								<div class="pk-dex-stat-value" data-bind="text: species.base.atk"></div>
+							</div>
+							<div class="pk-dex-stat">
+								<div class="pk-dex-stat-label">DEF</div>
+								<div class="pk-dex-stat-value" data-bind="text: species.base.def"></div>
+							</div>
+							<div class="pk-dex-stat">
+								<div class="pk-dex-stat-label">SPD</div>
+								<div class="pk-dex-stat-value" data-bind="text: species.base.spd"></div>
+							</div>
+						</div>
+					</div>
+
+					<div class="pk-dex-seen-hint mb-3" data-bind="visible: isSeen() && !isCaught()">
+						Telemetry redacted. Capture this Portalmon to reveal combat stats, move data, and ultimate protocols.
+					</div>
+
+					<div class="pk-dex-section-card mb-3" data-bind="visible: isCaught() && !!evolutionChainText()">
+						<div class="pk-dex-section-label">Unlock Path</div>
+						<div class="pk-dex-evo-chain" data-bind="text: evolutionChainText"></div>
+						<div class="pk-dex-evo-progress" data-bind="visible: !!evolutionProgressText(), text: evolutionProgressText"></div>
+						<div class="pk-dex-evo-progress" data-bind="visible: !evolutionProgressText() && !!evolvesFromSpecies">
+							No further unlock activity recorded.
+						</div>
+					</div>
+
+					<div class="pk-dex-section-card pk-dex-ult-card mb-3" data-bind="visible: isCaught() && !!resolvedUltimate">
+						<div class="pk-dex-section-label">Ultimate Protocol</div>
+						<div class="pk-dex-ult-name" data-bind="text: resolvedUltimate ? resolvedUltimate.name : ''"></div>
+						<div class="pk-dex-ult-meta">
+							<span data-bind="text: resolvedUltimate ? resolvedUltimate.type : ''"></span>
+							&bull;
+							<span data-bind="text: resolvedUltimate ? resolvedUltimate.chargeCost + ' charge' : ''"></span>
+							<!-- ko if: species.chargeArchetype -->
+							&bull;
+							<span data-bind="text: species.chargeArchetype"></span>
+							<!-- /ko -->
+						</div>
+						<div class="pk-dex-ult-charge-copy" data-bind="text: dm.getChargeArchetypeSummary(species.chargeArchetype)"></div>
+						<div class="pk-dex-ult-flavor" data-bind="text: resolvedUltimate ? resolvedUltimate.flavorText : ''"></div>
+					</div>
+
+					<div class="mb-3" data-bind="visible: isCaught()">
+						<div class="pk-dex-section-label">Move Set</div>
+						<div class="d-flex flex-column gap-1" data-bind="foreach: resolvedMoves">
+							<div class="pk-dex-move-row"
+								 data-bind="bsTooltip: { title: dm.getMoveTooltip($data), placement: 'left' }">
+								<div class="pk-dex-move-name" data-bind="text: $data.name"></div>
+								<div class="pk-dex-move-meta">
+									<span data-bind="text: $data.type"></span>
+									&bull;
+									<span data-bind="text: $data.power ? $data.power + 'pw' : '---'"></span>
+									&bull;
+									<span data-bind="text: $data.hitChance + '% acc'"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>

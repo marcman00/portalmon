@@ -1,0 +1,35 @@
+{
+  "tile_width": 16,
+  "tile_height": 24,
+  "columns": 2,
+  "tiles": [
+    {
+      "tile_id": 0,
+      "source": "tmp/packer-test/input/001_test.png",
+      "source_visible_bounds": [
+        2,
+        1,
+        14,
+        24
+      ],
+      "position": [
+        2,
+        1
+      ]
+    },
+    {
+      "tile_id": 1,
+      "source": "tmp/packer-test/input/002_test.png",
+      "source_visible_bounds": [
+        0,
+        10,
+        16,
+        24
+      ],
+      "position": [
+        16,
+        10
+      ]
+    }
+  ]
+}

@@ -1,0 +1,772 @@
+// =========================================
+// GBA SHELL
+// =========================================
+.gba-shell {
+    --gba-shell-top: #{$gba-purple-mid};
+    --gba-shell-mid: #{$gba-purple-mid};
+    --gba-shell-bottom: #{$gba-purple-dark};
+    --gba-shell-base-top: #{$gba-purple-mid};
+    --gba-shell-base-bottom: #{$gba-purple-shadow};
+    --gba-shell-label: rgba(255, 255, 255, 0.3);
+    --gba-shell-help-bg: rgba(255, 255, 255, 0.06);
+    --gba-shell-help-border: rgba(255, 255, 255, 0.18);
+    --gba-shell-help-text: rgba(255, 255, 255, 0.35);
+    --gba-shell-help-hover-bg: rgba(255, 255, 255, 0.14);
+    --gba-shell-help-hover-text: rgba(255, 255, 255, 0.75);
+    --gba-shell-help-hover-border: rgba(255, 255, 255, 0.35);
+    --gba-shell-speaker-dot: rgba(0, 0, 0, 0.4);
+    --gba-shell-bezel: #{$gba-bezel};
+    --gba-shell-bezel-inner: #{$gba-bezel-inner};
+    --gba-shell-btn-a-top: #ef5350;
+    --gba-shell-btn-a-bottom: #b71c1c;
+    --gba-shell-btn-a-shadow: #7f0000;
+    --gba-shell-btn-a-hover-top: #f44336;
+    --gba-shell-btn-a-hover-bottom: #c62828;
+    --gba-shell-btn-b-top: #42a5f5;
+    --gba-shell-btn-b-bottom: #0d47a1;
+    --gba-shell-btn-b-shadow: #072a6e;
+    --gba-shell-btn-b-hover-top: #64b5f6;
+    --gba-shell-btn-b-hover-bottom: #1565c0;
+    --gba-shell-pill-top: #2a1e42;
+    --gba-shell-pill-bottom: #1a1230;
+    --gba-shell-pill-hover-top: #352850;
+    --gba-shell-pill-hover-bottom: #201640;
+    --gba-shell-pill-text: rgba(255, 255, 255, 0.45);
+    --gba-shell-pill-hover-text: rgba(255, 255, 255, 0.75);
+    --gba-shell-pattern: none;
+    --gba-shell-pattern-opacity: 0;
+    --gba-bottom-pattern: none;
+    --gba-bottom-pattern-opacity: 0;
+    width: 100%;
+    max-width: $gba-shell-max-width;
+    margin: 0 auto;
+    zoom: 1.5;
+    background: linear-gradient(
+        165deg,
+        var(--gba-shell-top) 0%,
+        var(--gba-shell-mid) 60%,
+        var(--gba-shell-bottom) 100%
+    );
+    border-radius: 18px 18px 28px 28px;
+    box-shadow:
+        0 2px 0 rgba(255, 255, 255, 0.08) inset,
+        0 -3px 0 rgba(0, 0, 0, 0.4) inset,
+        2px 0 0 rgba(255, 255, 255, 0.04) inset,
+        0 12px 40px rgba(0, 0, 0, 0.6),
+        0 4px 12px rgba(0, 0, 0, 0.35);
+    overflow: hidden;
+    position: relative;
+
+    // Subtle plastic sheen highlight across the top third
+    &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 45%;
+        background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, transparent 100%);
+        pointer-events: none;
+        z-index: 0;
+        border-radius: 18px 18px 0 0;
+    }
+
+    &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: var(--gba-shell-pattern);
+        opacity: var(--gba-shell-pattern-opacity);
+        pointer-events: none;
+        z-index: 0;
+        border-radius: inherit;
+        background-repeat: no-repeat;
+    }
+}
+
+.gba-shell[data-skin="aqua"] {
+    --gba-shell-top: #8fd3d8;
+    --gba-shell-mid: #79c2c9;
+    --gba-shell-bottom: #5ea2aa;
+    --gba-shell-base-top: #6bb2ba;
+    --gba-shell-base-bottom: #294f58;
+    --gba-shell-label: rgba(241, 255, 255, 0.46);
+    --gba-shell-help-bg: rgba(255, 255, 255, 0.14);
+    --gba-shell-help-border: rgba(235, 255, 255, 0.28);
+    --gba-shell-help-text: rgba(244, 255, 255, 0.62);
+    --gba-shell-help-hover-bg: rgba(255, 255, 255, 0.22);
+    --gba-shell-help-hover-text: rgba(255, 255, 255, 0.92);
+    --gba-shell-help-hover-border: rgba(255, 255, 255, 0.42);
+    --gba-shell-speaker-dot: rgba(0, 30, 36, 0.4);
+    --gba-shell-bezel: #0c1319;
+    --gba-shell-bezel-inner: #111c24;
+    --gba-shell-btn-a-top: #f2706a;
+    --gba-shell-btn-a-bottom: #a73030;
+    --gba-shell-btn-a-shadow: #6b1919;
+    --gba-shell-btn-a-hover-top: #ff857f;
+    --gba-shell-btn-a-hover-bottom: #c14444;
+    --gba-shell-btn-b-top: #3b6ce0;
+    --gba-shell-btn-b-bottom: #19398e;
+    --gba-shell-btn-b-shadow: #11265d;
+    --gba-shell-btn-b-hover-top: #5886ef;
+    --gba-shell-btn-b-hover-bottom: #254fb2;
+    --gba-shell-pill-top: #4f7f88;
+    --gba-shell-pill-bottom: #355d67;
+    --gba-shell-pill-hover-top: #618f97;
+    --gba-shell-pill-hover-bottom: #416f79;
+    --gba-shell-pill-text: rgba(243, 255, 255, 0.72);
+    --gba-shell-pill-hover-text: rgba(255, 255, 255, 0.95);
+}
+
+.gba-shell[data-skin="pikachu"] {
+    --gba-shell-top: #f5dd58;
+    --gba-shell-mid: #e8c941;
+    --gba-shell-bottom: #c69a18;
+    --gba-shell-base-top: #d5b033;
+    --gba-shell-base-bottom: #6e5408;
+    --gba-shell-label: rgba(78, 57, 0, 0.55);
+    --gba-shell-help-bg: rgba(92, 68, 0, 0.12);
+    --gba-shell-help-border: rgba(92, 68, 0, 0.24);
+    --gba-shell-help-text: rgba(82, 60, 0, 0.55);
+    --gba-shell-help-hover-bg: rgba(92, 68, 0, 0.18);
+    --gba-shell-help-hover-text: rgba(56, 39, 0, 0.92);
+    --gba-shell-help-hover-border: rgba(92, 68, 0, 0.34);
+    --gba-shell-speaker-dot: rgba(56, 40, 0, 0.38);
+    --gba-shell-bezel: #14120b;
+    --gba-shell-bezel-inner: #19160e;
+    --gba-shell-btn-a-top: #d45c34;
+    --gba-shell-btn-a-bottom: #8a2c18;
+    --gba-shell-btn-a-shadow: #5e1d10;
+    --gba-shell-btn-a-hover-top: #e17549;
+    --gba-shell-btn-a-hover-bottom: #a43f21;
+    --gba-shell-btn-b-top: #7550c8;
+    --gba-shell-btn-b-bottom: #3e2975;
+    --gba-shell-btn-b-shadow: #261748;
+    --gba-shell-btn-b-hover-top: #8a68da;
+    --gba-shell-btn-b-hover-bottom: #5433a0;
+    --gba-shell-pill-top: #9b7418;
+    --gba-shell-pill-bottom: #6f510f;
+    --gba-shell-pill-hover-top: #b1841d;
+    --gba-shell-pill-hover-bottom: #7f5d12;
+    --gba-shell-pill-text: rgba(255, 248, 220, 0.86);
+    --gba-shell-pill-hover-text: rgba(255, 252, 238, 0.98);
+}
+
+.gba-shell[data-skin="mooroo"] {
+    --gba-shell-top: #fbf8f2;
+    --gba-shell-mid: #f5efe4;
+    --gba-shell-bottom: #ded4c5;
+    --gba-shell-base-top: #e6dccf;
+    --gba-shell-base-bottom: #7c6d5f;
+    --gba-shell-label: rgba(68, 52, 40, 0.55);
+    --gba-shell-help-bg: rgba(62, 50, 40, 0.08);
+    --gba-shell-help-border: rgba(88, 71, 58, 0.22);
+    --gba-shell-help-text: rgba(72, 56, 44, 0.58);
+    --gba-shell-help-hover-bg: rgba(50, 40, 30, 0.12);
+    --gba-shell-help-hover-text: rgba(40, 28, 20, 0.9);
+    --gba-shell-help-hover-border: rgba(88, 71, 58, 0.35);
+    --gba-shell-speaker-dot: rgba(38, 28, 20, 0.4);
+    --gba-shell-bezel: #111015;
+    --gba-shell-bezel-inner: #17161c;
+    --gba-shell-btn-a-top: #c96b60;
+    --gba-shell-btn-a-bottom: #824137;
+    --gba-shell-btn-a-shadow: #5d2b24;
+    --gba-shell-btn-a-hover-top: #d77e74;
+    --gba-shell-btn-a-hover-bottom: #995046;
+    --gba-shell-btn-b-top: #6f7b90;
+    --gba-shell-btn-b-bottom: #3b4250;
+    --gba-shell-btn-b-shadow: #252b35;
+    --gba-shell-btn-b-hover-top: #8590a4;
+    --gba-shell-btn-b-hover-bottom: #4b5668;
+    --gba-shell-pill-top: #5d5147;
+    --gba-shell-pill-bottom: #3d342d;
+    --gba-shell-pill-hover-top: #73655a;
+    --gba-shell-pill-hover-bottom: #4a3f37;
+    --gba-shell-pill-text: rgba(255, 247, 236, 0.78);
+    --gba-shell-pill-hover-text: rgba(255, 250, 242, 0.96);
+    --gba-shell-pattern: none;
+    --gba-shell-pattern-opacity: 0;
+    --gba-bottom-pattern:
+        radial-gradient(58px 18px at 8% 68%, rgba(18, 14, 11, 0.98) 0 72%, transparent 73%),
+        radial-gradient(42px 14px at 22% 28%, rgba(20, 16, 12, 0.96) 0 72%, transparent 73%),
+        radial-gradient(26px 10px at 31% 84%, rgba(23, 18, 14, 0.9) 0 72%, transparent 73%),
+        radial-gradient(44px 16px at 76% 24%, rgba(16, 13, 10, 0.98) 0 72%, transparent 73%),
+        radial-gradient(56px 18px at 92% 70%, rgba(18, 14, 11, 0.98) 0 72%, transparent 73%);
+    --gba-bottom-pattern-opacity: 0.9;
+}
+
+.gba-shell[data-skin="isaac"] {
+    --gba-shell-top: #ff69b4;
+    --gba-shell-mid: #ff1493;
+    --gba-shell-bottom: #cc0077;
+    --gba-shell-base-top: #e6118a;
+    --gba-shell-base-bottom: #6b003d;
+    --gba-shell-label: rgba(255, 255, 255, 0.55);
+    --gba-shell-help-bg: rgba(255, 255, 255, 0.12);
+    --gba-shell-help-border: rgba(255, 220, 240, 0.28);
+    --gba-shell-help-text: rgba(255, 255, 255, 0.6);
+    --gba-shell-help-hover-bg: rgba(255, 255, 255, 0.2);
+    --gba-shell-help-hover-text: rgba(255, 255, 255, 0.92);
+    --gba-shell-help-hover-border: rgba(255, 255, 255, 0.42);
+    --gba-shell-speaker-dot: rgba(80, 0, 40, 0.45);
+    --gba-shell-bezel: #12060e;
+    --gba-shell-bezel-inner: #180a12;
+    --gba-shell-btn-a-top: #ff4081;
+    --gba-shell-btn-a-bottom: #c2185b;
+    --gba-shell-btn-a-shadow: #880e4f;
+    --gba-shell-btn-a-hover-top: #ff80ab;
+    --gba-shell-btn-a-hover-bottom: #e91e63;
+    --gba-shell-btn-b-top: #ea80fc;
+    --gba-shell-btn-b-bottom: #9c27b0;
+    --gba-shell-btn-b-shadow: #6a0080;
+    --gba-shell-btn-b-hover-top: #f3a8ff;
+    --gba-shell-btn-b-hover-bottom: #ba68c8;
+    --gba-shell-pill-top: #a30060;
+    --gba-shell-pill-bottom: #6b003d;
+    --gba-shell-pill-hover-top: #c40075;
+    --gba-shell-pill-hover-bottom: #85004d;
+    --gba-shell-pill-text: rgba(255, 220, 240, 0.8);
+    --gba-shell-pill-hover-text: rgba(255, 240, 248, 0.96);
+}
+
+// --- Top bar ---
+.gba-top-bar {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    padding: 10px 18px 6px;
+    gap: 8px;
+}
+
+.gba-power-led {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #4caf50;
+    box-shadow:
+        0 0 8px rgba(76, 175, 80, 0.7),
+        0 0 2px rgba(76, 175, 80, 0.9) inset;
+    flex-shrink: 0;
+}
+
+.gba-brand-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gba-shell-label);
+    flex-shrink: 0;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+}
+
+.gba-help-btn {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1.5px solid var(--gba-shell-help-border);
+    background: var(--gba-shell-help-bg);
+    color: var(--gba-shell-help-text);
+    font-size: 0.65rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    transition: background 150ms, color 150ms, border-color 150ms;
+    flex-shrink: 0;
+
+    &:hover {
+        background: var(--gba-shell-help-hover-bg);
+        color: var(--gba-shell-help-hover-text);
+        border-color: var(--gba-shell-help-hover-border);
+    }
+}
+
+.gba-speaker {
+    margin-left: auto;
+    display: grid;
+    grid-template-columns: auto repeat(6, 5px);
+    gap: 3px;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.gba-speaker-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--gba-shell-speaker-dot);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+// =========================================
+// MAIN BODY — 3-column layout
+// =========================================
+.gba-body {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: nowrap; // never stack — panels must stay beside the screen
+    align-items: center;
+    padding: 4px 12px 8px;
+    gap: 10px;
+}
+
+// --- LEFT panel: D-pad ---
+.gba-left-panel {
+    flex: 0 0 88px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+// --- CENTER: Screen bezel ---
+.gba-bezel {
+    flex: 1 1 auto;
+    padding: 8px;
+    background: linear-gradient(180deg, var(--gba-shell-bezel) 0%, var(--gba-shell-bezel-inner) 100%);
+    border-radius: 6px;
+    box-shadow:
+        0 3px 10px rgba(0, 0, 0, 0.6) inset,
+        0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.gba-screen {
+    position: relative;
+    background: #0c140c;
+    border-radius: 3px;
+    overflow: hidden;
+    height: 400px; // fixed landscape height — content scrolls inside
+}
+
+// Scanline + warm LCD tint overlay
+.gba-scanlines {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 5;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent 0px,
+        transparent 2px,
+        rgba(0, 0, 0, 0.06) 2px,
+        rgba(0, 0, 0, 0.06) 4px
+    );
+
+    &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: rgba(180, 210, 160, 0.025);
+        pointer-events: none;
+    }
+}
+
+// --- RIGHT panel: A/B buttons ---
+.gba-right-panel {
+    flex: 0 0 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gba-ab-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    // Slight diagonal tilt like a real GBA
+    transform: rotate(-15deg);
+    align-items: center;
+}
+
+.gba-btn {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: none;
+    font-size: 0.55rem;
+    font-weight: 800;
+    letter-spacing: 0.07em;
+    color: rgba(255, 255, 255, 0.92);
+    cursor: pointer;
+    position: relative;
+    text-transform: uppercase;
+    // Undo the parent tilt so text reads straight
+    transform: rotate(15deg);
+    transition: box-shadow 100ms, transform 100ms;
+
+    &:active {
+        transform: rotate(15deg) translateY(2px);
+    }
+}
+
+.gba-btn-a {
+    background: linear-gradient(160deg, var(--gba-shell-btn-a-top), var(--gba-shell-btn-a-bottom));
+    box-shadow:
+        0 4px 0 var(--gba-shell-btn-a-shadow),
+        0 1px 0 rgba(255, 255, 255, 0.18) inset,
+        0 5px 14px rgba(0, 0, 0, 0.4);
+    // A button is offset up/right relative to B (like real GBA)
+    margin-right: 8px;
+
+    &:hover {
+        background: linear-gradient(160deg, var(--gba-shell-btn-a-hover-top), var(--gba-shell-btn-a-hover-bottom));
+    }
+
+    &:active {
+        box-shadow:
+            0 1px 0 var(--gba-shell-btn-a-shadow),
+            0 1px 0 rgba(255, 255, 255, 0.18) inset;
+    }
+}
+
+.gba-btn-b {
+    background: linear-gradient(160deg, var(--gba-shell-btn-b-top), var(--gba-shell-btn-b-bottom));
+    box-shadow:
+        0 4px 0 var(--gba-shell-btn-b-shadow),
+        0 1px 0 rgba(255, 255, 255, 0.18) inset,
+        0 5px 14px rgba(0, 0, 0, 0.4);
+    margin-left: 8px;
+
+    &:hover {
+        background: linear-gradient(160deg, var(--gba-shell-btn-b-hover-top), var(--gba-shell-btn-b-hover-bottom));
+    }
+
+    &:active {
+        box-shadow:
+            0 1px 0 var(--gba-shell-btn-b-shadow),
+            0 1px 0 rgba(255, 255, 255, 0.18) inset;
+    }
+}
+
+// =========================================
+// PILL BUTTONS (inside left panel)
+// =========================================
+.gba-pills-left {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
+}
+
+.gba-pill-btn {
+    padding: 5px 18px;
+    border-radius: 12px;
+    border: none;
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gba-shell-pill-text);
+    background: linear-gradient(180deg, var(--gba-shell-pill-top), var(--gba-shell-pill-bottom));
+    box-shadow:
+        0 3px 0 rgba(0, 0, 0, 0.4),
+        0 1px 0 rgba(255, 255, 255, 0.05) inset;
+    cursor: pointer;
+    transition: all 100ms;
+
+    &:hover {
+        color: var(--gba-shell-pill-hover-text);
+        background: linear-gradient(180deg, var(--gba-shell-pill-hover-top), var(--gba-shell-pill-hover-bottom));
+    }
+
+    &:active {
+        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+        transform: translateY(2px);
+    }
+}
+
+// --- Bottom rounded base ---
+.gba-bottom {
+    position: relative;
+    z-index: 1;
+    min-height: 42px;
+    padding: 6px 16px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, var(--gba-shell-base-top) 0%, var(--gba-shell-base-bottom) 100%);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+    overflow: hidden;
+
+    &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: var(--gba-bottom-pattern);
+        opacity: var(--gba-bottom-pattern-opacity);
+        pointer-events: none;
+        z-index: 0;
+    }
+}
+
+.gba-shell-switch {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(0, 0, 0, 0.08));
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.06) inset,
+        0 -1px 0 rgba(0, 0, 0, 0.22) inset;
+}
+
+.gba-shell-switch-label {
+    font-size: 0.44rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gba-shell-label);
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.18);
+    user-select: none;
+}
+
+.gba-shell-switch-track {
+    position: relative;
+    width: 114px;
+    height: 20px;
+    padding: 2px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    align-items: center;
+    border-radius: 999px;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.2));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+        0 2px 5px rgba(0, 0, 0, 0.28) inset,
+        0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.gba-shell-switch-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 14px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #dedee4, #7f7f8b);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.5) inset,
+        0 1px 4px rgba(0, 0, 0, 0.45);
+    pointer-events: none;
+    transition: transform 180ms ease;
+}
+
+.gba-shell-switch-track[data-skin="purple"]  .gba-shell-switch-thumb { transform: translateX(0); }
+.gba-shell-switch-track[data-skin="aqua"]    .gba-shell-switch-thumb { transform: translateX(22px); }
+.gba-shell-switch-track[data-skin="pikachu"] .gba-shell-switch-thumb { transform: translateX(44px); }
+.gba-shell-switch-track[data-skin="mooroo"]  .gba-shell-switch-thumb { transform: translateX(66px); }
+.gba-shell-switch-track[data-skin="isaac"]  .gba-shell-switch-thumb { transform: translateX(88px); }
+
+.gba-shell-switch-detent {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+
+    &::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        box-shadow:
+            0 1px 0 rgba(255, 255, 255, 0.14) inset,
+            0 0 0 1px rgba(0, 0, 0, 0.28);
+        transition: transform 100ms ease, filter 100ms ease;
+    }
+
+    &:hover::after {
+        transform: translate(-50%, -50%) scale(1.08);
+        filter: brightness(1.08);
+    }
+
+    &.is-active::after {
+        transform: translate(-50%, -50%) scale(1.12);
+    }
+}
+
+.gba-shell-switch-detent[data-skin-option="purple"]::after {
+    background: linear-gradient(180deg, #8b6cc7, #5f458f);
+}
+
+.gba-shell-switch-detent[data-skin-option="aqua"]::after {
+    background: linear-gradient(180deg, #9ee6ea, #60bfc7);
+}
+
+.gba-shell-switch-detent[data-skin-option="pikachu"]::after {
+    background: linear-gradient(180deg, #ffe46f, #d2a81c);
+}
+
+.gba-shell-switch-detent[data-skin-option="mooroo"]::after {
+    background: linear-gradient(135deg, #f3e7d9 0 58%, #2f261f 58% 100%);
+}
+.gba-shell-switch-detent[data-skin-option="isaac"]::after {
+    background: linear-gradient(180deg, #ff69b4, #ff1493);
+}
+
+// =========================================
+// SCREEN CONTENT — overlays and base layer
+// =========================================
+.gba-screen-base {
+    position: relative;
+    height: 100%; // 100% causes an unnecessary scrollbar to appear in intro unnecessarily, but then shrinking cuts off the combat log
+    overflow-y: auto;
+    overflow-x: hidden;
+    transition: filter 200ms ease;
+    @include pk-thin-scrollbar;
+
+    &.gba-dimmed {
+        filter: brightness(0.25) blur(1px);
+        pointer-events: none;
+    }
+}
+
+.gba-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    background: $s-bg;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.gba-overlay-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 12px;
+    background: $s-bg-mid;
+    border-bottom: 2px solid $s-border;
+    flex-shrink: 0;
+}
+
+.gba-overlay-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: $pk-red;
+    letter-spacing: 0.04em;
+}
+
+.gba-overlay-close {
+    background: none;
+    border: none;
+    color: $s-text-muted;
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 4px;
+
+    &:hover {
+        color: $s-text;
+    }
+}
+
+.gba-overlay-body {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    @include pk-thin-scrollbar;
+}
+
+// =========================================
+// D-PAD
+// =========================================
+.gba-dpad {
+    position: relative;
+    width: 64px;
+    height: 64px;
+}
+
+.gba-dpad-v {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+    width: 22px;
+    height: 100%;
+    background: linear-gradient(180deg, #222232, #1a1a28, #222232);
+    border-radius: 4px;
+    box-shadow:
+        0 1px 0 rgba(255,255,255,0.05) inset,
+        0 -1px 0 rgba(0,0,0,0.3) inset;
+}
+
+.gba-dpad-h {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    width: 100%;
+    height: 22px;
+    background: linear-gradient(90deg, #222232, #1a1a28, #222232);
+    border-radius: 4px;
+    box-shadow:
+        0 1px 0 rgba(255,255,255,0.05) inset,
+        0 -1px 0 rgba(0,0,0,0.3) inset;
+}
+
+.gba-dpad-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 22px;
+    height: 22px;
+    background: #1e1e2e;
+    border-radius: 2px;
+}
+
+.gba-dpad-hit {
+    position: absolute;
+    z-index: 2;
+    appearance: none;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    touch-action: none;
+
+    &:focus-visible {
+        outline: 2px solid rgba(255, 255, 255, 0.7);
+        outline-offset: -2px;
+    }
+
+    &:active {
+        background: rgba(255, 255, 255, 0.08);
+    }
+}
+
+.gba-dpad-hit--up,
+.gba-dpad-hit--down {
+    left: 21px;
+    width: 22px;
+    height: 21px;
+}
+
+.gba-dpad-hit--up { top: 0; }
+.gba-dpad-hit--down { bottom: 0; }
+
+.gba-dpad-hit--left,
+.gba-dpad-hit--right {
+    top: 21px;
+    width: 21px;
+    height: 22px;
+}
+
+.gba-dpad-hit--left { left: 0; }
+.gba-dpad-hit--right { right: 0; }

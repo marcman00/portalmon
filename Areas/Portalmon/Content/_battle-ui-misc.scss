@@ -1,0 +1,411 @@
+// ═══════════════════════════════════════════════════════════════
+// FIGHT PANEL (4 moves + wide BACK)
+// ═══════════════════════════════════════════════════════════════
+
+.pk-fight-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 5px;
+    height: 100%;
+    justify-content: center;
+}
+
+.pk-move-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3px;
+}
+
+.pk-btn-ultimate {
+    border-color: #c060ff;
+    color: #c060ff;
+    background: rgba(140, 60, 220, 0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.2;
+    &:hover:not(:disabled) { background: rgba(140, 60, 220, 0.18); }
+    &.pk-move-blocked { text-decoration: line-through; opacity: 0.45; }
+}
+
+.pk-btn-ultimate.pk-ult-charged {
+    border-color: #e0a0ff;
+    color: #e0a0ff;
+    background: rgba(180, 80, 255, 0.12);
+    box-shadow: 0 0 8px rgba(180, 80, 255, 0.4), 0 0 16px rgba(180, 80, 255, 0.15);
+    animation: pk-ult-crackle 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes pk-ult-crackle {
+    0%   { box-shadow: 0 0 6px rgba(180,80,255,0.3), 0 0 12px rgba(180,80,255,0.1); }
+    50%  { box-shadow: 0 0 12px rgba(255,200,80,0.5), 0 0 24px rgba(180,80,255,0.3); }
+    100% { box-shadow: 0 0 8px rgba(180,80,255,0.4), 0 0 18px rgba(255,200,80,0.2); }
+}
+
+.pk-ultimate-icon {
+    font-size: 0.6rem;
+    margin-right: 2px;
+    display: inline;
+}
+
+.pk-btn-back--wide {
+    width: 100%;
+    margin-top: 1px;
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// MAIN MENU ICONS
+// ═══════════════════════════════════════════════════════════════
+
+.pk-btn-icon {
+    font-size: 0.65rem;
+    margin-right: 2px;
+    vertical-align: middle;
+}
+
+.pk-btn-icon-img {
+    width: 12px;
+    height: 12px;
+    vertical-align: middle;
+    margin-right: 2px;
+    image-rendering: pixelated;
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// SPRITE BATTLE ANIMATIONS
+// ═══════════════════════════════════════════════════════════════
+
+// --- Idle float (always active) ---
+@keyframes pk-sprite-float {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-3px); }
+}
+
+.pk-player-sprite .pk-sprite-frame,
+.pk-enemy-sprite .pk-sprite-frame {
+    animation: pk-sprite-float 2.5s ease-in-out infinite;
+}
+
+// --- Attack gesture (player moves right toward enemy, enemy moves left toward player) ---
+@keyframes pk-sprite-attack-right {
+    0%   { transform: translateX(0); }
+    40%  { transform: translateX(12px); }
+    100% { transform: translateX(0); }
+}
+
+@keyframes pk-sprite-attack-left {
+    0%   { transform: translateX(0); }
+    40%  { transform: translateX(-12px); }
+    100% { transform: translateX(0); }
+}
+
+.pk-player-sprite.pk-sprite-anim-attacking .pk-sprite-frame {
+    animation: pk-sprite-attack-right 300ms ease-out forwards;
+}
+
+.pk-enemy-sprite.pk-sprite-anim-attacking .pk-sprite-frame {
+    animation: pk-sprite-attack-left 300ms ease-out forwards;
+}
+
+// --- Hit recoil (player knocked left, enemy knocked right) ---
+@keyframes pk-sprite-recoil-left {
+    0%   { transform: translateX(0); }
+    30%  { transform: translateX(-6px); }
+    100% { transform: translateX(0); }
+}
+
+@keyframes pk-sprite-recoil-right {
+    0%   { transform: translateX(0); }
+    30%  { transform: translateX(6px); }
+    100% { transform: translateX(0); }
+}
+
+.pk-player-sprite.pk-sprite-anim-hit .pk-sprite-frame {
+    animation: pk-sprite-recoil-left 200ms ease-out forwards;
+}
+
+.pk-enemy-sprite.pk-sprite-anim-hit .pk-sprite-frame {
+    animation: pk-sprite-recoil-right 200ms ease-out forwards;
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// BATTLE SIMULATOR (Admin)
+// ═══════════════════════════════════════════════════════════════
+
+.pk-sim {
+    font-size: 0.72rem;
+}
+
+.pk-sim-section {
+    margin-bottom: 10px;
+}
+
+.pk-sim-section-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: $s-accent;
+    margin-bottom: 4px;
+}
+
+.pk-sim-section--battle {
+    border-top: 1px solid $s-border;
+    padding-top: 8px;
+}
+
+// — Creature chip bars ——————————————————————————————————————
+
+.pk-sim-creature-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+    max-height: 60px;
+    overflow-y: auto;
+    padding: 3px;
+    background: $s-bg-dark;
+    border: 1px solid $s-border;
+    border-radius: 4px;
+    margin-bottom: 6px;
+}
+
+.pk-sim-creature-bar--small {
+    max-height: 44px;
+}
+
+.pk-sim-chip {
+    padding: 1px 6px;
+    font-size: 0.6rem;
+    font-family: inherit;
+    border: 1px solid $s-border;
+    border-radius: 3px;
+    background: $s-bg-mid;
+    color: $s-text-muted;
+    cursor: pointer;
+    transition: all 80ms;
+    white-space: nowrap;
+
+    &:hover {
+        color: $s-text;
+        border-color: $s-text-muted;
+    }
+
+    &--active {
+        background: $s-accent;
+        color: #000;
+        border-color: $s-accent;
+        font-weight: 700;
+    }
+
+    &--sm {
+        font-size: 0.55rem;
+        padding: 1px 4px;
+    }
+}
+
+// — Sprite preview ———————————————————————————————————————
+
+.pk-sim-preview-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.pk-sim-preview-pane {
+    flex: 1;
+    text-align: center;
+}
+
+.pk-sim-preview-label {
+    font-size: 0.55rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: $s-text-muted;
+    margin-bottom: 2px;
+}
+
+.pk-sim-preview-frame {
+    width: 100%;
+    aspect-ratio: 1;
+    max-height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $s-bg-dark;
+    border: 1px solid $s-border;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.pk-sim-preview-frame--battle {
+    background: linear-gradient(180deg, #0f3460 0%, #16213e 40%, #1a472a 70%, #2d5a27 100%);
+}
+
+.gba-btn-rest {
+    // Smaller green button — same 3D style as A/B but scaled down
+    width: 34px;
+    height: 34px;
+    background: linear-gradient(160deg, #66bb6a, #2e7d32);
+    box-shadow:
+        0 3px 0 #1b5e20,
+        0 1px 0 rgba(255, 255, 255, 0.18) inset,
+        0 4px 10px rgba(0, 0, 0, 0.4);
+    margin-top: -4px;
+
+    &:hover:not(:disabled) {
+        background: linear-gradient(160deg, #81c784, #388e3c);
+    }
+
+    &:active:not(:disabled) {
+        box-shadow:
+            0 1px 0 #1b5e20,
+            0 1px 0 rgba(255, 255, 255, 0.18) inset;
+        transform: rotate(15deg) translateY(2px);
+    }
+
+    &:disabled { opacity: 0.3; cursor: not-allowed; }
+}
+
+.pk-sprite-flipped {
+    transform: scaleX(-1) scale(var(--pk-battle-sprite-scale, 1));
+}
+
+.pk-sim-sprite-img {
+    max-width: 85%;
+    max-height: 85%;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+.pk-sim-no-sprite {
+    font-size: 0.6rem;
+    color: $s-text-muted;
+    font-style: italic;
+}
+
+// — Stats row ————————————————————————————————————————————
+
+.pk-sim-stats-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.6rem;
+    color: $s-text;
+    margin-bottom: 2px;
+}
+
+.pk-sim-stat {
+    color: $s-text-muted;
+    strong {
+        color: $s-text-em;
+    }
+}
+
+.pk-sim-flavor {
+    font-size: 0.58rem;
+    font-style: italic;
+    color: $s-text-muted;
+    margin-top: 2px;
+}
+
+// — Battle sim picker ————————————————————————————————————
+
+.pk-sim-picker-row {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+}
+
+.pk-sim-picker {
+    flex: 1;
+    min-width: 0;
+}
+
+.pk-sim-picker-label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: $s-text-em;
+    margin-bottom: 2px;
+}
+
+.pk-sim-vs {
+    flex: 0 0 auto;
+    font-size: 0.8rem;
+    font-weight: 900;
+    color: $s-accent;
+    align-self: center;
+    padding-top: 20px;
+}
+
+.pk-sim-pick-summary {
+    margin-top: 4px;
+    font-size: 0.6rem;
+    color: $s-text;
+}
+
+.pk-sim-pick-stats {
+    display: flex;
+    gap: 6px;
+    font-size: 0.55rem;
+    color: $s-text-muted;
+    margin-top: 1px;
+}
+
+.pk-sim-launch-btn {
+    font-size: 0.7rem !important;
+    padding: 4px 16px !important;
+}
+
+.pk-sim-disclaimer {
+    font-size: 0.52rem;
+    color: $s-text-muted;
+    text-align: center;
+    margin-top: 4px;
+    font-style: italic;
+}
+
+// — Sim mode banner (shown in battle) ———————————————————
+
+.pk-sim-banner {
+    background: linear-gradient(90deg, rgba(106, 50, 180, 0.3), rgba(140, 80, 200, 0.15));
+    border: 1px solid rgba(140, 80, 200, 0.4);
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 0.6rem;
+}
+
+.pk-sim-banner-label {
+    font-weight: 700;
+    color: #c090ff;
+    letter-spacing: 0.08em;
+}
+
+.pk-sim-banner-note {
+    color: $s-text-muted;
+    font-style: italic;
+}
+
+.pk-victory-hard-mode {
+    color: var(--pk-red);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+}
+
+.pk-rest-warning {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    background: linear-gradient(170deg, #0a0c10 0%, #0f1a10 50%, #0a0c10 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 1.25rem 1.5rem;
+    overflow: hidden;
+}
+

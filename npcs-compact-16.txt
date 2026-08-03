@@ -1,0 +1,10 @@
+0: ranger
+1: shopkeeper
+2: nurse
+3: fisher
+4: scientist
+5: student
+6: gardener
+7: elder
+8: mechanic
+9: traveler

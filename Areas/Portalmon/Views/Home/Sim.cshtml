@@ -1,0 +1,155 @@
+<div data-bind="with: simManager, as: 'sm'" class="pk-sim">
+
+	<!-- ===== SPRITE VIEWER ===== -->
+	<div class="pk-sim-section">
+		<div class="pk-sim-section-title">Sprite Viewer</div>
+
+		<!-- Creature chip bar -->
+		<div class="pk-sim-creature-bar">
+			<!-- ko foreach: allCreatures -->
+			<button type="button" class="pk-sim-chip"
+					data-bind="text: name,
+					           css: { 'pk-sim-chip--active': sm.previewCreature() && sm.previewCreature().id === id },
+					           click: function() { sm.setPreview($data); }">
+			</button>
+			<!-- /ko -->
+		</div>
+
+		<!-- Preview panes (only when a creature is selected) -->
+		<!-- ko if: previewCreature() -->
+		<div class="pk-sim-preview-row">
+			<!-- DEX VIEW -->
+			<div class="pk-sim-preview-pane">
+				<div class="pk-sim-preview-label">Dex View</div>
+				<div class="pk-sim-preview-frame">
+					<!-- ko if: previewCreature().portraitImage -->
+					<img class="pk-sim-sprite-img"
+						 data-bind="attr: { src: previewCreature().portraitImage, alt: previewCreature().name }" />
+					<!-- /ko -->
+					<!-- ko ifnot: previewCreature().portraitImage -->
+					<div class="pk-sim-no-sprite">No sprite</div>
+					<!-- /ko -->
+				</div>
+			</div>
+
+			<!-- PLAYER SIDE (behind) -->
+			<div class="pk-sim-preview-pane">
+				<div class="pk-sim-preview-label">Player Side</div>
+				<div class="pk-sim-preview-frame pk-sim-preview-frame--battle">
+					<!-- ko if: previewCreature().behindImage -->
+					<img class="pk-sim-sprite-img"
+						 data-bind="attr: { src: previewCreature().behindImage, alt: previewCreature().name },
+						            css: { 'pk-sprite-flipped': previewCreature().flipPlayer }" />
+					<!-- /ko -->
+					<!-- ko if: !previewCreature().behindImage && previewCreature().portraitImage -->
+					<img class="pk-sim-sprite-img"
+						 data-bind="attr: { src: previewCreature().portraitImage, alt: previewCreature().name },
+						            css: { 'pk-sprite-flipped': previewCreature().flipPlayer }" />
+					<!-- /ko -->
+					<!-- ko if: !previewCreature().behindImage && !previewCreature().portraitImage -->
+					<div class="pk-sim-no-sprite">No sprite</div>
+					<!-- /ko -->
+				</div>
+			</div>
+
+			<!-- ENEMY SIDE (front, flipped) -->
+			<div class="pk-sim-preview-pane">
+				<div class="pk-sim-preview-label">Enemy Side</div>
+				<div class="pk-sim-preview-frame pk-sim-preview-frame--battle">
+					<!-- ko if: previewCreature().portraitImage -->
+					<img class="pk-sim-sprite-img"
+						 data-bind="attr: { src: previewCreature().portraitImage, alt: previewCreature().name },
+						            css: { 'pk-sprite-flipped': previewCreature().flipEnemy }" />
+					<!-- /ko -->
+					<!-- ko ifnot: previewCreature().portraitImage -->
+					<div class="pk-sim-no-sprite">No sprite</div>
+					<!-- /ko -->
+				</div>
+			</div>
+		</div>
+
+		<!-- Stats summary -->
+		<div class="pk-sim-stats-row">
+			<span class="badge pk-type-badge" data-bind="text: previewCreature().type"></span>
+			<span class="pk-sim-stat">HP: <strong data-bind="text: previewCreature().base.hp"></strong></span>
+			<span class="pk-sim-stat">ATK: <strong data-bind="text: previewCreature().base.atk"></strong></span>
+			<span class="pk-sim-stat">DEF: <strong data-bind="text: previewCreature().base.def"></strong></span>
+			<span class="pk-sim-stat">SPD: <strong data-bind="text: previewCreature().base.spd"></strong></span>
+		</div>
+		<!-- ko if: previewCreature().creatureDescription -->
+		<div class="pk-sim-flavor" data-bind="text: previewCreature().creatureDescription"></div>
+		<!-- /ko -->
+		<!-- /ko -->
+	</div>
+
+	<!-- ===== BATTLE SIMULATOR ===== -->
+	<div class="pk-sim-section pk-sim-section--battle">
+		<div class="pk-sim-section-title">Battle Simulator</div>
+
+		<div class="pk-sim-picker-row">
+			<!-- YOUR CREATURE -->
+			<div class="pk-sim-picker">
+				<div class="pk-sim-picker-label">Your Creature</div>
+				<div class="pk-sim-creature-bar pk-sim-creature-bar--small">
+					<!-- ko foreach: allCreatures -->
+					<button type="button" class="pk-sim-chip pk-sim-chip--sm"
+							data-bind="text: name,
+							           css: { 'pk-sim-chip--active': sm.playerPick() && sm.playerPick().id === id },
+							           click: function() { sm.setPlayer($data); }">
+					</button>
+					<!-- /ko -->
+				</div>
+				<!-- ko if: playerPick() -->
+				<div class="pk-sim-pick-summary">
+					<strong data-bind="text: playerPick().name"></strong>
+					<span class="badge pk-type-badge ms-1" data-bind="text: playerPick().type"></span>
+					<div class="pk-sim-pick-stats">
+						<span>HP:<span data-bind="text: playerPick().base.hp"></span></span>
+						<span>ATK:<span data-bind="text: playerPick().base.atk"></span></span>
+						<span>DEF:<span data-bind="text: playerPick().base.def"></span></span>
+						<span>SPD:<span data-bind="text: playerPick().base.spd"></span></span>
+					</div>
+				</div>
+				<!-- /ko -->
+			</div>
+
+			<div class="pk-sim-vs">VS</div>
+
+			<!-- ENEMY CREATURE -->
+			<div class="pk-sim-picker">
+				<div class="pk-sim-picker-label">Enemy Creature</div>
+				<div class="pk-sim-creature-bar pk-sim-creature-bar--small">
+					<!-- ko foreach: allCreatures -->
+					<button type="button" class="pk-sim-chip pk-sim-chip--sm"
+							data-bind="text: name,
+							           css: { 'pk-sim-chip--active': sm.enemyPick() && sm.enemyPick().id === id },
+							           click: function() { sm.setEnemy($data); }">
+					</button>
+					<!-- /ko -->
+				</div>
+				<!-- ko if: enemyPick() -->
+				<div class="pk-sim-pick-summary">
+					<strong data-bind="text: enemyPick().name"></strong>
+					<span class="badge pk-type-badge ms-1" data-bind="text: enemyPick().type"></span>
+					<div class="pk-sim-pick-stats">
+						<span>HP:<span data-bind="text: enemyPick().base.hp"></span></span>
+						<span>ATK:<span data-bind="text: enemyPick().base.atk"></span></span>
+						<span>DEF:<span data-bind="text: enemyPick().base.def"></span></span>
+						<span>SPD:<span data-bind="text: enemyPick().base.spd"></span></span>
+					</div>
+				</div>
+				<!-- /ko -->
+			</div>
+		</div>
+
+		<div class="text-center mt-2">
+			<button type="button" class="pk-menu-btn pk-btn-fight pk-sim-launch-btn"
+					data-bind="enable: canLaunch, click: launchBattle">
+				START SIM
+			</button>
+		</div>
+		<div class="pk-sim-disclaimer">
+			Sim battles do not affect your dex, party, or evolution progress.
+		</div>
+	</div>
+</div>

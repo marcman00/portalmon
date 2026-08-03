@@ -1,0 +1,798 @@
+// =========================================
+// CHAMPIONSHIP VICTORY SCREEN
+// =========================================
+
+$gold: #f0c040;
+$gold-dim: #8a6a00;
+$gold-glow: rgba(240, 192, 64, 0.18);
+
+@keyframes pk-victory-enter {
+    from {
+        opacity: 0;
+        transform: scale(1.04);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes pk-victory-rise {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pk-victory-glow-pulse {
+    0%, 100% {
+        text-shadow: 0 0 24px rgba(240,192,64,0.5), 0 0 6px rgba(240,192,64,0.3);
+    }
+
+    50% {
+        text-shadow: 0 0 40px rgba(240,192,64,0.9), 0 0 12px rgba(240,192,64,0.6);
+    }
+}
+
+.pk-victory-screen {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    background: linear-gradient(170deg, #0a0c10 0%, #0f1a10 50%, #0a0c10 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 0.75rem;
+    overflow: hidden;
+    animation: pk-victory-enter 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    // Radial gold bloom behind everything
+    &::before {
+        content: "";
+        position: absolute;
+        top: 18%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 280px;
+        height: 180px;
+        background: radial-gradient(ellipse, $gold-glow 0%, transparent 70%);
+        pointer-events: none;
+    }
+}
+
+// Scanlines match the rest of the screen
+.pk-victory-scanlines {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background: repeating-linear-gradient( 0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px );
+}
+
+// ── Header ──
+.pk-victory-header {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    animation: pk-victory-rise 500ms ease-out 150ms both;
+}
+
+.pk-victory-trophy {
+    font-size: 1.6rem;
+    line-height: 1;
+    margin-bottom: 0.2rem;
+}
+
+.pk-victory-eyebrow {
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: $gold-dim;
+    margin-bottom: 0.15rem;
+}
+
+.pk-victory-trainer {
+    font-size: 1.5rem;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: $gold;
+    line-height: 1.1;
+    animation: pk-victory-glow-pulse 2.5s ease-in-out 700ms infinite;
+}
+
+.pk-victory-subtitle {
+    font-size: 0.58rem;
+    color: $s-text-muted;
+    letter-spacing: 0.08em;
+    margin-top: 0.2rem;
+}
+
+// ── Party roster ──
+.pk-victory-party {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: row;
+    gap: 0.4rem;
+    width: 100%;
+    justify-content: center;
+    animation: pk-victory-rise 500ms ease-out 300ms both;
+}
+
+.pk-victory-card {
+    flex: 1;
+    max-width: 96px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid $gold-dim;
+    border-radius: 6px;
+    padding: 0.4rem 0.3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    position: relative;
+    box-shadow: 0 0 8px rgba(240,192,64,0.08);
+
+    &.pk-victory-card--fainted {
+        opacity: 0.45;
+        border-color: $s-border;
+        box-shadow: none;
+    }
+}
+
+.pk-victory-portrait {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: $s-bg-dark;
+    border: 1.5px solid $gold-dim;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.pk-victory-portrait-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.pk-victory-portrait-fallback {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: $gold;
+    opacity: 0.6;
+}
+
+.pk-victory-card-name {
+    font-size: 0.62rem;
+    font-weight: 700;
+    color: $s-text-em;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.pk-victory-card-type {
+    .pk-type-badge {
+        font-size: 0.52rem;
+    }
+}
+
+.pk-victory-hp-wrap {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.pk-victory-hp-track {
+    height: 4px !important;
+}
+
+.pk-victory-hp-numbers {
+    font-size: 0.55rem;
+    font-family: monospace;
+    color: $s-text-muted;
+    text-align: center;
+}
+
+.pk-victory-fainted-badge {
+    font-size: 0.5rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    color: $pk-red;
+    text-transform: uppercase;
+}
+
+// ── Footer ──
+.pk-victory-footer {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    animation: pk-victory-rise 500ms ease-out 450ms both;
+}
+
+.pk-victory-glados {
+    font-size: 0.65rem;
+    color: $s-text-muted;
+    font-style: italic;
+    text-align: center;
+    line-height: 1.5;
+}
+
+.pk-victory-glados-attr {
+    display: block;
+    font-style: normal;
+    font-size: 0.58rem;
+    color: $gold-dim;
+    letter-spacing: 0.08em;
+    margin-top: 0.15rem;
+}
+
+.pk-victory-dismiss {
+    background: transparent;
+    border: 2px solid $gold;
+    color: $gold;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    border-radius: 5px;
+    padding: 0.35rem 1.4rem;
+    cursor: pointer;
+    transition: background 150ms, color 150ms;
+
+    &:hover {
+        background: $gold;
+        color: $s-bg;
+    }
+}
+// ---- GLaDOS Revival Overlay (full-party wipe screen) ----
+.pk-revive-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    background: $s-bg;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+// ---- Automatic Enrichment Center recovery after a non-simulation party wipe ----
+.pk-faint-recovery {
+    position: absolute;
+    inset: 0;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: rgba(3, 6, 10, 0);
+    color: $s-text;
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1.45;
+    letter-spacing: 0.03em;
+    opacity: 0;
+    pointer-events: none;
+    text-align: center;
+    transition: background 180ms ease-in, opacity 180ms ease-in;
+
+    span {
+        max-width: 18rem;
+        opacity: 0;
+        transform: translateY(3px);
+        transition: opacity 140ms ease-out 90ms, transform 140ms ease-out 90ms;
+    }
+}
+
+.pk-faint-recovery--active {
+    background: rgba(3, 6, 10, 0.98);
+    opacity: 1;
+    pointer-events: auto;
+
+    span {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+// ---- Empty party notice (shown on idle screen when party is empty) ----
+.pk-empty-party-notice {
+    font-size: 0.72rem;
+    color: $s-text-muted;
+    text-align: center;
+    margin-top: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid $s-border;
+    border-radius: 4px;
+    background: $s-bg-dark;
+}
+
+
+
+// ═══════════════════════════════════════════════════════════════
+// BATTLE INTRO CHOREOGRAPHY
+// ═══════════════════════════════════════════════════════════════
+
+// Enemy: slides in from right as silhouette, holds dark, then reveals
+@keyframes pk-intro-enemy {
+    0%   { filter: brightness(0); transform: translateX(40px); opacity: 0; }
+    20%  { filter: brightness(0); transform: translateX(0); opacity: 1; }
+    60%  { filter: brightness(0); transform: translateX(0); opacity: 1; }
+    100% { filter: brightness(1); transform: translateX(0); opacity: 1; }
+}
+
+// Plate slides in from off-screen left
+@keyframes pk-intro-slide-left {
+    from { transform: translateX(-120%); opacity: 0; }
+    to   { transform: translateX(0); opacity: 1; }
+}
+
+// Plate slides in from off-screen right
+@keyframes pk-intro-slide-right {
+    from { transform: translateX(120%); opacity: 0; }
+    to   { transform: translateX(0); opacity: 1; }
+}
+
+// Player sprite: enters from off-screen left
+@keyframes pk-intro-player {
+    from { transform: translateX(-60px); opacity: 0; }
+    to   { transform: translateX(0); opacity: 1; }
+}
+
+// Generic fade in
+@keyframes pk-intro-fade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+// --- Master choreography class (applied to .pk-battlefield) ---
+.pk-battle-intro {
+    .pk-enemy-sprite {
+        animation: pk-intro-enemy 800ms ease-out 100ms both;
+    }
+
+    .pk-enemy-plate {
+        animation: pk-intro-slide-left 350ms ease-out 500ms both;
+    }
+
+    .pk-player-sprite {
+        animation: pk-intro-player 350ms ease-out 800ms both;
+    }
+
+    .pk-player-plate {
+        animation: pk-intro-slide-right 350ms ease-out 800ms both;
+    }
+
+    .pk-sprite-shadow {
+        opacity: 0;
+        animation: pk-intro-fade 200ms ease-out 900ms both;
+    }
+}
+
+// Action panel fades in at end of intro, clicks blocked while invisible
+.pk-battle-intro-panel {
+    animation: pk-intro-fade 300ms ease-out 1100ms both;
+    pointer-events: none;
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// ULTIMATE ANIMATION FX
+// ═══════════════════════════════════════════════════════════════
+
+// --- Screen shake ---
+@keyframes pk-ult-shake-anim {
+    0%, 100% { transform: translate(0, 0); }
+    10%      { transform: translate(-3px, 1px); }
+    30%      { transform: translate(3px, -2px); }
+    50%      { transform: translate(-2px, 3px); }
+    70%      { transform: translate(2px, -1px); }
+    90%      { transform: translate(-1px, 2px); }
+}
+
+.pk-ult-shake {
+    animation: pk-ult-shake-anim 0.3s linear;
+}
+
+// --- Sparkle stars (cross shapes that pop and fade) ---
+.pk-ult-sparkle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    pointer-events: none;
+    z-index: 7;
+    animation: pk-sparkle-pop 0.5s ease-out forwards;
+
+    &::before, &::after {
+        content: '';
+        position: absolute;
+        background: var(--sparkle-color, #fff);
+    }
+    &::before {
+        width: 6px;
+        height: 2px;
+        top: 2px;
+        left: 0;
+    }
+    &::after {
+        width: 2px;
+        height: 6px;
+        top: 0;
+        left: 2px;
+    }
+}
+
+@keyframes pk-sparkle-pop {
+    0%   { opacity: 0; transform: scale(0) rotate(0deg); }
+    30%  { opacity: 1; transform: scale(1.5) rotate(45deg); }
+    100% { opacity: 0; transform: scale(0.5) rotate(90deg); }
+}
+
+// --- Damage number popup ---
+.pk-ult-dmg-number {
+    position: absolute;
+    z-index: 7;
+    font-size: 1.1rem;
+    font-weight: 900;
+    font-family: monospace;
+    text-shadow: 0 0 4px rgba(0,0,0,0.8), 0 2px 0 rgba(0,0,0,0.5);
+    pointer-events: none;
+    animation: pk-dmg-float 1s ease-out forwards;
+    transform: translateX(-50%);
+}
+
+@keyframes pk-dmg-float {
+    0%   { opacity: 1; transform: translateX(-50%) translateY(0) scale(0.5); }
+    20%  { opacity: 1; transform: translateX(-50%) translateY(-8px) scale(1.2); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-30px) scale(0.8); }
+}
+
+// --- Ultimate name banner ---
+.pk-ult-name-banner {
+    position: absolute;
+    z-index: 8;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+    font-family: monospace;
+    font-size: 0.9rem;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ult-color, #fff);
+    text-shadow: 0 0 8px var(--ult-color, #fff), 0 0 16px rgba(0,0,0,0.8), 0 2px 0 rgba(0,0,0,0.6);
+    pointer-events: none;
+    white-space: nowrap;
+    animation: pk-ult-name-appear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.pk-ult-name-banner--fade {
+    animation: pk-ult-name-fade 0.3s ease-in forwards;
+}
+
+@keyframes pk-ult-name-appear {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+    60%  { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+    100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes pk-ult-name-fade {
+    0%   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(1.3); }
+}
+
+
+
+// ═══════════════════════════════════════════════════════════════
+// GYM BADGE SYSTEM (inline on trainer cards)
+// ═══════════════════════════════════════════════════════════════
+
+.pk-portrait-badge-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin: 0 auto 0.5rem;
+}
+
+.pk-portrait-badge-wrap--champ,
+.pk-portrait-badge-wrap--secret {
+    margin: 0;
+}
+
+.pk-card-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border-radius: 999px;
+    border: 1px solid rgba(240, 192, 64, 0.8);
+    background: rgba(10, 16, 28, 0.92);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+}
+
+.pk-card-badge--medallion {
+    position: absolute;
+    right: -10px;
+    bottom: -6px;
+    width: 34px;
+    height: 34px;
+    z-index: 2;
+}
+
+.pk-card-badge--champ,
+.pk-card-badge--secret {
+    width: 36px;
+    height: 36px;
+}
+
+.pk-card-badge-img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    image-rendering: auto;
+    // Unearned: dark silhouette
+    filter: brightness(0.3) opacity(0.5);
+    transition: filter 300ms ease;
+}
+
+.pk-card-badge:disabled {
+    cursor: default;
+    pointer-events: none;
+}
+
+.pk-badge-earned .pk-card-badge-img {
+    // Earned: full color + golden glow
+    filter: brightness(1) drop-shadow(0 0 3px rgba(240, 192, 64, 0.6));
+}
+
+// Gym cards need position:relative for badge positioning
+.gym-card {
+    position: relative;
+}
+
+.championship-card {
+    position: relative;
+}
+
+// --- Badge click-to-enlarge modal ---
+.pk-badge-modal-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.pk-badge-modal {
+    background: rgba(20, 20, 40, 0.95);
+    border: 2px solid rgba(240, 192, 64, 0.5);
+    border-radius: 8px;
+    width: min(320px, calc(100% - 28px));
+    padding: 20px 24px 18px;
+    text-align: center;
+    cursor: default;
+    animation: pk-badge-reveal 0.3s ease-out;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+}
+
+@keyframes pk-badge-reveal {
+    0%   { transform: scale(0.5); opacity: 0; }
+    60%  { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.pk-badge-modal-img {
+    width: min(168px, 55vw);
+    height: min(168px, 55vw);
+    object-fit: contain;
+    image-rendering: auto;
+    filter: drop-shadow(0 0 8px rgba(240, 192, 64, 0.6));
+    margin-bottom: 10px;
+    transition: transform 180ms ease, filter 180ms ease;
+    cursor: zoom-in;
+}
+
+.pk-badge-modal-img:hover {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 12px rgba(240, 192, 64, 0.75));
+}
+
+.pk-badge-modal-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #f0a030;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+}
+
+.pk-badge-modal-desc {
+    font-size: 0.72rem;
+    color: #8899aa;
+    font-style: italic;
+    line-height: 1.4;
+}
+
+// Make earned badges clickable
+.pk-badge-earned {
+    cursor: pointer;
+    &:hover .pk-card-badge-img {
+        filter: brightness(1.2) drop-shadow(0 0 5px rgba(240, 192, 64, 0.8));
+    }
+}
+
+
+// CREDITS SEQUENCE
+// ═══════════════════════════════════════════════════════════════
+
+.pk-credits-screen {
+    position: absolute;
+    inset: 0;
+    z-index: 12;
+    background: #000;
+    overflow: hidden;
+}
+
+.pk-credits-scanlines {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        0deg, transparent, transparent 1px,
+        rgba(0, 0, 0, 0.12) 1px, rgba(0, 0, 0, 0.12) 2px
+    );
+    pointer-events: none;
+    z-index: 13;
+}
+
+.pk-credits-scroll {
+    animation: pk-credits-roll 45s linear forwards;
+    padding: 0 20px;
+    text-align: center;
+}
+
+@keyframes pk-credits-roll {
+    0%   { transform: translateY(100%); }
+    100% { transform: translateY(-100%); }
+}
+
+.pk-credits-spacer {
+    height: 100px;
+}
+
+.pk-credits-block {
+    margin-bottom: 40px;
+}
+
+.pk-credits-title {
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: #f0a030;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    text-shadow: 0 0 12px rgba(240, 160, 48, 0.4);
+    margin-bottom: 4px;
+}
+
+.pk-credits-subtitle {
+    font-size: 0.7rem;
+    color: #8899aa;
+    font-style: italic;
+    letter-spacing: 0.1em;
+    margin-bottom: 20px;
+}
+
+.pk-credits-heading {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #c060ff;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 6px;
+}
+
+.pk-credits-entry {
+    font-size: 0.75rem;
+    color: #e0e0e0;
+    margin-bottom: 3px;
+}
+
+.pk-credits-flavor {
+    font-size: 0.6rem;
+    color: #8899aa;
+    font-style: italic;
+    margin-top: 4px;
+}
+
+.pk-credits-glados-quote {
+    margin-top: 50px;
+    margin-bottom: 50px;
+    .pk-credits-flavor {
+        font-size: 0.72rem;
+        color: #ffaa00;
+    }
+}
+
+// --- The Big Reveal ---
+.pk-credits-reveal {
+    margin: 60px 0;
+}
+
+.pk-credits-april-fools {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: #ff3366;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-shadow:
+        0 0 20px rgba(255, 51, 102, 0.6),
+        0 0 40px rgba(255, 51, 102, 0.3),
+        0 2px 0 rgba(0, 0, 0, 0.5);
+    animation: pk-april-pulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes pk-april-pulse {
+    0%   { filter: brightness(1); text-shadow: 0 0 20px rgba(255, 51, 102, 0.6); }
+    100% { filter: brightness(1.3); text-shadow: 0 0 30px rgba(255, 51, 102, 0.8), 0 0 60px rgba(255, 51, 102, 0.4); }
+}
+
+.pk-credits-year {
+    font-size: 1rem;
+    color: #8899aa;
+    letter-spacing: 0.3em;
+    margin-top: 8px;
+}
+
+// --- Skip/Reboot Button ---
+.pk-credits-skip {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 14;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.55rem;
+    font-family: monospace;
+    padding: 4px 12px;
+    border-radius: 3px;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    transition: all 200ms;
+    animation: pk-credits-skip-pulse 3s ease-in-out infinite alternate;
+
+    &:hover {
+        color: rgba(255, 255, 255, 0.8);
+        border-color: rgba(255, 255, 255, 0.5);
+    }
+}
+
+@keyframes pk-credits-skip-pulse {
+    0%   { opacity: 0.3; }
+    100% { opacity: 0.7; }
+}
+

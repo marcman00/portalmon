@@ -1,0 +1,51 @@
+<div data-bind="visible: isChoosingStarter" class="pk-starter-select">
+	<div class="text-center mb-4">
+		<h4 class="pk-starter-title">Welcome to Portalmon!</h4>
+		<p class="text-muted">Choose your starter Portalmon to begin your journey.</p>
+	</div>
+
+	<div class="row g-3 justify-content-center" data-bind="foreach: starterOptions">
+		<div class="col-12 col-md-4">
+			<button type="button" class="pk-starter-card"
+					data-bind="click: function() { $parent.chooseStarter($data); }">
+				<!-- Portrait -->
+				<div class="pk-starter-portrait">
+					<!-- ko if: $data.portraitImage -->
+					<img class="pk-portrait-img" data-bind="attr: { src: $data.portraitImage, alt: $data.name }" />
+					<!-- /ko -->
+				</div>
+
+				<!-- Name -->
+				<div class="pk-starter-name" data-bind="text: $data.name"></div>
+
+				<!-- Type -->
+				<div class="badge bg-secondary mb-2" data-bind="text: $data.type"></div>
+
+				<!-- Stats -->
+				<div class="pk-starter-stats">
+					<div class="row g-1 text-center">
+						<div class="col-3">
+							<div class="pk-stat-label">HP</div>
+							<div class="pk-stat-value" data-bind="text: $data.base.hp"></div>
+						</div>
+						<div class="col-3">
+							<div class="pk-stat-label">ATK</div>
+							<div class="pk-stat-value" data-bind="text: $data.base.atk"></div>
+						</div>
+						<div class="col-3">
+							<div class="pk-stat-label">DEF</div>
+							<div class="pk-stat-value" data-bind="text: $data.base.def"></div>
+						</div>
+						<div class="col-3">
+							<div class="pk-stat-label">SPD</div>
+							<div class="pk-stat-value" data-bind="text: $data.base.spd"></div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Prompt -->
+				<div class="pk-starter-prompt mt-2">Choose</div>
+			</button>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,15 @@
+// This file is @import-ed inside #portalmon { } by the real site's global
+// style.scss (see the note in _variables.scss). It's split into partials
+// below purely for navigability — this file itself changes nothing about
+// how styles are scoped or compiled; order matches the original single-file
+// source exactly, so the compiled CSS is unchanged.
+
+@import "_variables";
+@import "_gba-shell";
+@import "_combat-and-battles";
+@import "_onboarding-and-dex";
+@import "_encounter-and-catch";
+@import "_overworld";
+@import "_postgame-and-fx";
+@import "_combat-overlays";
+@import "_battle-ui-misc";

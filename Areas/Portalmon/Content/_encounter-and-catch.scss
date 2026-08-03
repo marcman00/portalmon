@@ -1,0 +1,706 @@
+// =========================================
+// ENCOUNTER TAB — IDLE STATE
+// =========================================
+.pk-idle-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 240px;
+    padding: 1.5rem 1rem;
+    text-align: center;
+}
+
+.pk-idle-title { font-size: 0.95rem; font-weight: 700; color: $s-text-em; margin-bottom: 0.35rem; }
+.pk-idle-hint  { font-size: 0.74rem; color: $s-text-muted; line-height: 1.6; }
+
+.pk-idle-party-panel {
+    width: 100%;
+    max-width: 228px;
+    background: $s-bg-mid;
+    border: 1px solid $s-border;
+    border-radius: 7px;
+    padding: 0.45rem 0.5rem;
+}
+
+.pk-idle-party-header {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-bottom: 0.35rem;
+}
+
+.pk-idle-party-title {
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: $s-text-muted;
+}
+
+.pk-idle-party-count {
+    margin-left: auto;
+    font-size: 0.7rem;
+    font-weight: 700;
+    font-family: monospace;
+    color: $s-accent;
+}
+
+.pk-idle-party-strip {
+    display: flex;
+    justify-content: center;
+    gap: 0.35rem;
+}
+
+.pk-idle-party-card {
+    width: 54px;
+    min-width: 54px;
+    padding: 3px;
+    border-radius: 5px;
+    border: 1px solid $s-border;
+    background: $s-bg-dark;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    overflow: hidden;
+}
+
+.pk-idle-party-card--fainted {
+    opacity: 0.42;
+    filter: grayscale(0.8);
+}
+
+.pk-idle-party-card-img {
+    width: 100%;
+    height: 30px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    display: block;
+}
+
+.pk-idle-party-card-fallback {
+    width: 100%;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: $s-accent;
+    background: rgba(35, 42, 66, 0.65);
+}
+
+.pk-idle-party-card-name {
+    width: 100%;
+    font-size: 0.52rem;
+    font-weight: 700;
+    color: $s-text;
+    text-align: center;
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pk-idle-party-card-type {
+    font-size: 0.44rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: $s-text-muted;
+    line-height: 1;
+}
+
+.pk-idle-party-card-track {
+    width: 100%;
+    margin-top: 1px;
+}
+
+// =========================================
+// ENCOUNTER TAB — POST-BATTLE RESULT
+// =========================================
+.pk-result-panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 0.5rem;
+}
+
+.pk-btn-continue {
+    width: 100%;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    border: 2px solid $s-accent;
+    color: $s-accent;
+    background: transparent;
+    border-radius: 5px;
+    padding: 0.5rem;
+    transition: background-color 150ms, color 150ms;
+    &:hover { background: $s-accent; color: $s-bg; }
+}
+
+.pk-footer-hint {
+    color: $s-text-muted;
+    font-style: italic;
+    line-height: 1.4;
+}
+
+// =========================================
+// BOOTSTRAP OVERRIDES — inside the screen
+// Bootstrap utility classes and components must render dark
+// regardless of the page theme (light or dark mode).
+// =========================================
+.gba-screen,
+.gba-overlay {
+    // Typography utilities
+    color: $s-text;
+
+    .text-body, .text-body-emphasis { color: $s-text !important; }
+    .text-body-secondary, .text-muted, .text-secondary { color: $s-text-muted !important; }
+    .text-body-tertiary { color: $s-text-muted !important; }
+    .small, small { color: inherit; }
+    code { color: $pk-orange; background: $s-bg-dark; padding: 1px 4px; border-radius: 3px; }
+
+    // Links
+    a { color: $pk-orange; &:hover { color: lighten($pk-orange, 12%); } }
+
+    // Tables (used by Info view)
+    .table {
+        color: $s-text;
+        border-color: $s-border;
+
+        th, td { color: $s-text; border-color: $s-border; background: transparent; }
+        thead th, thead td { color: $s-text-muted; border-color: $s-border; background: $s-bg-mid; }
+        &.table-bordered { border-color: $s-border; }
+        &.table-sm th, &.table-sm td { padding: 0.25rem 0.4rem; }
+    }
+
+    // Badges
+    .badge.bg-secondary { background-color: $s-bg-mid !important; color: $s-text-muted; }
+
+    // Buttons with Bootstrap classes (used in Battles view)
+    .btn-outline-success { border-color: $pk-green;  color: $pk-green;  &:hover { background: $pk-green;  color: $s-bg; } }
+    .btn-outline-danger  { border-color: $pk-red;    color: $pk-red;    &:hover { background: $pk-red;    color: #fff; } }
+    .btn-outline-warning { border-color: $pk-orange; color: $pk-orange; &:hover { background: $pk-orange; color: $s-bg; } }
+    .btn-outline-secondary {
+        border-color: $s-border;
+        color: $s-text-muted;
+        &:hover { background: $s-bg-mid; color: $s-text; }
+    }
+    .btn-sm { font-size: 0.75rem; padding: 0.25rem 0.5rem; }
+
+    // Collapse / combat log
+    .btn-link { color: $s-text-muted; &:hover { color: $s-text; } }
+
+    // Headings inside overlays (Info view)
+    h5, h6 { color: $s-text-em; }
+
+    // Italic / strong in Info
+    em   { color: $pk-orange; font-style: italic; }
+    strong { color: $s-text-em; }
+}
+
+
+
+// =========================================
+// POWER LED — off state modifier
+// =========================================
+.gba-power-led--off {
+    background: #4a1a1a !important;
+    box-shadow: 0 0 4px rgba(120, 30, 30, 0.3), 0 0 1px rgba(80, 20, 20, 0.5) inset !important;
+}
+
+// =========================================
+// POWER-OFF CLICK-TO-START SCREEN
+// =========================================
+.pk-power-off-screen {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    background: #050809;
+    cursor: pointer;
+    z-index: 10;
+    user-select: none;
+
+    &:hover .pk-power-icon {
+        color: rgba(255, 255, 255, 0.55);
+        text-shadow: 0 0 18px rgba(200, 220, 255, 0.35);
+    }
+
+    &:hover .pk-power-hint {
+        color: rgba(255, 255, 255, 0.5);
+    }
+}
+
+.pk-power-icon {
+    font-size: 2.2rem;
+    color: rgba(255, 255, 255, 0.2);
+    line-height: 1;
+    transition: color 250ms, text-shadow 250ms;
+}
+
+.pk-power-hint {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.22);
+    transition: color 250ms;
+}
+
+// =========================================
+// LOGO SPLASH SCREEN
+// =========================================
+@keyframes pk-logo-fadein {
+    from {
+        opacity: 0;
+        transform: scale(0.94);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.pk-logo-screen {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    z-index: 10;
+}
+
+.pk-logo-img {
+    max-width: 80%;
+    max-height: 75%;
+    object-fit: contain;
+    animation: pk-logo-fadein 500ms ease-out both;
+    filter: drop-shadow(0 0 12px rgba(160, 200, 255, 0.25));
+}
+
+// Logo2 sits exactly on top of Logo1 and wipes in from the left after 2s
+@keyframes pk-logo-wipe {
+    from {
+        clip-path: inset(0 100% 0 0);
+    }
+
+    to {
+        clip-path: inset(0 0% 0 0);
+    }
+}
+
+.pk-logo-img--wipe {
+    position: absolute;
+    // animation-delay holds it invisible until 2s, then wipes over 1000ms
+    animation: pk-logo-fadein 500ms ease-out both, pk-logo-wipe 1000ms ease-in-out 2s both;
+}
+
+// =========================================
+// IDLE STATE — portal layout
+// =========================================
+
+.pk-portal-layout {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 100%;
+}
+
+.pk-cooldown-overlay {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+	width: 100%;
+	gap: 0.5rem;
+	text-align: center;
+	color: var(--bs-body-color);
+}
+.pk-cooldown-icon {
+	font-size: 2.5rem;
+}
+.pk-cooldown-portrait {
+	width: 80px;
+	height: auto;
+	border-radius: 50%;
+	opacity: 0.9;
+}
+.pk-cooldown-title {
+	font-size: 1.1rem;
+	font-weight: bold;
+	letter-spacing: 0.05em;
+}
+.pk-cooldown-message {
+	font-size: 0.85rem;
+	opacity: 0.7;
+}
+.pk-battery-bar {
+	display: flex;
+	align-items: center;
+	gap: 0.35rem;
+	width: 100%;
+	max-width: 140px;
+	margin-top: 0.5rem;
+}
+.pk-battery-label {
+	font-size: 0.9rem;
+	line-height: 1;
+}
+.pk-battery-track {
+	flex: 1;
+	height: 10px;
+	background: rgba(128, 128, 128, 0.3);
+	border-radius: 3px;
+	overflow: hidden;
+}
+.pk-battery-fill {
+	height: 100%;
+	border-radius: 3px;
+	transition: width 0.4s ease;
+}
+.pk-battery-high { background: var(--color-green, #28a745); }
+.pk-battery-mid  { background: var(--color-orange, #fd7e14); }
+.pk-battery-low  { background: var(--color-red, #dc3545); }
+.pk-battery-pct {
+	font-size: 0.75rem;
+	min-width: 2.2em;
+	text-align: right;
+	opacity: 0.8;
+}
+.pk-status-toast {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background: rgba(0, 0, 0, 0.85);
+	color: #0f0;
+	font-family: monospace;
+	font-size: 1.1rem;
+	font-weight: bold;
+	padding: 0.75rem 1.5rem;
+	border-radius: 6px;
+	z-index: 100;
+	pointer-events: none;
+	text-align: center;
+	letter-spacing: 0.05em;
+}
+// Center column: title + party HP
+.pk-portal-center {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 0.5rem;
+    gap: 0.25rem;
+    text-align: center;
+}
+
+// =========================================
+// DUAL PORTAL ENCOUNTER SELECTION
+// =========================================
+
+// Portal container — fills the full column height
+.pk-portal {
+    flex: 0 0 auto;
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    height: 100%;
+    padding: 0.5rem 0.25rem;
+
+    &:hover .pk-portal-interior {
+        filter: brightness(1.22);
+    }
+
+    &:active .pk-portal-interior {
+        filter: brightness(0.85);
+    }
+}
+
+// The oval: a circle squished horizontally via scaleX.
+// Height drives the size — we want it to fill most of the available height.
+.pk-portal-interior {
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    transform: scaleX(0.42);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: filter 150ms ease;
+    flex-shrink: 0;
+}
+
+// Silhouette — undo the parent scaleX so the image renders at natural ratio
+.pk-portal-silhouette {
+    transform: scaleX(2.38); // inverse of 0.42
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+    filter: brightness(0) invert(1) opacity(0.7);
+    pointer-events: none;
+}
+
+// Label beneath the portal
+.pk-portal-label {
+    margin-top: 6px;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+// ---- BLUE portal ----
+$portal-blue: #4fb3ff;
+
+.pk-portal-blue {
+    .pk-portal-interior {
+        background: radial-gradient(ellipse at 50% 40%, #0d2a4a 0%, #050e1a 70%);
+        box-shadow: 0 0 0 3px rgba($portal-blue, 0.9), 0 0 0 5px rgba($portal-blue, 0.35), 0 0 18px 6px rgba($portal-blue, 0.45), 0 0 40px 10px rgba($portal-blue, 0.18);
+    }
+
+    .pk-portal-silhouette {
+        filter: brightness(0) invert(1) sepia(1) saturate(3) hue-rotate(195deg) opacity(0.75);
+    }
+
+    .pk-portal-label {
+        color: rgba($portal-blue, 0.55);
+    }
+}
+
+// ---- ORANGE portal ----
+$portal-orange: #ff8030;
+
+.pk-portal-orange {
+    .pk-portal-interior {
+        background: radial-gradient(ellipse at 50% 40%, #3a1400 0%, #120600 70%);
+        box-shadow: 0 0 0 3px rgba($portal-orange, 0.9), 0 0 0 5px rgba($portal-orange, 0.35), 0 0 18px 6px rgba($portal-orange, 0.45), 0 0 40px 10px rgba($portal-orange, 0.18);
+    }
+
+    .pk-portal-silhouette {
+        filter: brightness(0) invert(1) sepia(1) saturate(4) hue-rotate(5deg) opacity(0.75);
+    }
+
+    .pk-portal-label {
+        color: rgba($portal-orange, 0.55);
+    }
+}
+
+
+
+.pk-portal-orb-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 4;
+    overflow: visible;
+}
+
+
+// =========================================
+// CATCH BALL ANIMATION
+// =========================================
+// The ball is absolutely positioned inside .pk-battlefield (position: relative).
+// Its natural/resting position is the enemy sprite center (top-right).
+// Coordinates are derived from the existing sprite placement rules:
+//   Enemy sprite: top: 14px, right: 28px, 100×100px  → center: top:64px, right:78px
+//   Player sprite: bottom: 28px, left: 28px, 100×100px → center: top:~146px, left:78px
+//   Ball size: 32px → offset by 16px from center when positioning top-left corner.
+
+.pk-catch-ball {
+    position: absolute;
+    // Resting at enemy sprite center
+    left: calc(100% - 94px); // 100% - (right:28 + half-sprite:50 + half-ball:16)
+    top: 48px; // enemy center y (64) - half-ball (16)
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    transform-origin: center center;
+    pointer-events: none;
+    z-index: 10;
+}
+
+// ── Flying ────────────────────────────────────────────────────────────────────
+// Arc from player sprite center → enemy sprite center.
+// Animating left/top gives us full control over the parabolic path.
+// The 35% keyframe is the peak of the arc (ball overshoots vertically).
+@keyframes pk-catch-throw {
+    0% {
+        left: 62px; // player center x - half-ball
+        top: 146px; // player center y - half-ball (battlefield ~240px)
+        transform: rotate(0deg) scale(1);
+    }
+
+    35% {
+        left: calc(50% - 16px); // mid-arc peak (horizontally centered)
+        top: 10px; // near top of battlefield — the high point
+        transform: rotate(210deg) scale(0.92);
+    }
+
+    100% {
+        left: calc(100% - 94px); // matches resting position
+        top: 48px;
+        transform: rotate(460deg) scale(0.88);
+    }
+}
+
+.pk-catch-phase-flying.pk-catch-ball {
+    animation: pk-catch-throw 700ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+// ── Absorbing ─────────────────────────────────────────────────────────────────
+// Quick flash-and-settle to sell the "suck in" moment.
+@keyframes pk-catch-absorb {
+    0% {
+        transform: scale(0.88);
+        filter: brightness(2.8);
+    }
+
+    40% {
+        transform: scale(1.2);
+        filter: brightness(1.6);
+    }
+
+    100% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+}
+
+.pk-catch-phase-absorbing.pk-catch-ball {
+    animation: pk-catch-absorb 350ms ease-out forwards;
+}
+
+// ── Wiggling ──────────────────────────────────────────────────────────────────
+// A single left-right rock. CatchAnimator toggles 'settling' → 'wiggling'
+// between iterations so the animation restarts for each discrete wiggle.
+@keyframes pk-catch-wiggle {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    20% {
+        transform: rotate(-24deg);
+    }
+
+    50% {
+        transform: rotate(24deg);
+    }
+
+    75% {
+        transform: rotate(-12deg);
+    }
+
+    90% {
+        transform: rotate(6deg);
+    }
+
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+.pk-catch-phase-wiggling.pk-catch-ball {
+    animation: pk-catch-wiggle 650ms ease-in-out forwards;
+}
+
+// ── Caught ────────────────────────────────────────────────────────────────────
+// Pulse of golden light then a steady glow — "locked in".
+@keyframes pk-catch-success {
+    0% {
+        transform: scale(1);
+        filter: brightness(1) drop-shadow(0 0 0px transparent);
+    }
+
+    25% {
+        transform: scale(1.18);
+        filter: brightness(1.8) drop-shadow(0 0 12px #ffe066);
+    }
+
+    55% {
+        transform: scale(0.95);
+        filter: brightness(1.3) drop-shadow(0 0 6px #ffcc00);
+    }
+
+    100% {
+        transform: scale(1);
+        filter: brightness(1.1) drop-shadow(0 0 5px #ffaa00);
+    }
+}
+
+@keyframes pk-catch-captured-idle {
+    0%, 100% {
+        transform: scale(1);
+        filter: brightness(1.1) drop-shadow(0 0 5px #ffaa00);
+    }
+
+    50% {
+        transform: scale(1.04);
+        filter: brightness(1.22) drop-shadow(0 0 9px #ffd24a);
+    }
+}
+
+.pk-catch-phase-caught.pk-catch-ball {
+    animation:
+        pk-catch-success 1000ms ease-out forwards,
+        pk-catch-captured-idle 1800ms ease-in-out 1000ms infinite;
+}
+
+// ── Escaped ───────────────────────────────────────────────────────────────────
+// Ball bursts open (scale up + bright flash + fade to nothing).
+@keyframes pk-catch-escape {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+        filter: brightness(1);
+    }
+
+    40% {
+        transform: scale(1.6);
+        opacity: 0.8;
+        filter: brightness(2.2);
+    }
+
+    100% {
+        transform: scale(0.4);
+        opacity: 0;
+        filter: brightness(1);
+    }
+}
+
+.pk-catch-phase-escaped.pk-catch-ball {
+    animation: pk-catch-escape 350ms ease-in forwards;
+}
+
+.pk-return-overworld-btn {
+    position: absolute;
+    z-index: 4;
+    top: 7px;
+    left: 7px;
+    padding: 4px 7px;
+    border: 1px solid #85c8ee;
+    color: #bfe8ff;
+    background: rgba(8, 28, 48, 0.9);
+    font: 700 0.55rem/1 monospace;
+    cursor: pointer;
+}
