@@ -30,10 +30,14 @@ export interface TrainerDef
 	battleImage: string;
 	party: SpeciesId[];
 	philosophy: string;
-	defeatQuote: string;
+	/** Text shown before a map-placed trainer battle begins. */
+	mapIntro?: string;
+	/** Text shown both in the victory presentation and on later map talks. */
+	victoryMessage: string;
 	winQuote: string;
 	transitionColor: TransitionColor;
 	badgeImage?: string;
+	specialty?: string;
 }
 
 export interface TrainerDialogueLine
@@ -54,9 +58,10 @@ export const TrainerDefs: Record<string, TrainerDef> = {
 		battleImage: "/Areas/Portalmon/Content/Images/Trainers/Coach_battle.png",
 		party: ["ressie", "beecyerview"],
 		philosophy: "Fundamentals. Patience. Outlast. Coach doesn't beat you -- he waits for you to beat yourself.",
-		defeatQuote: "...Well. I'll be damned. You earned that.",
+		victoryMessage: "...Well. I'll be damned. You earned that.",
 		winQuote: "Don't hang your head. You're better than when you walked in.",
 		transitionColor: "gold",
+		specialty: "Availability",
 
 		badgeImage: "/Areas/Portalmon/Content/Images/Badges/Coach.png",	},
 
@@ -66,9 +71,11 @@ export const TrainerDefs: Record<string, TrainerDef> = {
 		battleImage: "/Areas/Portalmon/Content/Images/Trainers/Lordis_battle.png",
 		party: ["mercatador", "redping"],
 		philosophy: "Surgical precision. Silence. Dismantlement. Lordis doesn't outlast you -- he takes you apart.",
-		defeatQuote: "...Hm.",
+		victoryMessage: "...Hm.",
 		winQuote: "Repair complete.",
 		transitionColor: "gold",
+		specialty: "Security",
+		mapIntro: "I've been portalmoning since before you were born. Prepare to get schooled.",
 
 		badgeImage: "/Areas/Portalmon/Content/Images/Badges/Lordis.png",	},
 
@@ -78,9 +85,10 @@ export const TrainerDefs: Record<string, TrainerDef> = {
 		battleImage: "/Areas/Portalmon/Content/Images/Trainers/Gargis_battle.png",
 		party: ["normking", "azurite"],
 		philosophy: "Versatile. Comes out swinging, then pivots to a tank. Mixed types -- no single counter.",
-		defeatQuote: "No shot. NO SHOT. ...Okay, fine. You got me.",
+		victoryMessage: "No shot. NO SHOT. ...Okay, fine. You got me.",
 		winQuote: "Good deal. Come back anytime.",
 		transitionColor: "gold",
+		specialty: "Performance / Security",
 
 		badgeImage: "/Areas/Portalmon/Content/Images/Badges/Gargis.png",	},
 
@@ -90,7 +98,7 @@ export const TrainerDefs: Record<string, TrainerDef> = {
 		battleImage: "/Areas/Portalmon/Content/Images/Trainers/Rey_battle.png",
 		party: ["prodle", "cpfnib", "dougtrio"],
 		philosophy: "The developer who built the system. Knows your stats better than you do. Fights you while barely tabbing back from his terminal.",
-		defeatQuote: "...Well played. I'll push a patch tonight. This won't happen again.",
+		victoryMessage: "...Well played. I'll push a patch tonight. This won't happen again.",
 		winQuote: "The cake is a lie. So was your win condition.",
 		transitionColor: "gold",
 
@@ -102,7 +110,7 @@ export const TrainerDefs: Record<string, TrainerDef> = {
 		battleImage: "/Areas/Portalmon/Content/Images/Trainers/GLaDOS_battle.png",
 		party: ["venusaur", "blastoise", "charizard"],
 		philosophy: "The AI that runs Portal. She IS the cloud. Opens a portal to another dimension and imports Gen 1 Pokemon. This is Portalmon vs Pokemon.",
-		defeatQuote: "...I opened a portal to another universe. I imported their strongest creatures. And you beat them. With IT infrastructure monsters.",
+		victoryMessage: "...I opened a portal to another universe. I imported their strongest creatures. And you beat them. With IT infrastructure monsters.",
 		winQuote: "The multiverse has spoken. You are insufficient in ALL dimensions.",
 		transitionColor: "red",
 

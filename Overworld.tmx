@@ -146,6 +146,7 @@
    </properties>
   </object>
  </objectgroup>
+ <objectgroup color="#ffff00" id="11" name="Portals"/>
  <objectgroup color="#aa00ff" id="7" name="Wild" locked="1">
   <object id="11" x="704" y="64" width="144" height="240">
    <properties>

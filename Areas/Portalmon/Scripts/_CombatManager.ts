@@ -316,6 +316,7 @@ export class CombatManager
 		portraitImage?: string,
 		battleImage?: string,
 		trainerId?: string,
+		showTrainerIntro: boolean = true,
 	): void
 	{
 		if (!party || party.length === 0) return;
@@ -357,7 +358,7 @@ export class CombatManager
 			await wait(1500);
 
 			// Phase 2: One longer trainer line instead of a rapid multi-line exchange
-			if (this.gymTrainerId)
+			if (this.gymTrainerId && showTrainerIntro)
 			{
 				const introLine = this.pickTrainerIntroLine();
 				if (introLine)

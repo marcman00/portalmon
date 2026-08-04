@@ -93,6 +93,8 @@ export class OverworldManager
 	private readonly useEnrichmentCenterCallback: () => void;
 	private readonly openGymCallback: (gymSlot: number) => void;
 	private readonly startWildEncounterCallback: () => boolean;
+	private readonly startTrainerBattleCallback: (trainerId: string, afterBattleMessage: string) => boolean;
+	private readonly isTrainerDefeatedCallback: (trainerId: string) => boolean;
 	private readonly terrainImage: HTMLImageElement = new Image();
 	private readonly playerImage: HTMLImageElement = new Image();
 	private readonly mapBackgroundImages: Map<string, HTMLImageElement> = new Map();
@@ -117,12 +119,16 @@ export class OverworldManager
 		useEnrichmentCenterCallback: () => void,
 		openGymCallback: (gymSlot: number) => void,
 		startWildEncounterCallback: () => boolean,
+		startTrainerBattleCallback: (trainerId: string, afterBattleMessage: string) => boolean,
+		isTrainerDefeatedCallback: (trainerId: string) => boolean,
 	)
 	{
 		this.isInputEnabled = isInputEnabled;
 		this.useEnrichmentCenterCallback = useEnrichmentCenterCallback;
 		this.openGymCallback = openGymCallback;
 		this.startWildEncounterCallback = startWildEncounterCallback;
+		this.startTrainerBattleCallback = startTrainerBattleCallback;
+		this.isTrainerDefeatedCallback = isTrainerDefeatedCallback;
 		this.terrainImage.addEventListener("load", this.prepareObjectCutouts);
 		this.terrainImage.src = "/Areas/Portalmon/Content/Images/Overworld/prototype-tiles.png";
 		this.playerImage.src = "/Areas/Portalmon/Content/Images/Overworld/atlas-walk-16.png";
@@ -201,6 +207,20 @@ export class OverworldManager
 				this.npcKey(this.currentMap().id, npc.id),
 				this.oppositeDirection(this.facing),
 			);
+			if (npc.trainerId)
+			{
+				if (this.isTrainerDefeatedCallback(npc.trainerId))
+				{
+					this.dialogue.open(npc.afterBattleDialogue ?? npc.dialogue);
+					return;
+				}
+				this.dialogue.open(npc.dialogue, () =>
+				{
+					if (!this.startTrainerBattleCallback(npc.trainerId!, npc.afterBattleDialogue?.lines[0] ?? ""))
+						this.showTemporaryStatus("Battle unavailable · prepare your party first");
+				});
+				return;
+			}
 			this.dialogue.open(npc.dialogue);
 			return;
 		}

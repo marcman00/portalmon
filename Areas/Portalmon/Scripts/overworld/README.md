@@ -109,7 +109,9 @@ build, test, or commit that follows a Tiled edit, otherwise the game will use
 stale collision, door, actable, or Wild-zone data.
 
 `Gym1.tmx` is rendered from its Tiled layers at runtime. After changing it,
-run `npm.cmd run map:gym`. Its `Ice` layer uses `ice = true`. Portal appearance
+run `npm.cmd run map:gym`. Both TMX importers read the same five object layers:
+`Actables`, `Wild`, `Spawns`, `Portals`, and `Warp` (an empty layer is valid).
+Its `Ice` layer uses `ice = true`. Portal appearance
 is authored on its `Portal Visuals` tile layer, using `PortalTileset.tsx`:
 blue, orange, then purple. Put the desired portal tile at each endpoint.
 Objects in the `Portals` layer pair on their integer `portal` property;
@@ -121,12 +123,19 @@ color in Tiled never changes its linkage.
 
 ### Actables (talkable people and signs)
 
-Everything the player can talk to on the overworld is one `Actables` object in
-`Overworld.tmx`. Names are **not** unique — several signs are named `Sign` — so
+Everything the player can talk to is one `Actables` object in its TMX map.
+Names are **not** unique — several signs are named `Sign` — so
 each actable is keyed by its Tiled object ID, and `TownMap.ts` turns each one
 into an `npcs` entry whose dialogue is `{ speaker: name, lines: [message] }`.
-There is no per-character authoring in TypeScript any more; edit the TMX
-properties and rerun the exporter.
+Ordinary dialogue stays in TMX; trainer mechanics and dialogue stay in the
+trainer registry so they remain editable after map authoring is frozen.
+
+For a map trainer, replace `name` and `message` with a `trainerId` property.
+The ID resolves to the complete typed entry in `Scripts/data/TrainerList.ts`,
+which owns the party, portraits, battle dialogue, map introduction, and
+post-battle line. The map continues to own only the trainer's position and
+facing. Trainer Actables must share a blocking tile and each trainer ID may be
+placed on only one map.
 
 The person and sign artwork is painted into the Tiled `Obstacle` layer, so it is
 already part of `Overworld.png` and also blocks movement. Town actables

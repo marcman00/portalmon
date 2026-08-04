@@ -72,6 +72,17 @@ export interface MapPortalDef
 	directionalExit: boolean;
 }
 
+/** A Tiled Actables object. Trainers are resolved from TrainerDefs by ID. */
+export interface MapActableDef
+{
+	id: number;
+	position: MapPoint;
+	facing: WalkDirection;
+	name?: string;
+	message?: string;
+	trainerId?: string;
+}
+
 /** A reusable map destination for recovery, scripted movement, and future interiors. */
 export interface MapTeleportDestination
 {
@@ -102,6 +113,10 @@ export interface MapNpcDef
 	name: string;
 	position: MapPoint;
 	initialFacing: WalkDirection;
+	/** When present, TALK starts this trainer's configured battle. */
+	trainerId?: string;
+	/** Dialogue shown after this trainer has been defeated. */
+	afterBattleDialogue?: DialogueSequence;
 	/** Omit when the actor is already drawn into the map's background image. */
 	spritePath?: string;
 	/** Zero-based tile in a single-row 16×16 NPC sprite sheet. */

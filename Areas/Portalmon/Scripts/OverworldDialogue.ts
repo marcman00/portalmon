@@ -24,13 +24,15 @@ export class OverworldDialogue
 	private lineIndex: number = 0;
 	private fullLine: string = "";
 	private typeTimer: number | null = null;
+	private onComplete: (() => void) | null = null;
 
-	public open(sequence: DialogueSequence): void
+	public open(sequence: DialogueSequence, onComplete?: () => void): void
 	{
 		this.stopTyping();
 		this.speaker(sequence.speaker);
 		this.lines = [...sequence.lines];
 		this.lineIndex = 0;
+		this.onComplete = onComplete ?? null;
 		this.visible(true);
 		this.typeCurrentLine();
 	}
@@ -47,7 +49,9 @@ export class OverworldDialogue
 
 		if (this.lineIndex >= this.lines.length - 1)
 		{
+			const callback = this.onComplete;
 			this.close();
+			callback?.();
 			return;
 		}
 
@@ -64,6 +68,7 @@ export class OverworldDialogue
 		this.lines = [];
 		this.lineIndex = 0;
 		this.fullLine = "";
+		this.onComplete = null;
 	}
 
 	private typeCurrentLine(): void

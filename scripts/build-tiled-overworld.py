@@ -13,6 +13,7 @@ Run ``npm run map:tiled`` after editing the TMX in Tiled.
 
 from __future__ import annotations
 
+import json
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -28,6 +29,10 @@ def properties(element: ET.Element) -> dict[str, str]:
         property_.get("name", ""): property_.get("value", property_.text or "")
         for property_ in element.findall("./properties/property")
     }
+
+
+def merged_properties(group: ET.Element, object_: ET.Element) -> dict[str, str]:
+    return {**properties(group), **properties(object_)}
 
 
 def exact_tile(value: float, unit: int, description: str) -> int:
@@ -156,11 +161,42 @@ def spawn_placements(
     return placements
 
 
+def portal_placements(root: ET.Element, tile_width: int, tile_height: int) -> list[dict[str, object]]:
+    """Read paired portal endpoints using the same contract as interior maps."""
+
+    group = next((candidate for candidate in root.findall("objectgroup") if candidate.get("name") == "Portals"), None)
+    if group is None:
+        raise ValueError("Missing required object layer: Portals")
+    default_directional_exit = properties(group).get("directionalExit", "false") == "true"
+    placements: list[dict[str, object]] = []
+    counts: dict[int, int] = {}
+    for object_ in group.findall("object"):
+        object_properties = merged_properties(group, object_)
+        try:
+            portal_id = int(object_properties["portal"])
+        except (KeyError, ValueError) as error:
+            raise ValueError(f"Portals object {object_.get('id')} needs an integer 'portal' property") from error
+        object_id = object_.get("id", "?")
+        x = exact_tile(float(object_.get("x", "0")), tile_width, f"Portals object {object_id} X")
+        y = exact_tile(float(object_.get("y", "0")), tile_height, f"Portals object {object_id} Y")
+        width = exact_tile(float(object_.get("width", "0")), tile_width, f"Portals object {object_id} width")
+        height = exact_tile(float(object_.get("height", "0")), tile_height, f"Portals object {object_id} height")
+        if width != 1 or height != 1:
+            raise ValueError(f"Portals object {object_id} must be exactly one tile")
+        directional_exit = object_properties.get("directionalExit", str(default_directional_exit).lower()) == "true"
+        placements.append({"portalId": portal_id, "position": {"x": x, "y": y}, "directionalExit": directional_exit})
+        counts[portal_id] = counts.get(portal_id, 0) + 1
+    invalid = [portal_id for portal_id, count in counts.items() if count != 2]
+    if invalid:
+        raise ValueError(f"Each portal ID must have exactly two endpoints; invalid IDs: {invalid}")
+    return placements
+
+
 def actable_placements(
     root: ET.Element,
     tile_width: int,
     tile_height: int,
-) -> list[tuple[int, str, str, int, int]]:
+) -> list[dict[str, object]]:
     """Read the Actables layer: one talkable person or sign per object.
 
     Each object is identified by its Tiled object ID rather than by name, because
@@ -171,16 +207,10 @@ def actable_placements(
     if group is None:
         raise ValueError("Missing required object layer: Actables")
 
-    placements: list[tuple[int, str, str, int, int]] = []
+    placements: list[dict[str, object]] = []
     for object_ in group.findall("object"):
         object_id = object_.get("id", "?")
-        object_properties = properties(object_)
-        for required in ("name", "message"):
-            if not object_properties.get(required, "").strip():
-                raise ValueError(
-                    f"Actables object {object_id} needs a non-empty {required!r} property "
-                    f"(found {sorted(object_properties)})"
-                )
+        object_properties = merged_properties(group, object_)
 
         x = exact_tile(float(object_.get("x", "0")), tile_width, f"Actables object {object_id} X")
         y = exact_tile(float(object_.get("y", "0")), tile_height, f"Actables object {object_id} Y")
@@ -188,14 +218,27 @@ def actable_placements(
         height = exact_tile(float(object_.get("height", "0")), tile_height, f"Actables object {object_id} height")
         if width != 1 or height != 1:
             raise ValueError(f"Actables object {object_id} must be exactly one tile (found {width}x{height})")
-        placements.append((int(object_id), object_properties["name"], object_properties["message"], x, y))
+        facing = object_properties.get("facing", "down")
+        if facing not in {"up", "down", "left", "right"}:
+            raise ValueError(f"Actables object {object_id} has invalid facing: {facing}")
+        placement: dict[str, object] = {"id": int(object_id), "position": {"x": x, "y": y}, "facing": facing}
+        trainer_id = object_properties.get("trainerId", "").strip()
+        if trainer_id:
+            placement["trainerId"] = trainer_id
+        else:
+            for required in ("name", "message"):
+                if not object_properties.get(required, "").strip():
+                    raise ValueError(f"Actables object {object_id} needs a non-empty {required!r} property")
+            placement["name"] = object_properties["name"]
+            placement["message"] = object_properties["message"]
+        placements.append(placement)
 
-    positions = [(x, y) for _, _, _, x, y in placements]
+    positions = [(placement["position"]["x"], placement["position"]["y"]) for placement in placements]
     duplicate = next((position for position in positions if positions.count(position) > 1), None)
     if duplicate is not None:
         raise ValueError(f"Multiple Actables objects share tile {duplicate[0]},{duplicate[1]}")
 
-    return sorted(placements)
+    return sorted(placements, key=lambda placement: int(placement["id"]))
 
 
 def ts_string(value: str) -> str:
@@ -210,7 +253,7 @@ def encounter_zones(root: ET.Element, tile_width: int, tile_height: int) -> list
 
     zones: list[tuple[int, int, int, int]] = []
     for object_ in group.findall("object"):
-        if properties(object_).get("wild") != "true":
+        if merged_properties(group, object_).get("wild") != "true":
             continue
         object_id = object_.get("id", "?")
         x = exact_tile(float(object_.get("x", "0")), tile_width, f"Wild object {object_id} X")
@@ -329,20 +372,12 @@ def main() -> None:
     spawns = spawn_placements(root, tile_width, tile_height)
     actables = actable_placements(root, tile_width, tile_height)
     wild_zones = encounter_zones(root, tile_width, tile_height)
+    portals = portal_placements(root, tile_width, tile_height)
     rectangles, transparent_tile_count = collision_rectangles(root, width)
 
     lines = [
         "// Generated from Overworld.tmx by scripts/build-tiled-overworld.py. Do not edit.",
-        'import { MapCollisionRect, MapEncounterZone, MapPoint, MapSpawnDef, MapWarpDef } from "./OverworldMapTypes";',
-        "",
-        "export interface TiledActable",
-        "{",
-        "\t/** Tiled object ID; names are not unique, several signs share one. */",
-        "\tid: number;",
-        "\tname: string;",
-        "\tmessage: string;",
-        "\tposition: MapPoint;",
-        "}",
+        'import { MapActableDef, MapCollisionRect, MapEncounterZone, MapPoint, MapPortalDef, MapSpawnDef, MapWarpDef } from "./OverworldMapTypes";',
         "",
         "export const TILED_COLLISION_RECTS: MapCollisionRect[] = [",
         *[f'\t{{ x: {x}, y: {y}, width: {rect_width}, height: {rect_height}, label: "{label}" }},' for x, y, rect_width, rect_height, label in rectangles],
@@ -364,13 +399,9 @@ def main() -> None:
         *[f"\t{{ x: {x}, y: {y}, width: {zone_width}, height: {zone_height} }}," for x, y, zone_width, zone_height in wild_zones],
         "];",
         "",
-        "export const TILED_ACTABLES: TiledActable[] = [",
-        *[
-            f"\t{{ id: {actable_id}, name: {ts_string(name)}, message: {ts_string(message)},"
-            f" position: {{ x: {x}, y: {y} }} }},"
-            for actable_id, name, message, x, y in actables
-        ],
-        "];",
+        "export const TILED_PORTALS: MapPortalDef[] = " + json.dumps(portals) + ";",
+        "",
+        "export const TILED_ACTABLES: MapActableDef[] = " + json.dumps(actables) + ";",
         "",
     ]
     OUTPUT_PATH.write_text("\n".join(lines), encoding="utf-8")

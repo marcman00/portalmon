@@ -1,8 +1,11 @@
 import { OverworldMapDef } from "./OverworldMapTypes";
 import gymTilesetImagePath from "../../../../indoortileset.png";
 import pokemonTilesetImagePath from "../../../../Tileset.png";
+import npcTilesetImagePath from "../../../../npcs-compact-16.png";
 import portalTilesetImagePath from "../../../../portal-tiles.png";
+import { resolveMapActables } from "./MapActables";
 import {
+	GYM1_ACTABLES,
 	GYM1_COLLISION_RECTS,
 	GYM1_HEIGHT,
 	GYM1_ICE_TILES,
@@ -11,6 +14,7 @@ import {
 	GYM1_TILE_LAYERS,
 	GYM1_TILESETS,
 	GYM1_WARPS,
+	GYM1_WILD_ZONES,
 	GYM1_WIDTH,
 } from "./Gym1.generated";
 
@@ -29,17 +33,19 @@ export const GYM1_MAP: OverworldMapDef = {
 			? gymTilesetImagePath
 			: tileset.imagePath === "/Tileset.png"
 				? pokemonTilesetImagePath
-				: portalTilesetImagePath,
+				: tileset.imagePath === "/npcs-compact-16.png"
+					? npcTilesetImagePath
+					: portalTilesetImagePath,
 	})),
 	tileLayers: GYM1_TILE_LAYERS,
 	objects: [],
 	collisionRects: GYM1_COLLISION_RECTS,
 	collisionPoints: [],
-	encounterZones: [],
+	encounterZones: GYM1_WILD_ZONES,
 	iceTiles: GYM1_ICE_TILES,
 	portals: GYM1_PORTALS,
 	spawns: GYM1_SPAWNS,
 	warps: GYM1_WARPS,
 	interactions: [],
-	npcs: [],
+	npcs: resolveMapActables(GYM1_ACTABLES, GYM1_COLLISION_RECTS),
 };

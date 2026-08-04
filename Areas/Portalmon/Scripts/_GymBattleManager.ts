@@ -123,46 +123,25 @@ export class GymLeaderVM
 // Gym leader definitions  (edit these to match your actual creature IDs)
 // ---------------------------------------------------------------------------
 
-const GYM_LEADER_DEFS: GymLeaderDef[] = [
-	{
-		id: "coach", name: TrainerDefs["coach"].name,
-		party: TrainerDefs["coach"].party,
-		defeatQuote: TrainerDefs["coach"].defeatQuote,
-		winQuote: TrainerDefs["coach"].winQuote,
-		portraitImage: TrainerDefs["coach"].portraitImage,
-		battleImage: TrainerDefs["coach"].battleImage,
-		philosophy: TrainerDefs["coach"].philosophy,
-		badgeImage: TrainerDefs["coach"].badgeImage,
-		specialty: "Availability",
-	},
-	{
-		id: "lordis", name: TrainerDefs["lordis"].name,
-		party: TrainerDefs["lordis"].party,
-		defeatQuote: TrainerDefs["lordis"].defeatQuote,
-		winQuote: TrainerDefs["lordis"].winQuote,
-		portraitImage: TrainerDefs["lordis"].portraitImage,
-		battleImage: TrainerDefs["lordis"].battleImage,
-		philosophy: TrainerDefs["lordis"].philosophy,
-		badgeImage: TrainerDefs["lordis"].badgeImage,
-		specialty: "Security",
-	},
-	{
-		id: "gargis", name: TrainerDefs["gargis"].name,
-		party: TrainerDefs["gargis"].party,
-		defeatQuote: TrainerDefs["gargis"].defeatQuote,
-		winQuote: TrainerDefs["gargis"].winQuote,
-		portraitImage: TrainerDefs["gargis"].portraitImage,
-		battleImage: TrainerDefs["gargis"].battleImage,
-		philosophy: TrainerDefs["gargis"].philosophy,
-		badgeImage: TrainerDefs["gargis"].badgeImage,
-		specialty: "Performance / Security",
-	},
-];
+const GYM_LEADER_DEFS: GymLeaderDef[] = Object.values(TrainerDefs)
+	.filter(trainer => trainer.role === "gym")
+	.map(trainer => ({
+		id: trainer.id,
+		name: trainer.name,
+		party: trainer.party,
+		defeatQuote: trainer.victoryMessage,
+		winQuote: trainer.winQuote,
+		portraitImage: trainer.portraitImage,
+		battleImage: trainer.battleImage,
+		philosophy: trainer.philosophy,
+		badgeImage: trainer.badgeImage,
+		specialty: trainer.specialty,
+	}));
 
 const CHAMPIONSHIP_DEF: BossDef = {
 	id: "champion", name: TrainerDefs["rey"].name,
 	party: TrainerDefs["rey"].party,
-	defeatQuote: TrainerDefs["rey"].defeatQuote,
+	defeatQuote: TrainerDefs["rey"].victoryMessage,
 	winQuote: TrainerDefs["rey"].winQuote,
 	portraitImage: TrainerDefs["rey"].portraitImage,
 	battleImage: TrainerDefs["rey"].battleImage,
@@ -177,7 +156,7 @@ const SECRET_DEF: BossDef = {
 	subtitle: "The cake is ready. Accept your trophy...",
 	portraitEmoji: "🎂",
 	party: TrainerDefs["glados"].party,
-	defeatQuote: TrainerDefs["glados"].defeatQuote,
+	defeatQuote: TrainerDefs["glados"].victoryMessage,
 	winQuote: TrainerDefs["glados"].winQuote,
 	portraitImage: TrainerDefs["glados"].portraitImage,
 	battleImage: TrainerDefs["glados"].battleImage,
@@ -319,6 +298,30 @@ export class GymBattleManager
 			leader.portraitImage, leader.battleImage, leader.id,
 		);
 		this.onReady(label);
+	};
+
+	/** Start a leader battle from a map Actable. Map dialogue supplies the victory line. */
+	public startMapTrainerBattle = (trainerId: string, afterBattleMessage: string): boolean =>
+	{
+		const leader = this.gymLeaders().find(candidate => candidate.id === trainerId);
+		if (!leader || leader.isDefeated() || this.combatManager.isInActiveBattle() || this.cache.selectedParty.length === 0)
+			return false;
+		if (!afterBattleMessage.trim()) return false;
+
+		const label = `Gym Battle: ${leader.name}`;
+		this.soundHandler.playGymMusic();
+		this.combatManager.beginGymBattle(
+			leader.party, label, leader.name, afterBattleMessage,
+			() => this._markGymDefeated(leader.id),
+			leader.portraitImage, leader.battleImage, leader.id, false,
+		);
+		this.onReady(label);
+		return true;
+	};
+
+	public isTrainerDefeated = (trainerId: string): boolean =>
+	{
+		return !!this.gymState.defeats[trainerId];
 	};
 
 	public startChampionshipBattle = (): void =>

@@ -185,6 +185,8 @@ class PortalmonController
 			() => void this.useEnrichmentCenter(),
 			(gymSlot: number) => this.openTownGym(gymSlot),
 			() => this.startWildEncounter(),
+			(trainerId: string, afterBattleMessage: string) => this.gymBattleManager.startMapTrainerBattle(trainerId, afterBattleMessage),
+			(trainerId: string) => this.gymBattleManager.isTrainerDefeated(trainerId),
 		);
 
 		

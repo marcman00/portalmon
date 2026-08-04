@@ -8,6 +8,8 @@ Gym maps render their TMX layers directly. Gameplay data stays in Tiled:
 * a Portals-layer ``directionalExit`` property is the default for its objects;
 * ``Warp`` objects use ``map`` and ``spawn`` to move between maps;
 * ``Spawns`` objects are safe, non-triggering arrival points.
+* ``Actables`` objects provide signs, dialogue NPCs, and map-placed trainers;
+* ``Wild`` objects define encounter zones.
 """
 
 from __future__ import annotations
@@ -62,6 +64,58 @@ def group(root: ET.Element, name: str, required: bool = True) -> ET.Element | No
     result = next((candidate for candidate in root.findall("objectgroup") if candidate.get("name") == name), None)
     if result is None and required:
         raise ValueError(f"Missing required object layer: {name}")
+    return result
+
+
+def merged_properties(group_: ET.Element, object_: ET.Element) -> dict[str, str]:
+    """Object properties override layer defaults, matching Tiled's authoring model."""
+
+    return {**properties(group_), **properties(object_)}
+
+
+def actables(root: ET.Element, tile_width: int, tile_height: int) -> list[dict[str, object]]:
+    actable_group = group(root, "Actables")
+    result: list[dict[str, object]] = []
+    positions: set[tuple[int, int]] = set()
+    for object_ in actable_group.findall("object"):
+        object_id = int(object_.get("id", "0"))
+        object_properties = merged_properties(actable_group, object_)
+        trainer_id = object_properties.get("trainerId", "").strip()
+        x, y = one_tile_object(object_, tile_width, tile_height, "Actables")
+        if (x, y) in positions:
+            raise ValueError(f"Multiple Actables objects share tile {x},{y}")
+        positions.add((x, y))
+        facing = object_properties.get("facing", "down")
+        if facing not in {"up", "down", "left", "right"}:
+            raise ValueError(f"Actables object {object_id} has invalid facing: {facing}")
+        entry: dict[str, object] = {"id": object_id, "position": {"x": x, "y": y}, "facing": facing}
+        if trainer_id:
+            entry["trainerId"] = trainer_id
+        else:
+            name = object_properties.get("name", "").strip()
+            message = object_properties.get("message", "").strip()
+            if not name or not message:
+                raise ValueError(f"Actables object {object_id} needs non-empty 'name' and 'message' properties")
+            entry["name"] = name
+            entry["message"] = message
+        result.append(entry)
+    return result
+
+
+def wild_zones(root: ET.Element, tile_width: int, tile_height: int) -> list[dict[str, int]]:
+    wild_group = group(root, "Wild")
+    result: list[dict[str, int]] = []
+    for object_ in wild_group.findall("object"):
+        if merged_properties(wild_group, object_).get("wild") != "true":
+            continue
+        object_id = object_.get("id", "?")
+        x = exact_tile(float(object_.get("x", "0")), tile_width, f"Wild object {object_id} X")
+        y = exact_tile(float(object_.get("y", "0")), tile_height, f"Wild object {object_id} Y")
+        width = exact_tile(float(object_.get("width", "0")), tile_width, f"Wild object {object_id} width")
+        height = exact_tile(float(object_.get("height", "0")), tile_height, f"Wild object {object_id} height")
+        if width <= 0 or height <= 0:
+            raise ValueError(f"Wild object {object_id} must cover at least one tile")
+        result.append({"x": x, "y": y, "width": width, "height": height})
     return result
 
 
@@ -307,6 +361,8 @@ def main() -> None:
     portal_defs = portals(root, tile_width, tile_height)
     spawn_defs = spawns(root, tile_width, tile_height)
     warp_defs = warps(root, tile_width, tile_height)
+    actable_defs = actables(root, tile_width, tile_height)
+    wild_defs = wild_zones(root, tile_width, tile_height)
     validate_portal_visuals(layers, width, portal_defs)
     for spawn in spawn_defs:
         position = spawn["position"]
@@ -316,7 +372,7 @@ def main() -> None:
 
     output = [
         "// Generated from Gym1.tmx by scripts/build-tiled-gym.py. Do not edit.",
-        'import { MapCollisionRect, MapPoint, MapPortalDef, MapSpawnDef, MapTilesetDef, MapWarpDef } from "./OverworldMapTypes";',
+        'import { MapActableDef, MapCollisionRect, MapEncounterZone, MapPoint, MapPortalDef, MapSpawnDef, MapTilesetDef, MapWarpDef } from "./OverworldMapTypes";',
         "",
         f"export const GYM1_WIDTH = {width};",
         f"export const GYM1_HEIGHT = {height};",
@@ -327,6 +383,8 @@ def main() -> None:
         "export const GYM1_PORTALS: MapPortalDef[] = " + json.dumps(portal_defs) + ";",
         "export const GYM1_SPAWNS: MapSpawnDef[] = " + json.dumps(spawn_defs) + ";",
         "export const GYM1_WARPS: MapWarpDef[] = " + json.dumps(warp_defs) + ";",
+        "export const GYM1_ACTABLES: MapActableDef[] = " + json.dumps(actable_defs) + ";",
+        "export const GYM1_WILD_ZONES: MapEncounterZone[] = " + json.dumps(wild_defs) + ";",
         "",
     ]
     OUTPUT_PATH.write_text("\n".join(output), encoding="utf-8")

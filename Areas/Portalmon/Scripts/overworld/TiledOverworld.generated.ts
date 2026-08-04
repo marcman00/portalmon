@@ -1,14 +1,5 @@
 // Generated from Overworld.tmx by scripts/build-tiled-overworld.py. Do not edit.
-import { MapCollisionRect, MapEncounterZone, MapPoint, MapSpawnDef, MapWarpDef } from "./OverworldMapTypes";
-
-export interface TiledActable
-{
-	/** Tiled object ID; names are not unique, several signs share one. */
-	id: number;
-	name: string;
-	message: string;
-	position: MapPoint;
-}
+import { MapActableDef, MapCollisionRect, MapEncounterZone, MapPoint, MapPortalDef, MapSpawnDef, MapWarpDef } from "./OverworldMapTypes";
 
 export const TILED_COLLISION_RECTS: MapCollisionRect[] = [
 	{ x: 0, y: 0, width: 56, height: 1, label: "obstacle" },
@@ -238,17 +229,6 @@ export const TILED_WILD_ZONES: MapEncounterZone[] = [
 	{ x: 44, y: 4, width: 9, height: 15 },
 ];
 
-export const TILED_ACTABLES: TiledActable[] = [
-	{ id: 12, name: "Eric", message: "I got this house on a crazy good deal.", position: { x: 3, y: 16 } },
-	{ id: 13, name: "Hailey", message: "Mm mm that bread at the market is so tasy.", position: { x: 14, y: 15 } },
-	{ id: 14, name: "Ben", message: "Some people say the mayor is a robot. Maybe that's why she never seems to age.", position: { x: 21, y: 31 } },
-	{ id: 15, name: "Billy", message: "Be careful! The garden is full of Portalmon.", position: { x: 41, y: 18 } },
-	{ id: 16, name: "Nurse Karen", message: "Your Portalmon will be well taken care of in our enrichment center", position: { x: 20, y: 16 } },
-	{ id: 17, name: "bob1", message: "Fresh cache, picked this morning. Only slightly stale.", position: { x: 6, y: 25 } },
-	{ id: 18, name: "bob2", message: "Two for one on legacy dependencies. No refunds, no support.", position: { x: 9, y: 25 } },
-	{ id: 20, name: "bob4", message: "Everything at this stall is organic, artisanal, and completely untested.", position: { x: 15, y: 25 } },
-	{ id: 21, name: "Joe", message: "Been phishing for days now and no bytes.", position: { x: 51, y: 37 } },
-	{ id: 22, name: "bob3", message: "These tomatoes are heirloom. So is my codebase. Neither is documented.", position: { x: 12, y: 25 } },
-	{ id: 28, name: "Sign", message: "Wild Portalmon ahead. Enter at your own risk!", position: { x: 48, y: 20 } },
-	{ id: 30, name: "Sign", message: "Farmer's Market", position: { x: 18, y: 25 } },
-];
+export const TILED_PORTALS: MapPortalDef[] = [];
+
+export const TILED_ACTABLES: MapActableDef[] = [{"id": 12, "position": {"x": 3, "y": 16}, "facing": "down", "name": "Eric", "message": "I got this house on a crazy good deal."}, {"id": 13, "position": {"x": 14, "y": 15}, "facing": "down", "name": "Hailey", "message": "Mm mm that bread at the market is so tasy."}, {"id": 14, "position": {"x": 21, "y": 31}, "facing": "down", "name": "Ben", "message": "Some people say the mayor is a robot. Maybe that's why she never seems to age."}, {"id": 15, "position": {"x": 41, "y": 18}, "facing": "down", "name": "Billy", "message": "Be careful! The garden is full of Portalmon."}, {"id": 16, "position": {"x": 20, "y": 16}, "facing": "down", "name": "Nurse Karen", "message": "Your Portalmon will be well taken care of in our enrichment center"}, {"id": 17, "position": {"x": 6, "y": 25}, "facing": "down", "name": "bob1", "message": "Fresh cache, picked this morning. Only slightly stale."}, {"id": 18, "position": {"x": 9, "y": 25}, "facing": "down", "name": "bob2", "message": "Two for one on legacy dependencies. No refunds, no support."}, {"id": 20, "position": {"x": 15, "y": 25}, "facing": "down", "name": "bob4", "message": "Everything at this stall is organic, artisanal, and completely untested."}, {"id": 21, "position": {"x": 51, "y": 37}, "facing": "down", "name": "Joe", "message": "Been phishing for days now and no bytes."}, {"id": 22, "position": {"x": 12, "y": 25}, "facing": "down", "name": "bob3", "message": "These tomatoes are heirloom. So is my codebase. Neither is documented."}, {"id": 28, "position": {"x": 48, "y": 20}, "facing": "down", "name": "Sign", "message": "Wild Portalmon ahead. Enter at your own risk!"}, {"id": 30, "position": {"x": 18, "y": 25}, "facing": "down", "name": "Sign", "message": "Farmer's Market"}];
