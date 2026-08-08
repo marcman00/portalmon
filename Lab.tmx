@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="15" height="9" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="9">
+ <tileset firstgid="1" source="indoortileset.tsx"/>
+ <tileset firstgid="12289" source="PortalTileset.tsx"/>
+ <tileset firstgid="12293" source="GladosSprite.tsx"/>
+ <layer id="1" name="Floor" width="15" height="9">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,5198,5967,5967,5967,5967,5967,0,0,0,0,0,5967,5199,0,
+0,5390,5776,5776,5776,5776,5776,0,0,0,0,0,5776,5391,0,
+0,5390,5776,5776,5776,5776,5776,5776,0,0,0,5776,5776,5391,0,
+0,5390,5776,5776,5776,5776,5776,5776,0,0,0,5776,5776,5391,0,
+0,5390,5776,5776,5776,5776,5776,5776,5776,5776,5776,5776,5776,5583,0,
+0,11209,11211,11211,11211,11211,11211,11211,11211,11211,11211,11211,11211,11212,0,
+0,0,0,0,0,6155,6156,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <layer id="2" name="Obstacles" width="15" height="9">
+  <data encoding="csv">
+4813,4814,5773,5774,5773,5774,5773,5001,5002,5003,5003,5004,5773,4815,4816,
+5005,5006,5965,5966,5965,5966,5965,5193,5194,5195,5195,5196,5965,5007,5008,
+5197,0,0,0,0,0,0,5385,5386,5387,5387,5388,0,0,5200,
+5389,0,0,0,0,0,0,5577,5578,5579,5769,5580,0,0,5392,
+5389,0,0,0,0,0,0,0,5770,5771,5772,0,0,0,5392,
+5389,0,0,0,0,0,0,0,5962,5963,5964,0,0,0,5392,
+5389,0,12294,0,0,0,0,0,0,0,0,0,0,0,5584,
+5581,0,0,0,0,0,0,0,0,0,0,0,0,0,5584,
+7122,7122,7122,7122,7122,0,0,7122,7122,7122,7122,7122,7122,7122,7122
+</data>
+ </layer>
+ <layer id="3" name="Portal Visuals" width="15" height="9">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,12289,0,12290,0,12291,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,12293,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <objectgroup color="#ff0000" id="4" name="Actables">
+  <object id="1" x="32" y="16" width="16" height="16">
+   <properties>
+    <property name="name" value="Blue Portal"/>
+   </properties>
+  </object>
+  <object id="2" x="64" y="16" width="16" height="16">
+   <properties>
+    <property name="name" value="Orange Portal"/>
+   </properties>
+  </object>
+  <object id="3" x="96" y="16" width="16" height="16">
+   <properties>
+    <property name="name" value="Purple Portal"/>
+   </properties>
+  </object>
+  <object id="5" x="192" y="16" width="16" height="16">
+   <properties>
+    <property name="message" value="Portalmon simulation: ACTIVE."/>
+    <property name="name" value="Computer"/>
+   </properties>
+  </object>
+  <object id="6" x="128" y="48" width="48" height="48">
+   <properties>
+    <property name="message" value="Ah, you're finally awake. Welcome to my simulation. Here I will appease myself watching your scrawny attempts to catch Portalmon and battle for your life."/>
+    <property name="name" value="GLaDOS"/>
+   </properties>
+  </object>
+  <object id="8" x="32" y="96" width="16" height="16">
+   <properties>
+    <property name="message" value="&lt;3"/>
+    <property name="name" value="Companion Cube"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>
