@@ -39,7 +39,7 @@ class TownMapTests(unittest.TestCase):
             self.assertEqual((255, 255), image.getchannel("A").getextrema())
 
     def test_source_tileset_contains_complete_sparse_grid(self) -> None:
-        with Image.open(ROOT / "Tileset.png") as source:
+        with Image.open(builder.SOURCE_PATH) as source:
             self.assertGreaterEqual(source.width, builder.SOURCE_ORIGIN + 28 * builder.SOURCE_PITCH - 1)
             self.assertGreaterEqual(source.height, builder.SOURCE_ORIGIN + 47 * builder.SOURCE_PITCH - 1)
 

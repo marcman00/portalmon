@@ -85,7 +85,7 @@ can be replaced without redrawing or renaming the physical gyms.
 
 ### Tiled collision, doors, and actables
 
-`Overworld.tmx` is the authoring source for the current overworld's gameplay
+`../../Maps/Source/Overworld.tmx` is the authoring source for the current overworld's gameplay
 metadata. The runtime still renders the precomposed `Overworld.png`; it does
 not render Tiled tiles directly. Do not edit `TiledOverworld.generated.ts` by
 hand. After editing objects or obstacle tiles in Tiled, run:
@@ -108,7 +108,7 @@ Enrichment Center healing sequence.
 build, test, or commit that follows a Tiled edit, otherwise the game will use
 stale collision, door, actable, or Wild-zone data.
 
-`Gym1.tmx` and `Gym2.tmx` are rendered from their Tiled layers at runtime. After changing either one,
+`../../Maps/Source/Gym1.tmx`, `Gym2.tmx`, `Gym3.tmx`, and `Lab.tmx` are rendered from their Tiled layers at runtime. After changing any of them,
 run `npm.cmd run map:gym`. Both TMX importers read the same five object layers:
 `Actables`, `Wild`, `Spawns`, `Portals`, and `Warp` (an empty layer is valid).
 Its `Ice` layer uses `ice = true`. Portal appearance

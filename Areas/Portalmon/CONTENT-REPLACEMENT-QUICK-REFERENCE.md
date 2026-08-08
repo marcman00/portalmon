@@ -1,5 +1,7 @@
 # Portalmon Content Replacement Quick Reference
 
+> Map filenames in this guide live under Areas/Portalmon/Maps/Source/.
+
 This guide covers replacing the Portalmon roster, gym leaders, trainer parties,
 art, and dialogue without changing the battle or overworld systems.
 

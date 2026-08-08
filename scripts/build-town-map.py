@@ -18,7 +18,7 @@ from PIL import Image, ImageEnhance, ImageOps
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE_PATH = ROOT / "Tileset.png"
+SOURCE_PATH = ROOT / "Areas/Portalmon/Content/Images/Overworld/Tilesets/Tileset.png"
 LAYOUT_PATH = ROOT / "Areas/Portalmon/Scripts/overworld/town-layout.json"
 IMAGE_PATH = ROOT / "Areas/Portalmon/Content/Images/Overworld/enrichment-town.png"
 DATA_PATH = ROOT / "Areas/Portalmon/Scripts/overworld/TownLayout.generated.ts"

@@ -7,6 +7,7 @@ export const TILED_COLLISION_RECTS: MapCollisionRect[] = [
 	{ x: 0, y: 2, width: 56, height: 1, label: "obstacle" },
 	{ x: 0, y: 3, width: 2, height: 1, label: "obstacle" },
 	{ x: 3, y: 3, width: 7, height: 1, label: "obstacle" },
+	{ x: 17, y: 3, width: 1, height: 1, label: "obstacle" },
 	{ x: 27, y: 3, width: 6, height: 1, label: "obstacle" },
 	{ x: 43, y: 3, width: 13, height: 1, label: "obstacle" },
 	{ x: 0, y: 4, width: 2, height: 1, label: "obstacle" },

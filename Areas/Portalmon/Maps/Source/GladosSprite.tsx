@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tileset version="1.10" tiledversion="1.12.2" name="glados-sprite" tilewidth="16" tileheight="32" tilecount="2" columns="2">
- <image source="glados-sprite.png" width="32" height="32"/>
+ <image source="../../Content/Images/Overworld/Tilesets/glados-sprite.png" width="32" height="32"/>
  <tile id="0">
   <properties>
    <property name="name" value="GLaDOS"/>

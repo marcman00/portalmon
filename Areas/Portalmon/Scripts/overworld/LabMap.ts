@@ -1,7 +1,7 @@
 import { OverworldMapDef } from "./OverworldMapTypes";
-import indoorTilesetImagePath from "../../../../indoortileset.png";
-import portalTilesetImagePath from "../../../../portal-tiles.png";
-import gladosTilesetImagePath from "../../../../glados-sprite.png";
+import indoorTilesetImagePath from "../../Content/Images/Overworld/Tilesets/indoortileset.png";
+import portalTilesetImagePath from "../../Content/Images/Overworld/Tilesets/portal-tiles.png";
+import gladosTilesetImagePath from "../../Content/Images/Overworld/Tilesets/glados-sprite.png";
 import { resolveMapActables } from "./MapActables";
 import {
 	LAB_ACTABLES,

@@ -1,8 +1,8 @@
 import { OverworldMapDef } from "./OverworldMapTypes";
-import gymTilesetImagePath from "../../../../indoortileset.png";
-import pokemonTilesetImagePath from "../../../../Tileset.png";
-import npcTilesetImagePath from "../../../../npcs-compact-16.png";
-import portalTilesetImagePath from "../../../../portal-tiles.png";
+import gymTilesetImagePath from "../../Content/Images/Overworld/Tilesets/indoortileset.png";
+import pokemonTilesetImagePath from "../../Content/Images/Overworld/Tilesets/Tileset.png";
+import npcTilesetImagePath from "../../Content/Images/Overworld/Tilesets/npcs-compact-16.png";
+import portalTilesetImagePath from "../../Content/Images/Overworld/Tilesets/portal-tiles.png";
 import { resolveMapActables } from "./MapActables";
 import {
 	GYM2_ACTABLES,

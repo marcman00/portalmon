@@ -20,7 +20,7 @@ from pathlib import Path
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent
-SOURCE_PATH = ROOT / "Overworld.tmx"
+SOURCE_PATH = ROOT / "Areas/Portalmon/Maps/Source/Overworld.tmx"
 OUTPUT_PATH = ROOT / "Areas/Portalmon/Scripts/overworld/TiledOverworld.generated.ts"
 
 

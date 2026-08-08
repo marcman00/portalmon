@@ -21,6 +21,8 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parent.parent
+MAP_SOURCE_DIR = ROOT / "Areas/Portalmon/Maps/Source"
+MAP_OUTPUT_DIR = ROOT / "Areas/Portalmon/Scripts/overworld"
 TILED_MAPS = (
     ("Gym1.tmx", "Gym1.generated.ts", "GYM1"),
     ("Gym2.tmx", "Gym2.generated.ts", "GYM2"),
@@ -65,6 +67,22 @@ def one_tile_object(object_: ET.Element, tile_width: int, tile_height: int, grou
     return x, y
 
 
+def actable_position(object_: ET.Element, tile_width: int, tile_height: int) -> tuple[int, int]:
+    """Use a tile actable directly, or anchor a larger visual at its bottom center."""
+    object_id = object_.get("id", "?")
+    x = exact_tile(float(object_.get("x", "0")), tile_width, f"Actables object {object_id} X")
+    y = exact_tile(float(object_.get("y", "0")), tile_height, f"Actables object {object_id} Y")
+    width = exact_tile(float(object_.get("width", "0")), tile_width, f"Actables object {object_id} width")
+    height = exact_tile(float(object_.get("height", "0")), tile_height, f"Actables object {object_id} height")
+    if width <= 0 or height <= 0:
+        raise ValueError(f"Actables object {object_id} must cover at least one tile")
+    if width == 1 and height == 1:
+        return x, y
+    if width % 2 == 0:
+        raise ValueError(f"Large Actables object {object_id} must have an odd tile width")
+    return x + width // 2, y + height
+
+
 def group(root: ET.Element, name: str, required: bool = True) -> ET.Element | None:
     result = next((candidate for candidate in root.findall("objectgroup") if candidate.get("name") == name), None)
     if result is None and required:
@@ -87,7 +105,7 @@ def actables(root: ET.Element, tile_width: int, tile_height: int) -> list[dict[s
         object_properties = merged_properties(actable_group, object_)
         trainer_id = object_properties.get("trainerId", "").strip()
         script_id = object_properties.get("scriptId", "").strip()
-        x, y = one_tile_object(object_, tile_width, tile_height, "Actables")
+        x, y = actable_position(object_, tile_width, tile_height)
         if (x, y) in positions:
             raise ValueError(f"Multiple Actables objects share tile {x},{y}")
         positions.add((x, y))
@@ -384,7 +402,7 @@ def export_map(source_path: Path, output_path: Path, prefix: str) -> None:
         if tile_count <= 0 or columns <= 0:
             raise ValueError(f"Gym tileset {source!r} needs positive tilecount and columns")
         tilesets.append({
-            "imagePath": "/" + image.get("source"),
+            "imagePath": "/" + Path(image.get("source")).name,
             "firstGid": int(tileset_reference.get("firstgid", "0")),
             "tileCount": tile_count,
             "columns": columns,
@@ -439,8 +457,8 @@ def main() -> None:
         raise ValueError(f"Unknown Tiled map selection: {', '.join(sorted(requested))}")
     for source_name, output_name, prefix in selected:
         export_map(
-            ROOT / source_name,
-            ROOT / "Areas/Portalmon/Scripts/overworld" / output_name,
+            MAP_SOURCE_DIR / source_name,
+            MAP_OUTPUT_DIR / output_name,
             prefix,
         )
 

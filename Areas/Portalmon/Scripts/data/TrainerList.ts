@@ -1,6 +1,6 @@
 import { SpeciesId } from "./CreatureList";
 import { TransitionColor } from "../BattleTransition";
-import npcSpriteSheetPath from "../../../../npcs-compact-16.png";
+import npcSpriteSheetPath from "../../Content/Images/Overworld/Tilesets/npcs-compact-16.png";
 
 // ============================================================
 // DIALOGUE TRIGGER TYPES
