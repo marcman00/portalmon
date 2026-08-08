@@ -10,6 +10,7 @@ import { SoundHandler } from "./SoundManager";
 
 interface GymBattleStateData
 {
+	version?: number;
 	defeats: Record<string, boolean>;
 	championDefeated: boolean;
 	secretDefeated: boolean;
@@ -18,6 +19,7 @@ interface GymBattleStateData
 class GymBattleState
 {
 	private static readonly _key = "PortalKombatGymState";
+	private static readonly _version = 3;
 
 	public defeats: Record<string, boolean>;
 	public championDefeated: boolean;
@@ -35,7 +37,11 @@ class GymBattleState
 		try
 		{
 			const raw = localStorage.getItem(GymBattleState._key);
-			if (raw) return new GymBattleState(JSON.parse(raw));
+			if (raw)
+			{
+				const data = JSON.parse(raw) as GymBattleStateData;
+				if (data.version === GymBattleState._version) return new GymBattleState(data);
+			}
 		}
 		catch { /* ignore */ }
 		return new GymBattleState();
@@ -44,6 +50,7 @@ class GymBattleState
 	public save(): void
 	{
 		localStorage.setItem(GymBattleState._key, JSON.stringify({
+			version: GymBattleState._version,
 			defeats: this.defeats,
 			championDefeated: this.championDefeated,
 			secretDefeated: this.secretDefeated,
@@ -139,22 +146,7 @@ const GYM_LEADER_DEFS: GymLeaderDef[] = Object.values(TrainerDefs)
 	}));
 
 const CHAMPIONSHIP_DEF: BossDef = {
-	id: "champion", name: TrainerDefs["rey"].name,
-	party: TrainerDefs["rey"].party,
-	defeatQuote: TrainerDefs["rey"].victoryMessage,
-	winQuote: TrainerDefs["rey"].winQuote,
-	portraitImage: TrainerDefs["rey"].portraitImage,
-	battleImage: TrainerDefs["rey"].battleImage,
-	philosophy: TrainerDefs["rey"].philosophy,
-	badgeImage: TrainerDefs["rey"].badgeImage,
-	battleLabel: "Championship Battle",
-};
-
-const SECRET_DEF: BossDef = {
-	id: "secret", name: "???",
-	revealedName: "GLaDOS",
-	subtitle: "The cake is ready. Accept your trophy...",
-	portraitEmoji: "🎂",
+	id: "champion", name: TrainerDefs["glados"].name,
 	party: TrainerDefs["glados"].party,
 	defeatQuote: TrainerDefs["glados"].victoryMessage,
 	winQuote: TrainerDefs["glados"].winQuote,
@@ -162,7 +154,22 @@ const SECRET_DEF: BossDef = {
 	battleImage: TrainerDefs["glados"].battleImage,
 	philosophy: TrainerDefs["glados"].philosophy,
 	badgeImage: TrainerDefs["glados"].badgeImage,
-	battleLabel: "??? vs ???",
+	battleLabel: "Championship Battle: GLaDOS",
+};
+
+const SECRET_DEF: BossDef = {
+	id: "secret", name: "???",
+	revealedName: "Rey",
+	subtitle: "Developer signature detected. Location unknown.",
+	portraitEmoji: "🕵️",
+	party: TrainerDefs["rey"].party,
+	defeatQuote: TrainerDefs["rey"].victoryMessage,
+	winQuote: TrainerDefs["rey"].winQuote,
+	portraitImage: TrainerDefs["rey"].portraitImage,
+	battleImage: TrainerDefs["rey"].battleImage,
+	philosophy: TrainerDefs["rey"].philosophy,
+	badgeImage: TrainerDefs["rey"].badgeImage,
+	battleLabel: "Developer Battle: Rey",
 };
 
 // ---------------------------------------------------------------------------
@@ -215,18 +222,18 @@ export class GymBattleManager
 
 	public showBadgeFor = (trainerId: string): void =>
 	{
-		if (trainerId === "rey" && this.isChampionshipDefeated())
+		if (trainerId === "glados" && this.isChampionshipDefeated())
 		{
 			this.badgeModalImage(this.championBadgeImage);
 			this.badgeModalTitle("Champion Badge");
-			this.badgeModalDesc("Received by defeating Rey, the Champion.");
+			this.badgeModalDesc("Received by defeating GLaDOS and completing the simulation.");
 			this.badgeModalVisible(true);
 		}
-		else if (trainerId === "glados" && this.isSecretDefeated())
+		else if (trainerId === "rey" && this.isSecretDefeated())
 		{
 			this.badgeModalImage(this.secretBadgeImage);
-			this.badgeModalTitle("Portal Badge");
-			this.badgeModalDesc("Received by defeating GLaDOS. The cake was real this time.");
+			this.badgeModalTitle("Developer Badge");
+			this.badgeModalDesc("Received by finding and defeating Rey.");
 			this.badgeModalVisible(true);
 		}
 	};
@@ -252,10 +259,11 @@ export class GymBattleManager
 
 	/**
 	 * Set by PortalmonController after construction.
-	 * Fired the first time (and every rematch) the championship is won.
+	 * Fired when the championship is won.
 	 */
 	public onChampionshipVictory: (() => void) | null = null;
 	public onSecretVictory: (() => void) | null = null;
+	public onChampionshipUnlocked: (() => void) | null = null;
 
 	constructor(cache: PortalmonCache, combatManager: CombatManager, onReady: GymBattleReadyCallback, soundHandler: SoundHandler)
 	{
@@ -303,6 +311,8 @@ export class GymBattleManager
 	/** Start a leader battle from a map Actable. Map dialogue supplies the victory line. */
 	public startMapTrainerBattle = (trainerId: string, afterBattleMessage: string): boolean =>
 	{
+		if (trainerId === "rey") return this.startSecretBattle();
+
 		const leader = this.gymLeaders().find(candidate => candidate.id === trainerId);
 		if (!leader || leader.isDefeated() || this.combatManager.isInActiveBattle() || this.cache.selectedParty.length === 0)
 			return false;
@@ -321,6 +331,8 @@ export class GymBattleManager
 
 	public isTrainerDefeated = (trainerId: string): boolean =>
 	{
+		if (trainerId === "glados") return this.isChampionshipDefeated();
+		if (trainerId === "rey") return this.isSecretDefeated();
 		return !!this.gymState.defeats[trainerId];
 	};
 
@@ -336,16 +348,17 @@ export class GymBattleManager
 			CHAMPIONSHIP_DEF.name,
 			CHAMPIONSHIP_DEF.defeatQuote,
 			() => this._markChampionDefeated(),
-			CHAMPIONSHIP_DEF.portraitImage, CHAMPIONSHIP_DEF.battleImage, "rey",
+			CHAMPIONSHIP_DEF.portraitImage, CHAMPIONSHIP_DEF.battleImage, "glados",
 		);
 		this.onReady(CHAMPIONSHIP_DEF.battleLabel);
 	};
 
-	public startSecretBattle = (): void =>
+	public startSecretBattle = (): boolean =>
 	{
-		if (!this.isSecretUnlocked()) return;
-		if (this.combatManager.isInActiveBattle()) return;
-		if (this.cache.selectedParty.length === 0) return;
+		if (!this.isSecretUnlocked()) return false;
+		if (this.isSecretDefeated()) return false;
+		if (this.combatManager.isInActiveBattle()) return false;
+		if (this.cache.selectedParty.length === 0) return false;
 		this.soundHandler.playBossMusic();
 		this.combatManager.beginGymBattle(
 			SECRET_DEF.party,
@@ -353,9 +366,10 @@ export class GymBattleManager
 			SECRET_DEF.revealedName,
 			SECRET_DEF.defeatQuote,
 			() => this._markSecretDefeated(),
-			SECRET_DEF.portraitImage, SECRET_DEF.battleImage, "glados",
+			SECRET_DEF.portraitImage, SECRET_DEF.battleImage, "rey",
 		);
 		this.onReady(SECRET_DEF.battleLabel);
+		return true;
 	};
 
 	// -----------------------------------------------------------------------
@@ -364,6 +378,7 @@ export class GymBattleManager
 
 	private _markGymDefeated(leaderId: string): void
 	{
+		const wasUnlocked = this.isChampionshipUnlocked();
 		const leader = this.gymLeaders().find(l => l.id === leaderId);
 		if (leader && !leader.isDefeated())
 		{
@@ -371,6 +386,7 @@ export class GymBattleManager
 		}
 		this.gymState.defeats[leaderId] = true;
 		this.gymState.save();
+		if (!wasUnlocked && this.isChampionshipUnlocked()) this.onChampionshipUnlocked?.();
 	}
 
 	private _markChampionDefeated(): void

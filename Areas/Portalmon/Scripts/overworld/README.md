@@ -108,7 +108,7 @@ Enrichment Center healing sequence.
 build, test, or commit that follows a Tiled edit, otherwise the game will use
 stale collision, door, actable, or Wild-zone data.
 
-`Gym1.tmx` is rendered from its Tiled layers at runtime. After changing it,
+`Gym1.tmx` and `Gym2.tmx` are rendered from their Tiled layers at runtime. After changing either one,
 run `npm.cmd run map:gym`. Both TMX importers read the same five object layers:
 `Actables`, `Wild`, `Spawns`, `Portals`, and `Warp` (an empty layer is valid).
 Its `Ice` layer uses `ice = true`. Portal appearance
@@ -120,6 +120,10 @@ linked portal in the same travel direction. The exporter rejects invalid pairs,
 blocked exits, and ice loops on routes reachable from a configured spawn.
 Portal visuals deliberately have no gameplay properties, so changing a portal's
 color in Tiled never changes its linkage.
+
+`Warp` objects may be one tile or a tile-aligned rectangle. Rectangles expand
+to one trigger per covered tile, which keeps multi-tile hazards such as Gym 2's
+quicksand fully authored in Tiled.
 
 ### Actables (talkable people and signs)
 

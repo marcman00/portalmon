@@ -10,7 +10,6 @@
 			<span class="pk-overworld-position"
 				  data-bind="text: currentMapName() + ' · ' + positionLabel()"></span>
 		</div>
-
 		<div class="pk-overworld-help" data-bind="visible: !dialogue.visible()">
 			MOVE: D-PAD / ARROWS / WASD · TALK: A / ENTER / E
 		</div>
@@ -22,7 +21,20 @@
 			 aria-label="Conversation">
 			<div class="pk-dialogue-speaker" data-bind="text: dialogue.speaker"></div>
 			<div class="pk-dialogue-text" data-bind="text: dialogue.text"></div>
+			<div class="pk-dialogue-choices" data-bind="visible: dialogue.isChoosing, foreach: dialogue.choices">
+				<button type="button" class="pk-dialogue-choice"
+						data-bind="text: label,
+						click: $parent.dialogue.selectChoice,
+						clickBubble: false,
+						css: { 'is-selected': $index() === $parent.dialogue.selectedChoiceIndex() }"></button>
+			</div>
 			<div class="pk-dialogue-advance" data-bind="text: dialogue.advanceHint"></div>
+		</div>
+
+		<div class="pk-lab-wake" data-bind="css: { 'is-active': $root.isLabWakeActive }, click: $root.skipLabWake">
+			<div class="pk-lab-wake__lid pk-lab-wake__lid--top"></div>
+			<div class="pk-lab-wake__lid pk-lab-wake__lid--bottom"></div>
+			<div class="pk-lab-wake__hint">E · WAKE UP</div>
 		</div>
 	</div>
 </div>

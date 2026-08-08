@@ -4,6 +4,12 @@ export interface DialogueSequence
 	lines: string[];
 }
 
+export interface DialogueChoice
+{
+	label: string;
+	action: () => void;
+}
+
 /**
  * Reusable typewriter dialogue state. Calling advance while text is typing
  * completes the line; calling it afterward advances or closes the sequence.
@@ -14,9 +20,15 @@ export class OverworldDialogue
 	public readonly speaker: KnockoutObservable<string> = ko.observable("");
 	public readonly text: KnockoutObservable<string> = ko.observable("");
 	public readonly isTyping: KnockoutObservable<boolean> = ko.observable(false);
+	public readonly choices: KnockoutObservableArray<DialogueChoice> = ko.observableArray([]);
+	public readonly selectedChoiceIndex: KnockoutObservable<number> = ko.observable(0);
+	public readonly isChoosing: KnockoutComputed<boolean> = ko.pureComputed(() =>
+		this.visible() && !this.isTyping() && this.lineIndex >= this.lines.length - 1 && this.choices().length > 0,
+	);
 	public readonly advanceHint: KnockoutComputed<string> = ko.pureComputed(() =>
 	{
 		if (this.isTyping()) return "";
+		if (this.isChoosing()) return "D-PAD · E CONFIRM";
 		return this.lineIndex >= this.lines.length - 1 ? "E · CLOSE" : "E · NEXT";
 	});
 
@@ -33,9 +45,40 @@ export class OverworldDialogue
 		this.lines = [...sequence.lines];
 		this.lineIndex = 0;
 		this.onComplete = onComplete ?? null;
+		this.choices([]);
+		this.selectedChoiceIndex(0);
 		this.visible(true);
 		this.typeCurrentLine();
 	}
+
+	public openChoice(sequence: DialogueSequence, choices: DialogueChoice[]): void
+	{
+		this.open(sequence);
+		this.choices([...choices]);
+	}
+
+	public moveChoice(direction: number): void
+	{
+		if (!this.isChoosing()) return;
+		const count = this.choices().length;
+		this.selectedChoiceIndex((this.selectedChoiceIndex() + direction + count) % count);
+	}
+
+	public confirmChoice = (): void =>
+	{
+		if (!this.isChoosing()) return;
+		const action = this.choices()[this.selectedChoiceIndex()]?.action;
+		this.close();
+		action?.();
+	};
+
+	public selectChoice = (choice: DialogueChoice): void =>
+	{
+		const index = this.choices().indexOf(choice);
+		if (index < 0) return;
+		this.selectedChoiceIndex(index);
+		this.confirmChoice();
+	};
 
 	public advance = (): void =>
 	{
@@ -44,6 +87,11 @@ export class OverworldDialogue
 		{
 			this.stopTyping();
 			this.text(this.fullLine);
+			return;
+		}
+		if (this.isChoosing())
+		{
+			this.confirmChoice();
 			return;
 		}
 
@@ -69,6 +117,8 @@ export class OverworldDialogue
 		this.lineIndex = 0;
 		this.fullLine = "";
 		this.onComplete = null;
+		this.choices([]);
+		this.selectedChoiceIndex(0);
 	}
 
 	private typeCurrentLine(): void

@@ -1,5 +1,6 @@
 import { SpeciesId } from "./CreatureList";
 import { TransitionColor } from "../BattleTransition";
+import npcSpriteSheetPath from "../../../../npcs-compact-16.png";
 
 // ============================================================
 // DIALOGUE TRIGGER TYPES
@@ -25,13 +26,19 @@ export interface TrainerDef
 {
 	id: string;
 	name: string;
-	role: "gym" | "champion" | "final";
+	role: "gym" | "champion" | "secret";
 	portraitImage: string;
 	battleImage: string;
 	party: SpeciesId[];
 	philosophy: string;
 	/** Text shown before a map-placed trainer battle begins. */
 	mapIntro?: string;
+	/** Optional runtime overworld sprite. Omit for trainers painted into their map. */
+	mapSpritePath?: string;
+	/** Zero-based, row-major tile index in a 16px sprite sheet. */
+	mapSpriteTileIndex?: number;
+	/** Transparent pixels separating sprite-sheet rows. */
+	mapSpriteRowGap?: number;
 	/** Text shown both in the victory presentation and on later map talks. */
 	victoryMessage: string;
 	winQuote: string;
@@ -89,11 +96,12 @@ export const TrainerDefs: Record<string, TrainerDef> = {
 		winQuote: "Good deal. Come back anytime.",
 		transitionColor: "gold",
 		specialty: "Performance / Security",
+		mapIntro: "Oh good. I was getting bored. Let's see what you've got.",
 
 		badgeImage: "/Areas/Portalmon/Content/Images/Badges/Gargis.png",	},
 
 	"rey": {
-		id: "rey", name: "Rey", role: "champion",
+		id: "rey", name: "Rey", role: "secret",
 		portraitImage: "/Areas/Portalmon/Content/Images/Trainers/Rey_portrait.png",
 		battleImage: "/Areas/Portalmon/Content/Images/Trainers/Rey_battle.png",
 		party: ["prodle", "cpfnib", "dougtrio"],
@@ -101,11 +109,15 @@ export const TrainerDefs: Record<string, TrainerDef> = {
 		victoryMessage: "...Well played. I'll push a patch tonight. This won't happen again.",
 		winQuote: "The cake is a lie. So was your win condition.",
 		transitionColor: "gold",
+		mapIntro: "...",
+		mapSpritePath: npcSpriteSheetPath,
+		mapSpriteTileIndex: 10,
+		mapSpriteRowGap: 1,
 
 		badgeImage: "/Areas/Portalmon/Content/Images/Badges/Rey.png",	},
 
 	"glados": {
-		id: "glados", name: "GLaDOS", role: "final",
+		id: "glados", name: "GLaDOS", role: "champion",
 		portraitImage: "/Areas/Portalmon/Content/Images/Trainers/GLaDOS_portrait.png",
 		battleImage: "/Areas/Portalmon/Content/Images/Trainers/GLaDOS_battle.png",
 		party: ["venusaur", "blastoise", "charizard"],

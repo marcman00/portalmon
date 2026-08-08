@@ -3,7 +3,7 @@ import { PortalKombatType } from "./TypeList";
 import { ChargeArchetype } from "./UltimateList";
 
 export type SpeciesId = string;
-export type PortalEncounterUnlock = "always" | "after_secret_defeated";
+export type PortalEncounterUnlock = "always" | "after_champion_defeated";
 
 export interface SpeciesDef
 {
@@ -621,7 +621,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 		behindImage: "/Areas/Portalmon/Content/Images/Portalmon/Venusaur_Behind.png",
 		ultimateId: "solar_beam",
 		chargeArchetype: "Endurance",
-		portalUnlock: "after_secret_defeated",
+		portalUnlock: "after_champion_defeated",
 		creatureDescription: "Imported from another dimension. Your SLA does not cover this.",
 	},
 
@@ -635,7 +635,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 		behindImage: "/Areas/Portalmon/Content/Images/Portalmon/Blastoise_Behind.png",
 		ultimateId: "hydro_cannon",
 		chargeArchetype: "Tactician",
-		portalUnlock: "after_secret_defeated",
+		portalUnlock: "after_champion_defeated",
 		creatureDescription: "Dual water cannons. Cross-dimensional firepower.",
 	},
 
@@ -649,7 +649,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 		behindImage: "/Areas/Portalmon/Content/Images/Portalmon/Charizard_Behind.png",
 		ultimateId: "blast_burn",
 		chargeArchetype: "Brawler",
-		portalUnlock: "after_secret_defeated",
+		portalUnlock: "after_champion_defeated",
 		creatureDescription: "Fire-breathing dragon vs your database audit tortoise. Seems fair.",
 	},
 };

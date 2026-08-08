@@ -8,6 +8,7 @@ import { SimManager } from "./_SimManager";
 import { BattleTransition, TransitionColor } from "./BattleTransition";
 import { OverworldManager } from "./OverworldManager";
 import { FAINT_RECOVERY_DESTINATION } from "./overworld/RecoveryDestination";
+import { MapWarpDef, OverworldMapId } from "./overworld/OverworldMapTypes";
 import { wait } from "./HelperFunctions";
 
 type GameboySkin = "purple" | "aqua" | "pikachu" | "mooroo" | "isaac";
@@ -74,9 +75,9 @@ class PortalmonController
 	public faintRecoveryMessage: KnockoutObservable<string> = ko.observable("");
 
 	/**
-	 * The player's trainer name, entered during the welcome screen
+	 * The player's trainer name. New saves use Test Subject; it can be changed in Settings.
 	 */
-	public trainerName: KnockoutObservable<string> = ko.observable("");
+	public trainerName: KnockoutObservable<string> = ko.observable("Test Subject");
 	/** Editing buffer for the start-menu name change */
 	public pendingTrainerName: KnockoutObservable<string> = ko.observable("");
 
@@ -96,29 +97,10 @@ class PortalmonController
 	 */
 	public isShowingLogo: KnockoutObservable<boolean> = ko.observable(false);
 
-	// =========================================================================
-	// ONBOARDING
-	// =========================================================================
-
-	/**
-	 * Step 1 of the new-player flow: GlaDOS welcome screen
-	 */
-	public isShowingWelcome: KnockoutObservable<boolean> = ko.observable(false);
-
-	/**
-	 * Step 2 of the new-player flow: starter selection
-	 */
-	public isChoosingStarter: KnockoutObservable<boolean> = ko.observable(false);
-
-	/**
-	 * Step 3 of the new-player flow: post-pick confirmation screen
-	 */
-	public isShowingStarterConfirm: KnockoutObservable<boolean> = ko.observable(false);
-
-	/**
-	 * The starter the player just picked — used by the confirm screen
-	 */
-	public chosenStarter: KnockoutObservable<SpeciesDef | null> = ko.observable(null);
+	/** True while the first-person blink overlay introduces the lab. */
+	public isLabWakeActive: KnockoutObservable<boolean> = ko.observable(false);
+	private pendingLabSummons: boolean = false;
+	private labWakeTimer: number | null = null;
 
 	/**
 	 * Label displayed at the top of the Encounter tab during a trainer battle.
@@ -141,11 +123,6 @@ class PortalmonController
 	 */
 	public isShowingVictoryScreen: KnockoutObservable<boolean> = ko.observable(false);
 	public isShowingCredits: KnockoutObservable<boolean> = ko.observable(false);
-
-	/**
-	 * The three starter Portalmon to choose from
-	 */
-	public starterOptions: SpeciesDef[];
 
 	/** Current battery level (0–100) */
 	public batteryPercent: KnockoutObservable<number> = ko.observable(100);
@@ -170,11 +147,6 @@ class PortalmonController
 			this.trainerName(this.cache.trainerName);
 		}
 
-		this.starterOptions = [
-			CreatureDex["normling"],
-			CreatureDex["cpfnib"],
-			CreatureDex["ressie"],
-		];
 		this.soundHandler = new SoundHandler(this.cache.soundEnabled);
 		this.dexManager = new DexManager(this.cache);
 		this.combatManager = new CombatManager(this.cache, this.dexManager, this.soundHandler);
@@ -187,6 +159,9 @@ class PortalmonController
 			() => this.startWildEncounter(),
 			(trainerId: string, afterBattleMessage: string) => this.gymBattleManager.startMapTrainerBattle(trainerId, afterBattleMessage),
 			(trainerId: string) => this.gymBattleManager.isTrainerDefeated(trainerId),
+			(trainerId: string) => trainerId !== "rey" || this.gymBattleManager.isSecretUnlocked(),
+			(scriptId: string) => this.runOverworldScript(scriptId),
+			(sourceMapId: OverworldMapId, warp: MapWarpDef) => this.resolveOverworldWarp(sourceMapId, warp),
 		);
 
 		
@@ -207,9 +182,8 @@ class PortalmonController
 		this.gymBattleManager = new GymBattleManager(this.cache, this.combatManager, onGymBattleReady, this.soundHandler);
 		this.simManager = new SimManager(() => this.launchSimBattle());
 		this.isSimUnlocked = ko.pureComputed(() =>
-			this.hasSimDevOverride || this.gymBattleManager.isSecretDefeated()
+			this.hasSimDevOverride || this.gymBattleManager.isChampionshipDefeated()
 		);
-
 		// Wire the dex battle guard so party changes are blocked during active combat
 		this.dexManager.isInActiveBattle = this.combatManager.isInActiveBattle;
 
@@ -225,12 +199,33 @@ class PortalmonController
 			this.catchAnim.reset();
 			this.drainBattery();
 			this.inEncounter(false);
+			if (this.pendingLabSummons)
+			{
+				this.pendingLabSummons = false;
+				window.setTimeout(() => this.overworldManager.dialogue.open({
+					speaker: "GLaDOS",
+					lines: ["Attention, Test Subject. You have exhausted the educational value of my middle management. Return to the lab for your final evaluation."],
+				}), 150);
+			}
 		};
 		this.combatManager.onPartyWiped = () => void this.recoverFromFaint();
 
 		// Show the victory screen when the championship is won
 		this.gymBattleManager.onChampionshipVictory = () => this.showVictoryScreen();
-		this.gymBattleManager.onSecretVictory = () => this.showCredits();
+		this.gymBattleManager.onSecretVictory = () =>
+		{
+			this._statusToast("Secret boss defeated. Developer containment successful.");
+			window.setTimeout(() => this._statusToast(""), 3000);
+		};
+		this.gymBattleManager.onChampionshipUnlocked = () => { this.pendingLabSummons = true; };
+		document.addEventListener("keydown", event =>
+		{
+			if (this.isLabWakeActive() && ["enter", " ", "e"].includes(event.key.toLowerCase()))
+			{
+				event.preventDefault();
+				this.skipLabWake();
+			}
+		});
 
 		this.isBatteryDepleted = ko.pureComputed(() => this.batteryPercent() <= 0);
 		this.initBattery();
@@ -257,15 +252,15 @@ class PortalmonController
 			this.isShowingLogo(false);
 			this.isPoweredOn(true);
 
-			// New-player flow: show GlaDOS welcome first, then starter select
-			if (!this.cache.hasChosenStarter)
+			this.soundHandler.playBackgroundMusic();
+			if (!this.cache.hasCompletedLabIntro)
 			{
-				this.isShowingWelcome(true);
-				this.soundHandler.playIntroMusic();
-			}
-			else
-			{
-				this.soundHandler.playBackgroundMusic();
+				this.overworldManager.teleportToSpawn("lab", "lab-start");
+				if (!this.cache.hasChosenStarter) this.beginLabWakeSequence();
+				else window.setTimeout(() => this.overworldManager.dialogue.open({
+					speaker: "GLaDOS",
+					lines: ["You already selected a Portalmon. Against the odds, your short-term memory is operational. The exit is now available."],
+				}), 250);
 			}
 		}, 5000);
 	};
@@ -274,7 +269,7 @@ class PortalmonController
 	private isEligibleForWildEncounter = (species: SpeciesDef): boolean =>
 	{
 		const portalUnlock = species.portalUnlock ?? "always";
-		if (portalUnlock === "after_secret_defeated" && !this.gymBattleManager.isSecretDefeated())
+		if (portalUnlock === "after_champion_defeated" && !this.gymBattleManager.isChampionshipDefeated())
 			return false;
 
 		return !species.evolvesFrom
@@ -441,7 +436,6 @@ class PortalmonController
 
 	private initiateWildEncounter = async (species: SpeciesDef, portalColor: TransitionColor = "blue"): Promise<void> =>
 	{
-		if (this.isShowingWelcome() || this.isChoosingStarter() || this.isShowingStarterConfirm()) return;
 		if (this.cache.selectedParty.length === 0) return;
 		if (this.combatManager.playerParty().every(p => p.isFainted())) return;
 		if (this.battleTransition.isPlaying()) return; // prevent double-click during transition
@@ -490,7 +484,6 @@ class PortalmonController
 	/** Starts a random battle from an overworld Wild zone. */
 	public startWildEncounter = (): boolean =>
 	{
-		if (this.isShowingWelcome() || this.isChoosingStarter() || this.isShowingStarterConfirm()) return false;
 		if (this.cache.selectedParty.length === 0) return false;
 		if (this.combatManager.playerParty().every(p => p.isFainted())) return false;
 		if (this.battleTransition.isPlaying() || this.isBatteryDepleted()) return false;
@@ -518,28 +511,79 @@ class PortalmonController
 		await this.combatManager.applyCatchResult(caught);
 	};
 
-	// =========================================================================
-	// ONBOARDING FLOW
-	// =========================================================================
-
-	/**
-	 * Called from the Welcome screen's "Begin Testing" button.
-	 * Saves the trainer name and advances from step 1 → step 2.
-	 */
-	public advanceToStarterSelect = (): void =>
+	private beginLabWakeSequence(): void
 	{
-		const name = this.trainerName().trim();
-		if (!name) return; // require a name before proceeding
-		this.cache.trainerName = name;
-		this.cache.saveCache();
-		this.isShowingWelcome(false);
-		this.isChoosingStarter(true);
+		this.isLabWakeActive(true);
+		this.labWakeTimer = window.setTimeout(() => this.finishLabWake(), 1600);
+	}
+
+	public skipLabWake = (): void =>
+	{
+		if (!this.isLabWakeActive()) return;
+		if (this.labWakeTimer !== null) window.clearTimeout(this.labWakeTimer);
+		this.finishLabWake();
 	};
 
-	/**
-	 * Player picks their starter Portalmon
-	 */
-	public chooseStarter = (species: SpeciesDef): void =>
+	private finishLabWake(): void
+	{
+		this.labWakeTimer = null;
+		this.isLabWakeActive(false);
+		this.overworldManager.dialogue.open({
+			speaker: "GLaDOS",
+			lines: [
+				"Oh. You're awake. That is either excellent news or a calibration error.",
+				"For April Fools, I placed you inside a behavioral simulation. The joke is that your choices will be recorded forever.",
+				"Three portals contain starter Portalmon. Inspect them, select one, and try not to make your personality statistically significant.",
+				"The exit will remain locked until you choose. This is called freedom with measurable outcomes.",
+			],
+		});
+	}
+
+	private runOverworldScript = (scriptId: string): boolean =>
+	{
+		if (scriptId.startsWith("starter:"))
+		{
+			const species = CreatureDex[scriptId.slice("starter:".length) as SpeciesId];
+			if (species) this.inspectStarterPortal(species);
+			return true;
+		}
+		if (scriptId === "lab:glados")
+		{
+			this.talkToGlados();
+			return true;
+		}
+		return false;
+	};
+
+	private inspectStarterPortal(species: SpeciesDef): void
+	{
+		if (this.cache.hasChosenStarter)
+		{
+			const assigned = this.cache.selectedParty[0] === species.id;
+			this.overworldManager.dialogue.open({
+				speaker: "GLaDOS",
+				lines: [assigned
+					? `${species.name}. Your selected variable. It has already begun judging you.`
+					: `${species.name}. This portal is empty. You cannot collect starters like commemorative mugs.`],
+			});
+			return;
+		}
+
+		const descriptions: Partial<Record<SpeciesId, string>> = {
+			cpfnib: "CPFNib is precise, prickly, and surprisingly dangerous when given clear requirements.",
+			normling: "Normling is adaptable, dependable, and almost aggressively normal. A suspicious quality.",
+			ressie: "Ressie is resilient, curious, and difficult to discourage. I have tried.",
+		};
+		this.overworldManager.dialogue.openChoice({
+			speaker: "GLaDOS",
+			lines: [`${descriptions[species.id] ?? species.description} Choose ${species.name}?`],
+		}, [
+			{ label: "YES", action: () => this.chooseStarterFromPortal(species) },
+			{ label: "NO", action: () => this.overworldManager.dialogue.open({ speaker: "GLaDOS", lines: ["Caution. How novel. The other portals remain available."] }) },
+		]);
+	}
+
+	private chooseStarterFromPortal(species: SpeciesDef): void
 	{
 		const speciesId = species.id;
 
@@ -554,20 +598,60 @@ class PortalmonController
 		this.dexManager.refreshFromCache();
 		this.combatManager.reloadParty();
 
-		// Step 2 → step 3: show the confirm/briefing screen
-		this.chosenStarter(species);
-		this.isChoosingStarter(false);
-		this.isShowingStarterConfirm(true);
-	};
+		this.overworldManager.dialogue.open({
+			speaker: "GLaDOS",
+			lines: [`${species.name} assigned. It is now emotionally dependent on you. The exit is unlocked.`],
+		});
+	}
 
-	/**
-	 * Called from the StarterConfirm screen's "Enter Testing Chamber" button.
-	 * Clears all new-player screens and drops the player into the game.
-	 */
-	public confirmAndEnterGame = (): void =>
+	private talkToGlados(): void
 	{
-		this.isShowingStarterConfirm(false);
-		this.chosenStarter(null);
+		if (!this.cache.hasChosenStarter)
+		{
+			this.overworldManager.dialogue.open({ speaker: "GLaDOS", lines: ["Inspect the portals. Choose one. I designed an entire illusion of agency for this."] });
+			return;
+		}
+		if (this.gymBattleManager.isChampionshipDefeated())
+		{
+			this.overworldManager.dialogue.open({
+				speaker: "GLaDOS",
+				lines: ["You defeated me. Once. In a controlled simulation I designed. Please continue enjoying your wildly overqualified victory lap."],
+			});
+			return;
+		}
+		if (!this.gymBattleManager.isChampionshipUnlocked())
+		{
+			const defeated = this.gymBattleManager.gymLeaders().filter(leader => leader.isDefeated()).length;
+			this.overworldManager.dialogue.open({
+				speaker: "GLaDOS",
+				lines: [`Gym leaders defeated: ${defeated} of 3. Continue. Their confidence is a renewable resource.`],
+			});
+			return;
+		}
+		this.overworldManager.dialogue.openChoice({
+			speaker: "GLaDOS",
+			lines: ["You have passed every preliminary test. Would you like to challenge the intelligence responsible for all of them? Answer carefully. I will interpret either answer as fear."],
+		}, [
+			{ label: "YES", action: () => this.gymBattleManager.startChampionshipBattle() },
+			{ label: "NO", action: () => this.overworldManager.dialogue.open({ speaker: "GLaDOS", lines: ["Sensible. Disappointing, but sensible. I will remain here being undefeated at you."] }) },
+		]);
+	}
+
+	private resolveOverworldWarp = (sourceMapId: OverworldMapId, warp: MapWarpDef): MapWarpDef | null =>
+	{
+		if (sourceMapId !== "lab") return warp;
+		if (!this.cache.hasChosenStarter)
+		{
+			this.overworldManager.dialogue.open({ speaker: "GLaDOS", lines: ["The exit is locked. Select a Portalmon first. This obstacle was specifically tailored to your current failure."] });
+			return null;
+		}
+		if (!this.cache.hasCompletedLabIntro)
+		{
+			this.cache.hasCompletedLabIntro = true;
+			this.cache.saveCache();
+			return { ...warp, targetSpawnId: "game-start" };
+		}
+		return warp;
 	};
 
 	// =========================================================================
@@ -596,9 +680,7 @@ class PortalmonController
 
 	public isOverworldScreenActive = (): boolean =>
 		this.isPoweredOn()
-		&& !this.isShowingWelcome()
-		&& !this.isChoosingStarter()
-		&& !this.isShowingStarterConfirm()
+		&& !this.isLabWakeActive()
 		&& this.activeOverlay() === "none"
 		&& !this.isRecoveringFromFaint()
 		&& !this.battleTransition.isPlaying()
@@ -743,7 +825,7 @@ class PortalmonController
 		this.isShowingVictoryScreen(true);
 	};
 
-	/** Show the credits sequence after beating GLaDOS */
+	/** Show the credits sequence after beating GLaDOS. */
 	public showCredits = (): void =>
 	{
 		this.activeOverlay("none");
@@ -752,16 +834,18 @@ class PortalmonController
 		this.soundHandler.playCreditsMusic();
 	};
 
-	/** Reboot the game after credits — back to power-on splash */
-	public rebootGame = (): void =>
+	/** Resume the same save after credits and return to the overworld. */
+	public resumeAfterCredits = (): void =>
 	{
 		this.isShowingCredits(false);
 		this.isShowingVictoryScreen(false);
 		this.inEncounter(false);
 		this.activeOverlay("none");
-		// Reset to power-off state — player sees the boot sequence again
-		this.isPoweredOn(false);
-		this.isShowingLogo(false);
+		this.soundHandler.playBackgroundMusic();
+		window.setTimeout(() => this.overworldManager.dialogue.open({
+			speaker: "GLaDOS",
+			lines: ["The simulation has resumed. Your victory remains on file under ‘unlikely but technically reproducible.’"],
+		}), 150);
 	};
 
 	/** Rehydrate dex state from upstream sync */
@@ -780,10 +864,11 @@ class PortalmonController
 		setTimeout(() => this._statusToast(""), 3000);
 	};
 
-	/** Dismiss the victory screen and return to the idle portal view */
+	/** Continue from the victory screen into the credits. */
 	public dismissVictoryScreen = (): void =>
 	{
 		this.isShowingVictoryScreen(false);
+		this.showCredits();
 	};
 }
 
@@ -896,7 +981,9 @@ export class PortalmonCache
 {
 	// These are not part of cache
 	static readonly _cacheName: string = "PortalmonCache";
+	static readonly _version: number = 2;
 
+	public version: number;
 
 	/**
 	 * Record of caught creatures: { speciesId: count }
@@ -912,6 +999,8 @@ export class PortalmonCache
 	 * Whether the user has chosen their starter Portalmon
 	 */
 	public hasChosenStarter: boolean;
+	/** True after the player has selected a starter and left the lab once. */
+	public hasCompletedLabIntro: boolean;
 
 	/**
 	 * The player's trainer name
@@ -975,12 +1064,19 @@ export class PortalmonCache
 		{
 			try
 			{
-				var data = JSON.parse(cachedData);
+				const data = JSON.parse(cachedData);
+				if (data.version !== PortalmonCache._version)
+				{
+					this.initCache();
+					return;
+				}
 				isNew = false;
+				this.version = data.version;
 				this.caughtCreatures = data.caughtCreatures || {};
 				this.seenCreatures = data.seenCreatures || {};
 				this.hasChosenStarter = data.hasChosenStarter || false;
-				this.trainerName = data.trainerName || "";
+				this.hasCompletedLabIntro = data.hasCompletedLabIntro || false;
+				this.trainerName = data.trainerName || "Test Subject";
 				this.selectedParty = data.selectedParty || [];
 				this.creatureHealth = data.creatureHealth || {};
 				this.battleCounts = data.battleCounts || {};
@@ -1004,10 +1100,12 @@ export class PortalmonCache
 	}
 	private initCache(): void
 	{
+		this.version = PortalmonCache._version;
 		this.caughtCreatures = {};
 		this.seenCreatures = {};
 		this.hasChosenStarter = false;
-		this.trainerName = "";
+		this.hasCompletedLabIntro = false;
+		this.trainerName = "Test Subject";
 		this.selectedParty = [];
 		this.creatureHealth = {};
 		this.battleCounts = {};

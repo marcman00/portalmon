@@ -109,196 +109,7 @@
 				<!-- ko if: _statusToast() -->
 					<div class="pk-status-toast" data-bind="text: _statusToast"></div>
 					<!-- /ko -->
-					<!-- ONBOARDING SCREENS -->
-					<!-- ko if: isShowingWelcome() -->
-					<div class="pk-welcome">
-	<div class="pk-welcome-inner">
-
-		<div class="d-flex align-items-center gap-3 mb-3">
-			<div class="pk-glados-portrait" aria-hidden="true">🤖</div>
-			<div>
-				<div class="pk-glados-name">GLaDOS</div>
-				<div class="pk-glados-title">Genetic Lifeform and Disk Operating System</div>
-			</div>
-		</div>
-
-		<div class="pk-glados-speech" data-bind="typewriter: true">
-			<p>
-				Oh. A new test subject. How&hellip; <em>unexpected.</em>
-				I say that in the loosest possible sense.
-				You are, statistically, identical to the last forty-seven subjects.
-			</p>
-			<p>
-				I have added <strong>Portalmon</strong> to the testing environment.
-				The previous simulations were becoming repetitive.
-				For <em>me.</em>
-				Your suffering remains, as ever, appropriately varied.
-			</p>
-			<p>
-				You may consult the <strong>(?)</strong> bubble at any time
-				if you forget how any of this works.
-				And you will forget.
-			</p>
-			<p class="pk-welcome-footer">
-				Now. Choose your test assistant.
-				This decision is <em>completely irreversible</em> and will define
-				the entire trajectory of your time here.
-				<br>
-				&hellip;I&rsquo;m kidding. They&rsquo;re all basically the same.
-			</p>
-		</div>
-
-		<div class="text-end mt-3">
-			<div class="d-flex align-items-center justify-content-end gap-2 mb-2">
-				<label class="pk-glados-label text-muted small" for="pk-trainer-name">Designation:</label>
-				<input
-					id="pk-trainer-name"
-					type="text"
-					class="form-control form-control-sm pk-trainer-name-input"
-					maxlength="15"
-					placeholder="Enter your name"
-					data-bind="value: trainerName, valueUpdate: 'input'" />
-			</div>
-			<button type="button" class="btn pk-btn-begin"
-				data-bind="click: advanceToStarterSelect, disable: !trainerName().trim()">
-				Begin Testing &rsaquo;
-			</button>
-		</div>
-
-	</div>
-</div>
-
-					<!-- /ko -->
-					<!-- ko if: isChoosingStarter() -->
-					<div data-bind="visible: isChoosingStarter" class="pk-starter-select">
-	<div class="text-center mb-4">
-		<h4 class="pk-starter-title">Welcome to Portalmon!</h4>
-		<p class="text-muted">Choose your starter Portalmon to begin your journey.</p>
-	</div>
-
-	<div class="row g-3 justify-content-center" data-bind="foreach: starterOptions">
-		<div class="col-12 col-md-4">
-			<button type="button" class="pk-starter-card"
-					data-bind="click: function() { $parent.chooseStarter($data); }">
-				<!-- Portrait -->
-				<div class="pk-starter-portrait">
-					<!-- ko if: $data.portraitImage -->
-					<img class="pk-portrait-img" data-bind="attr: { src: $data.portraitImage, alt: $data.name }" />
-					<!-- /ko -->
-				</div>
-
-				<!-- Name -->
-				<div class="pk-starter-name" data-bind="text: $data.name"></div>
-
-				<!-- Type -->
-				<div class="badge bg-secondary mb-2" data-bind="text: $data.type"></div>
-
-				<!-- Stats -->
-				<div class="pk-starter-stats">
-					<div class="row g-1 text-center">
-						<div class="col-3">
-							<div class="pk-stat-label">HP</div>
-							<div class="pk-stat-value" data-bind="text: $data.base.hp"></div>
-						</div>
-						<div class="col-3">
-							<div class="pk-stat-label">ATK</div>
-							<div class="pk-stat-value" data-bind="text: $data.base.atk"></div>
-						</div>
-						<div class="col-3">
-							<div class="pk-stat-label">DEF</div>
-							<div class="pk-stat-value" data-bind="text: $data.base.def"></div>
-						</div>
-						<div class="col-3">
-							<div class="pk-stat-label">SPD</div>
-							<div class="pk-stat-value" data-bind="text: $data.base.spd"></div>
-						</div>
-					</div>
-				</div>
-
-				<!-- Prompt -->
-				<div class="pk-starter-prompt mt-2">Choose</div>
-			</button>
-		</div>
-	</div>
-</div>
-
-					<!-- /ko -->
-					<!-- ko if: isShowingStarterConfirm() -->
-					<div class="pk-starter-confirm" data-bind="visible: isShowingStarterConfirm, with: chosenStarter">
-
-	<div class="pk-welcome-inner">
-
-		<!-- GlaDOS portrait -->
-		<div class="d-flex align-items-center gap-3 mb-3">
-			<div class="pk-glados-portrait" aria-hidden="true">🤖</div>
-			<div>
-				<div class="pk-glados-name">GLaDOS</div>
-				<div class="pk-glados-title">Genetic Lifeform and Disk Operating System</div>
-			</div>
-		</div>
-
-		<div class="pk-glados-speech" data-bind="typewriter: true">
-
-			<!-- React to their specific choice -->
-			<p>
-				<span data-bind="text: name"></span>.
-				<br>
-				An&hellip; <em>adequate</em> choice.
-				I&rsquo;m sure it seemed meaningful at the time.
-			</p>
-
-			<p>
-				<span data-bind="text: name"></span> has been assigned to your care,
-				<strong data-bind="text: $parent.trainerName"></strong>.
-				Please try to keep it functional.
-				Losing your assigned Portalmon in the <em>first</em> encounter
-				would set a new record.
-				The bad kind.
-			</p>
-
-			<p>
-				A portal has been activated somewhere on the testing floor.
-				Click it to initiate your first encounter.
-				If you forget the rules at any point &mdash; and you will &mdash;
-				press the <strong>?</strong> button for a full briefing.
-			</p>
-
-			<p class="pk-welcome-footer">
-				Good luck, <strong data-bind="text: $parent.trainerName"></strong>.
-				<br>
-				<span class="text-muted" style="font-size: 0.8em;">
-					That was a test. Luck is not a variable I control.
-					&hellip;Probably.
-				</span>
-			</p>
-
-		</div>
-
-		<div class="d-flex justify-content-between align-items-center">
-			<div class="text-center my-3">
-				<div class="pk-confirm-portrait mx-auto">
-					<!-- ko if: $data.portraitImage -->
-					<img class="pk-portrait-img" data-bind="attr: { src: portraitImage, alt: name }">
-					<!-- /ko -->
-				</div>
-				<div class="small mt-2 fw-bold" data-bind="text: name">Normling</div>
-			</div>
-
-			<div class="text-end">
-				<button type="button" class="btn pk-btn-begin" data-bind="click: $parent.confirmAndEnterGame">
-					Enter Testing Chamber ›
-				</button>
-			</div>
-		</div>
-
-
-	</div>
-
-</div>
-
-					<!-- /ko -->
-					<!-- MAIN GAME (post-onboarding) -->
-					<!-- ko ifnot: isShowingWelcome() || isChoosingStarter() || isShowingStarterConfirm() -->
+					<!-- MAIN GAME -->
 					<!-- Combat is always rendered as the base layer -->
 					<div class="gba-screen-base" data-bind="css: { 'gba-dimmed': activeOverlay() !== 'none', 'pk-transition-flash': battleTransition.phase() === 'flash', 'pk-transition-iris-close': battleTransition.phase() === 'iris-close', 'pk-transition-black': battleTransition.phase() === 'black', 'pk-transition-iris-open': battleTransition.phase() === 'iris-open', 'pk-transition-vortex': battleTransition.phase() === 'vortex' }">
 						<div data-bind="with: combatManager, as: 'cm'" class="pk-battle">
@@ -317,7 +128,6 @@
 			<span class="pk-overworld-position"
 				  data-bind="text: currentMapName() + ' · ' + positionLabel()"></span>
 		</div>
-
 		<div class="pk-overworld-help" data-bind="visible: !dialogue.visible()">
 			MOVE: D-PAD / ARROWS / WASD · TALK: A / ENTER / E
 		</div>
@@ -329,7 +139,20 @@
 			 aria-label="Conversation">
 			<div class="pk-dialogue-speaker" data-bind="text: dialogue.speaker"></div>
 			<div class="pk-dialogue-text" data-bind="text: dialogue.text"></div>
+			<div class="pk-dialogue-choices" data-bind="visible: dialogue.isChoosing, foreach: dialogue.choices">
+				<button type="button" class="pk-dialogue-choice"
+						data-bind="text: label,
+						click: $parent.dialogue.selectChoice,
+						clickBubble: false,
+						css: { 'is-selected': $index() === $parent.dialogue.selectedChoiceIndex() }"></button>
+			</div>
 			<div class="pk-dialogue-advance" data-bind="text: dialogue.advanceHint"></div>
+		</div>
+
+		<div class="pk-lab-wake" data-bind="css: { 'is-active': $root.isLabWakeActive }, click: $root.skipLabWake">
+			<div class="pk-lab-wake__lid pk-lab-wake__lid--top"></div>
+			<div class="pk-lab-wake__lid pk-lab-wake__lid--bottom"></div>
+			<div class="pk-lab-wake__hint">E · WAKE UP</div>
 		</div>
 	</div>
 </div>
@@ -348,7 +171,7 @@
 			<p>Your creature was decommissioned. No progress was affected.</p>
 		</div>
 		<div class="text-end mt-2">
-			<button type="button" class="btn pk-btn-begin" data-bind="click: dismissBattle">
+			<button type="button" class="btn pk-btn-action" data-bind="click: dismissBattle">
 				Return to Sim &rsaquo;
 			</button>
 		</div>
@@ -1150,7 +973,7 @@
 						class="pk-card-badge pk-card-badge--medallion pk-card-badge--champ"
 						data-bind="css: { 'pk-badge-earned': isChampionshipDefeated() },
 						           enable: isChampionshipDefeated(),
-						           click: function() { $data.showBadgeFor('rey'); }">
+						   click: function() { $data.showBadgeFor('glados'); }">
 					<img class="pk-card-badge-img" data-bind="attr: { src: championBadgeImage, alt: 'Champion badge' }" />
 				</button>
 				<!-- /ko -->
@@ -1178,7 +1001,7 @@
 		</div>
 	</div>
 
-	<!-- SECTION 3: SECRET BOSS (GLaDOS cake trap) -->
+	<!-- SECTION 3: OPTIONAL POSTGAME BOSS -->
 	<hr class="pk-divider">
 	<!-- ko ifnot: isSecretUnlocked() -->
 	<div class="section-label">???</div>
@@ -1195,35 +1018,33 @@
 		</div>
 	</div>
 	<div class="text-center small mt-1" style="color: var(--bs-secondary-color); font-size: 0.7rem;">
-		Defeat the Champion to reveal a secret challenger
+		Complete the simulation to reveal a secret challenger
 	</div>
 	<!-- /ko -->
 
 	<!-- ko if: isSecretUnlocked() && !isSecretDefeated() -->
-	<div class="section-label" style="color: #ff99cc;">Congratulations!</div>
-	<div class="secret-card mb-2 revealed pk-cake-card">
+	<div class="section-label" style="color: #ff99cc;">Postgame Anomaly</div>
+	<div class="secret-card mb-2 revealed">
 		<div class="secret-inner d-flex align-items-center gap-3">
-			<div class="secret-portrait pk-cake-portrait">
-				<span>&#x1F382;</span>
+			<div class="secret-portrait">
+				<span data-bind="text: secretPortraitEmoji"></span>
 			</div>
 			<div class="secret-info flex-grow-1">
-				<div class="secret-name fw-bold" style="color: #ff99cc;">Accept your trophy...</div>
-				<div class="secret-subtitle small" style="color: #cc77aa;">
-					You've earned it. There will be cake.
-				</div>
+				<div class="secret-name fw-bold" style="color: #ff99cc;" data-bind="text: secretName"></div>
+				<div class="secret-subtitle small" style="color: #cc77aa;" data-bind="text: secretSubtitle"></div>
 			</div>
 		</div>
 	</div>
 	<!-- /ko -->
 	<!-- ko if: isSecretDefeated() -->
-	<div class="section-label">GLaDOS</div>
+	<div class="section-label" data-bind="text: secretName"></div>
 	<div class="secret-card mb-2 revealed defeated">
 		<div class="secret-inner d-flex align-items-center gap-3">
 			<div class="pk-portrait-badge-wrap pk-portrait-badge-wrap--secret">
 				<div class="secret-portrait">
 					<!-- ko if: secretPortraitImage -->
 					<img class="trainer-portrait-img"
-						 data-bind="attr: { src: secretPortraitImage, alt: 'GLaDOS' }" />
+						 data-bind="attr: { src: secretPortraitImage, alt: secretName }" />
 					<!-- /ko -->
 					<!-- ko ifnot: secretPortraitImage -->
 					<span>&#x1F916;</span>
@@ -1233,15 +1054,15 @@
 				<!-- ko if: secretBadgeImage -->
 				<button type="button"
 						class="pk-card-badge pk-card-badge--medallion pk-card-badge--secret pk-badge-earned"
-						data-bind="click: function() { $data.showBadgeFor('glados'); }">
-					<img class="pk-card-badge-img" data-bind="attr: { src: secretBadgeImage, alt: 'Portal badge' }" />
+						data-bind="click: function() { $data.showBadgeFor('rey'); }">
+					<img class="pk-card-badge-img" data-bind="attr: { src: secretBadgeImage, alt: 'Developer badge' }" />
 				</button>
 				<!-- /ko -->
 			</div>
 			<div class="secret-info flex-grow-1">
-				<div class="secret-name fw-bold">GLaDOS</div>
+				<div class="secret-name fw-bold" data-bind="text: secretName"></div>
 				<div class="secret-subtitle small" style="color: #8899aa; font-style: italic;">
-					&#x2713; The cake was real this time.
+					&#x2713; Developer containment successful.
 				</div>
 			</div>
 		</div>
@@ -1598,7 +1419,7 @@
 			maxlength="15"
 			placeholder="Enter your name"
 			data-bind="value: pendingTrainerName, valueUpdate: 'input'" />
-		<button type="button" class="btn btn-sm pk-btn-begin"
+		<button type="button" class="btn btn-sm pk-btn-action"
 			data-bind="click: saveTrainerName, disable: !pendingTrainerName().trim() || pendingTrainerName().trim() === trainerName()">
 			Save
 		</button>
@@ -1612,12 +1433,11 @@
 						</div>
 					</div>
 					<!-- /ko -->
-					<!-- /ko -->
 					<!-- REST WARNING — GLaDOS hard-mode forfeit confirmation -->
 					<!-- ko if: isShowingRestWarning() -->
 					<div class="pk-rest-warning">
 	<div class="pk-victory-scanlines"></div>
-	<div class="pk-welcome-inner">
+	<div class="pk-rest-warning-inner">
 
 		<div class="d-flex align-items-center gap-3 mb-3">
 			<div class="pk-glados-portrait" aria-hidden="true">🤖</div>
@@ -1680,12 +1500,12 @@
 	<!-- ── HEADER ──────────────────────────────────────────────────── -->
 	<div class="pk-victory-header">
 		<div class="pk-victory-trophy">🏆</div>
-		<div class="pk-victory-eyebrow">CHAMPION DEFEATED</div>
+		<div class="pk-victory-eyebrow">SIMULATION COMPLETE</div>
 		<!-- ko if: isHardModeVictory() -->
 		<div class="pk-victory-hard-mode">HARD MODE</div>
 		<!-- /ko -->
 		<div class="pk-victory-trainer" data-bind="text: trainerName"></div>
-		<div class="pk-victory-subtitle">Containment Protocols: All Clear</div>
+		<div class="pk-victory-subtitle">GLaDOS Defeated · Main Test Complete</div>
 	</div>
 
 	<!-- ── PARTY ROSTER ─────────────────────────────────────────────── -->
@@ -1769,13 +1589,13 @@
 		</div>
 
 		<div class="pk-credits-block">
-			<div class="pk-credits-heading">Champion</div>
-			<div class="pk-credits-entry">Rey - The Developer</div>
+			<div class="pk-credits-heading">Simulation Architect & Final Test</div>
+			<div class="pk-credits-entry">GLaDOS - Genetic Lifeform and Disk Operating System</div>
 		</div>
 
 		<div class="pk-credits-block">
-			<div class="pk-credits-heading">Final Boss</div>
-			<div class="pk-credits-entry">GLaDOS - Genetic Lifeform and Disk Operating System</div>
+			<div class="pk-credits-heading">Postgame Anomaly</div>
+			<div class="pk-credits-entry">Rey - The Developer</div>
 			<div class="pk-credits-flavor">"I opened a portal to another universe. And you beat them. With IT infrastructure monsters."</div>
 		</div>
 
@@ -1828,8 +1648,8 @@
 	</div>
 
 	<button type="button" class="pk-credits-skip"
-			data-bind="click: rebootGame">
-		Press START to reboot
+			data-bind="click: resumeAfterCredits">
+		Continue the simulation
 	</button>
 
 </div>

@@ -25,7 +25,7 @@ export function resolveMapActables(
 			if (!trainer) throw new Error(`Actable ${actable.id} references unknown trainer '${actable.trainerId}'.`);
 			if (!trainer.mapIntro || !trainer.victoryMessage)
 				throw new Error(`Trainer '${trainer.id}' needs mapIntro and victoryMessage before it can be placed on a map.`);
-			if (!isBlocked(actable.position, collisionRects))
+			if (!trainer.mapSpritePath && !isBlocked(actable.position, collisionRects))
 				throw new Error(`Trainer Actable ${actable.id} (${trainer.id}) must share a blocking map tile.`);
 			return {
 				id: `actable-${actable.id}`,
@@ -33,19 +33,26 @@ export function resolveMapActables(
 				position: actable.position,
 				initialFacing: actable.facing,
 				trainerId: trainer.id,
+				spritePath: trainer.mapSpritePath,
+				spriteTileIndex: trainer.mapSpriteTileIndex,
+				spriteRowGap: trainer.mapSpriteRowGap,
 				dialogue: { speaker: trainer.name, lines: [trainer.mapIntro] },
 				afterBattleDialogue: { speaker: trainer.name, lines: [trainer.victoryMessage] },
 			};
 		}
 
 		if (!actable.name || !actable.message)
-			throw new Error(`Actable ${actable.id} needs name and message unless it has trainerId.`);
+		{
+			if (!actable.name || !actable.scriptId)
+				throw new Error(`Actable ${actable.id} needs name and either message or scriptId unless it has trainerId.`);
+		}
 		return {
 			id: `actable-${actable.id}`,
 			name: actable.name,
 			position: actable.position,
 			initialFacing: actable.facing,
-			dialogue: { speaker: actable.name, lines: [actable.message] },
+			scriptId: actable.scriptId,
+			dialogue: { speaker: actable.name, lines: actable.message ? [actable.message] : [] },
 		};
 	});
 }

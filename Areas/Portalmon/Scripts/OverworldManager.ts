@@ -95,6 +95,9 @@ export class OverworldManager
 	private readonly startWildEncounterCallback: () => boolean;
 	private readonly startTrainerBattleCallback: (trainerId: string, afterBattleMessage: string) => boolean;
 	private readonly isTrainerDefeatedCallback: (trainerId: string) => boolean;
+	private readonly isTrainerChallengeUnlockedCallback: (trainerId: string) => boolean;
+	private readonly runScriptedInteractionCallback: (scriptId: string) => boolean;
+	private readonly resolveWarpCallback: (sourceMapId: OverworldMapId, warp: MapWarpDef) => MapWarpDef | null;
 	private readonly terrainImage: HTMLImageElement = new Image();
 	private readonly playerImage: HTMLImageElement = new Image();
 	private readonly mapBackgroundImages: Map<string, HTMLImageElement> = new Map();
@@ -121,6 +124,9 @@ export class OverworldManager
 		startWildEncounterCallback: () => boolean,
 		startTrainerBattleCallback: (trainerId: string, afterBattleMessage: string) => boolean,
 		isTrainerDefeatedCallback: (trainerId: string) => boolean,
+		isTrainerChallengeUnlockedCallback: (trainerId: string) => boolean,
+		runScriptedInteractionCallback: (scriptId: string) => boolean,
+		resolveWarpCallback: (sourceMapId: OverworldMapId, warp: MapWarpDef) => MapWarpDef | null,
 	)
 	{
 		this.isInputEnabled = isInputEnabled;
@@ -129,6 +135,9 @@ export class OverworldManager
 		this.startWildEncounterCallback = startWildEncounterCallback;
 		this.startTrainerBattleCallback = startTrainerBattleCallback;
 		this.isTrainerDefeatedCallback = isTrainerDefeatedCallback;
+		this.isTrainerChallengeUnlockedCallback = isTrainerChallengeUnlockedCallback;
+		this.runScriptedInteractionCallback = runScriptedInteractionCallback;
+		this.resolveWarpCallback = resolveWarpCallback;
 		this.terrainImage.addEventListener("load", this.prepareObjectCutouts);
 		this.terrainImage.src = "/Areas/Portalmon/Content/Images/Overworld/prototype-tiles.png";
 		this.playerImage.src = "/Areas/Portalmon/Content/Images/Overworld/atlas-walk-16.png";
@@ -159,7 +168,13 @@ export class OverworldManager
 	public pressDirection = (direction: WalkDirection, event?: Event): boolean =>
 	{
 		event?.preventDefault();
-		if (!this.canAcceptMovement() || this.dialogue.visible()) return true;
+		if (this.dialogue.visible())
+		{
+			if (this.dialogue.isChoosing())
+				this.dialogue.moveChoice(direction === "left" || direction === "up" ? -1 : 1);
+			return true;
+		}
+		if (!this.canAcceptMovement()) return true;
 		this.pointerHeld.add(direction);
 		this.tryStartMove(performance.now(), direction);
 		return true;
@@ -207,6 +222,7 @@ export class OverworldManager
 				this.npcKey(this.currentMap().id, npc.id),
 				this.oppositeDirection(this.facing),
 			);
+			if (npc.scriptId && this.runScriptedInteractionCallback(npc.scriptId)) return;
 			if (npc.trainerId)
 			{
 				if (this.isTrainerDefeatedCallback(npc.trainerId))
@@ -214,11 +230,28 @@ export class OverworldManager
 					this.dialogue.open(npc.afterBattleDialogue ?? npc.dialogue);
 					return;
 				}
-				this.dialogue.open(npc.dialogue, () =>
+				if (!this.isTrainerChallengeUnlockedCallback(npc.trainerId))
 				{
-					if (!this.startTrainerBattleCallback(npc.trainerId!, npc.afterBattleDialogue?.lines[0] ?? ""))
-						this.showTemporaryStatus("Battle unavailable · prepare your party first");
-				});
+					this.dialogue.open({
+						speaker: npc.name,
+						lines: [...npc.dialogue.lines, "He doesn't acknowledge challengers who haven't defeated GLaDOS."],
+					});
+					return;
+				}
+				this.dialogue.openChoice({
+					speaker: npc.dialogue.speaker,
+					lines: [...npc.dialogue.lines, `Challenge ${npc.name}?`],
+				}, [
+					{
+						label: "YES",
+						action: () =>
+						{
+							if (!this.startTrainerBattleCallback(npc.trainerId!, npc.afterBattleDialogue?.lines[0] ?? ""))
+								this.showTemporaryStatus("Battle unavailable · prepare your party first");
+						},
+					},
+					{ label: "NO", action: () => undefined },
+				]);
 				return;
 			}
 			this.dialogue.open(npc.dialogue);
@@ -243,6 +276,15 @@ export class OverworldManager
 		this.buildCollisionMap();
 	}
 
+	public teleportToSpawn(mapId: OverworldMapId, spawnId: string): boolean
+	{
+		const map = WORLD_MAPS[mapId];
+		const spawn = map?.spawns.find(candidate => candidate.id === spawnId);
+		if (!spawn) return false;
+		this.teleportTo({ mapId, position: spawn.position, facing: spawn.facing });
+		return true;
+	}
+
 	private handleKeyDown = (event: KeyboardEvent): void =>
 	{
 		if (!this.isInputEnabled() || this.isTypingTarget(event.target)) return;
@@ -254,7 +296,17 @@ export class OverworldManager
 		}
 
 		const direction = this.directionForKey(event.key);
-		if (!direction || !this.canAcceptMovement() || this.dialogue.visible()) return;
+		if (!direction) return;
+		if (this.dialogue.visible())
+		{
+			if (this.dialogue.isChoosing() && !event.repeat)
+			{
+				event.preventDefault();
+				this.dialogue.moveChoice(direction === "left" || direction === "up" ? -1 : 1);
+			}
+			return;
+		}
+		if (!this.canAcceptMovement()) return;
 		event.preventDefault();
 		this.keyboardHeld.add(direction);
 		this.tryStartMove(performance.now(), direction);
@@ -600,16 +652,18 @@ export class OverworldManager
 					const image = this.tiledTilesetImages.get(tileset.imagePath);
 					if (!image || image.naturalWidth <= 0) continue;
 					const tileIndex = gid - tileset.firstGid;
+					const tileWidth = tileset.tileWidth ?? TILE_SIZE;
+					const tileHeight = tileset.tileHeight ?? TILE_SIZE;
 					context.drawImage(
 						image,
-						tileset.margin + (tileIndex % tileset.columns) * (TILE_SIZE + tileset.spacing),
-						tileset.margin + Math.floor(tileIndex / tileset.columns) * (TILE_SIZE + tileset.spacing),
-						TILE_SIZE,
-						TILE_SIZE,
+						tileset.margin + (tileIndex % tileset.columns) * (tileWidth + tileset.spacing),
+						tileset.margin + Math.floor(tileIndex / tileset.columns) * (tileHeight + tileset.spacing),
+						tileWidth,
+						tileHeight,
 						Math.round(x * TILE_SIZE - camera.x),
-						Math.round(y * TILE_SIZE - camera.y),
-						TILE_SIZE,
-						TILE_SIZE,
+						Math.round(y * TILE_SIZE - camera.y + TILE_SIZE - tileHeight),
+						tileWidth,
+						tileHeight,
 					);
 				}
 			}
@@ -677,8 +731,11 @@ export class OverworldManager
 		const cellIndex = DIRECTION_ROWS[facing];
 		const sourceWidth = isCompactSprite ? TILE_SIZE : image.naturalWidth / 2;
 		const sourceHeight = isCompactSprite ? TILE_SIZE : image.naturalHeight / 2;
-		const sourceX = isCompactSprite ? npc.spriteTileIndex! * TILE_SIZE : (cellIndex % 2) * sourceWidth;
-		const sourceY = isCompactSprite ? 0 : Math.floor(cellIndex / 2) * sourceHeight;
+		const compactColumns = isCompactSprite ? Math.floor(image.naturalWidth / TILE_SIZE) : 0;
+		const sourceX = isCompactSprite ? (npc.spriteTileIndex! % compactColumns) * TILE_SIZE : (cellIndex % 2) * sourceWidth;
+		const sourceY = isCompactSprite
+			? Math.floor(npc.spriteTileIndex! / compactColumns) * (TILE_SIZE + (npc.spriteRowGap ?? 0))
+			: Math.floor(cellIndex / 2) * sourceHeight;
 		const spriteSize = isCompactSprite ? TILE_SIZE : 32;
 		context.drawImage(
 			image,
@@ -810,7 +867,10 @@ export class OverworldManager
 		{
 			for (let y = rectangle.y; y < rectangle.y + rectangle.height; y++)
 				for (let x = rectangle.x; x < rectangle.x + rectangle.width; x++)
-					this.collisionLabels.set(`${x},${y}`, rectangle.label);
+				{
+					const point = { x, y };
+					this.collisionLabels.set(this.pointKey(point), rectangle.label);
+				}
 		}
 		for (const point of map.collisionPoints)
 			this.collisionLabels.set(this.pointKey(point), point.label);
@@ -835,6 +895,9 @@ export class OverworldManager
 
 	private enterMap(warp: MapWarpDef): void
 	{
+		const resolvedWarp = this.resolveWarpCallback(this.currentMap().id, warp);
+		if (!resolvedWarp) return;
+		warp = resolvedWarp;
 		const targetMap = WORLD_MAPS[warp.targetMapId];
 		const spawn = targetMap?.spawns.find(candidate => candidate.id === warp.targetSpawnId);
 		if (!spawn)

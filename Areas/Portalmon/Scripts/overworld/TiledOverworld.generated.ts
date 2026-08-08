@@ -210,19 +210,23 @@ export const TILED_COLLISION_RECTS: MapCollisionRect[] = [
 export const TILED_DOORS: Record<number, MapPoint> = {
 	1: { x: 50, y: 27 },
 	2: { x: 5, y: 14 },
-	3: { x: 6, y: 7 },
 	4: { x: 12, y: 14 },
 	5: { x: 23, y: 16 },
-	7: { x: 30, y: 7 },
-	8: { x: 37, y: 8 },
 };
 
 export const TILED_WARPS: MapWarpDef[] = [
 	{ position: { x: 23, y: 8 }, targetMapId: "gym1", targetSpawnId: "gym1-entrance" },
+	{ position: { x: 30, y: 7 }, targetMapId: "gym2", targetSpawnId: "gym2-entrance" },
+	{ position: { x: 37, y: 8 }, targetMapId: "gym3", targetSpawnId: "gym3-entrance" },
+	{ position: { x: 6, y: 7 }, targetMapId: "lab", targetSpawnId: "lab-entrance" },
 ];
 
 export const TILED_SPAWNS: MapSpawnDef[] = [
 	{ id: "gym1-exit", position: { x: 23, y: 9 }, facing: "down" },
+	{ id: "gym2-exit", position: { x: 30, y: 8 }, facing: "down" },
+	{ id: "gym3-exit", position: { x: 37, y: 9 }, facing: "down" },
+	{ id: "lab-exit", position: { x: 6, y: 8 }, facing: "down" },
+	{ id: "game-start", position: { x: 29, y: 33 }, facing: "down" },
 ];
 
 export const TILED_WILD_ZONES: MapEncounterZone[] = [
@@ -231,4 +235,4 @@ export const TILED_WILD_ZONES: MapEncounterZone[] = [
 
 export const TILED_PORTALS: MapPortalDef[] = [];
 
-export const TILED_ACTABLES: MapActableDef[] = [{"id": 12, "position": {"x": 3, "y": 16}, "facing": "down", "name": "Eric", "message": "I got this house on a crazy good deal."}, {"id": 13, "position": {"x": 14, "y": 15}, "facing": "down", "name": "Hailey", "message": "Mm mm that bread at the market is so tasy."}, {"id": 14, "position": {"x": 21, "y": 31}, "facing": "down", "name": "Ben", "message": "Some people say the mayor is a robot. Maybe that's why she never seems to age."}, {"id": 15, "position": {"x": 41, "y": 18}, "facing": "down", "name": "Billy", "message": "Be careful! The garden is full of Portalmon."}, {"id": 16, "position": {"x": 20, "y": 16}, "facing": "down", "name": "Nurse Karen", "message": "Your Portalmon will be well taken care of in our enrichment center"}, {"id": 17, "position": {"x": 6, "y": 25}, "facing": "down", "name": "bob1", "message": "Fresh cache, picked this morning. Only slightly stale."}, {"id": 18, "position": {"x": 9, "y": 25}, "facing": "down", "name": "bob2", "message": "Two for one on legacy dependencies. No refunds, no support."}, {"id": 20, "position": {"x": 15, "y": 25}, "facing": "down", "name": "bob4", "message": "Everything at this stall is organic, artisanal, and completely untested."}, {"id": 21, "position": {"x": 51, "y": 37}, "facing": "down", "name": "Joe", "message": "Been phishing for days now and no bytes."}, {"id": 22, "position": {"x": 12, "y": 25}, "facing": "down", "name": "bob3", "message": "These tomatoes are heirloom. So is my codebase. Neither is documented."}, {"id": 28, "position": {"x": 48, "y": 20}, "facing": "down", "name": "Sign", "message": "Wild Portalmon ahead. Enter at your own risk!"}, {"id": 30, "position": {"x": 18, "y": 25}, "facing": "down", "name": "Sign", "message": "Farmer's Market"}];
+export const TILED_ACTABLES: MapActableDef[] = [{"id": 12, "position": {"x": 3, "y": 16}, "facing": "down", "name": "Eric", "message": "I got this house on a crazy good deal."}, {"id": 13, "position": {"x": 14, "y": 15}, "facing": "down", "name": "Hailey", "message": "Mm mm that bread at the market is so tasy."}, {"id": 14, "position": {"x": 21, "y": 31}, "facing": "down", "name": "Ben", "message": "Some people say the mayor is a robot. Maybe that's why she never seems to age."}, {"id": 15, "position": {"x": 41, "y": 18}, "facing": "down", "name": "Billy", "message": "Be careful! The garden is full of Portalmon."}, {"id": 16, "position": {"x": 20, "y": 16}, "facing": "down", "name": "Nurse Karen", "message": "Your Portalmon will be well taken care of in our enrichment center"}, {"id": 17, "position": {"x": 6, "y": 25}, "facing": "down", "name": "bob1", "message": "Fresh cache, picked this morning. Only slightly stale."}, {"id": 18, "position": {"x": 9, "y": 25}, "facing": "down", "name": "bob2", "message": "Two for one on legacy dependencies. No refunds, no support."}, {"id": 20, "position": {"x": 15, "y": 25}, "facing": "down", "name": "bob4", "message": "Everything at this stall is organic, artisanal, and completely untested."}, {"id": 21, "position": {"x": 51, "y": 37}, "facing": "down", "name": "Joe", "message": "Been phishing for days now and no bytes."}, {"id": 22, "position": {"x": 12, "y": 25}, "facing": "down", "name": "bob3", "message": "These tomatoes are heirloom. So is my codebase. Neither is documented."}, {"id": 28, "position": {"x": 48, "y": 20}, "facing": "down", "name": "Sign", "message": "Wild Portalmon ahead. Enter at your own risk!"}, {"id": 30, "position": {"x": 18, "y": 25}, "facing": "down", "name": "Sign", "message": "Farmer's Market"}, {"id": 40, "position": {"x": 17, "y": 3}, "facing": "down", "trainerId": "rey"}];

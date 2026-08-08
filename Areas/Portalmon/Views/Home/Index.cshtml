@@ -100,18 +100,7 @@
 				<!-- ko if: _statusToast() -->
 					<div class="pk-status-toast" data-bind="text: _statusToast"></div>
 					<!-- /ko -->
-					<!-- ONBOARDING SCREENS -->
-					<!-- ko if: isShowingWelcome() -->
-					@Html.Partial("~/Areas/Portalmon/Views/Home/Welcome.cshtml")
-					<!-- /ko -->
-					<!-- ko if: isChoosingStarter() -->
-					@Html.Partial("~/Areas/Portalmon/Views/Home/StarterSelect.cshtml")
-					<!-- /ko -->
-					<!-- ko if: isShowingStarterConfirm() -->
-					@Html.Partial("~/Areas/Portalmon/Views/Home/StarterConfirm.cshtml")
-					<!-- /ko -->
-					<!-- MAIN GAME (post-onboarding) -->
-					<!-- ko ifnot: isShowingWelcome() || isChoosingStarter() || isShowingStarterConfirm() -->
+					<!-- MAIN GAME -->
 					<!-- Combat is always rendered as the base layer -->
 					<div class="gba-screen-base" data-bind="css: { 'gba-dimmed': activeOverlay() !== 'none', 'pk-transition-flash': battleTransition.phase() === 'flash', 'pk-transition-iris-close': battleTransition.phase() === 'iris-close', 'pk-transition-black': battleTransition.phase() === 'black', 'pk-transition-iris-open': battleTransition.phase() === 'iris-open', 'pk-transition-vortex': battleTransition.phase() === 'vortex' }">
 						@Html.Partial("~/Areas/Portalmon/Views/Home/Encounter.cshtml")
@@ -180,7 +169,6 @@
 							@Html.Partial("~/Areas/Portalmon/Views/Home/Settings.cshtml")
 						</div>
 					</div>
-					<!-- /ko -->
 					<!-- /ko -->
 					<!-- REST WARNING — GLaDOS hard-mode forfeit confirmation -->
 					<!-- ko if: isShowingRestWarning() -->

@@ -3,7 +3,7 @@
  <tileset firstgid="1" source="indoortileset.tsx"/>
  <tileset firstgid="12289" source="pokemon.tsx"/>
  <tileset firstgid="13605" source="PortalTileset.tsx"/>
- <tileset firstgid="13608" source="npcs-compact-16.tsx"/>
+ <tileset firstgid="13609" source="npcs-compact-16.tsx"/>
  <layer id="1" name="Floor" width="33" height="40">
   <properties>
    <property name="walkable" type="bool" value="true"/>
@@ -153,7 +153,7 @@
 8409,8410,8411,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8409,8410,8411,8223,8223,8223,8223,8223,8223,8223,8223,8223,8223,8223,8223,
 8409,8410,8411,8222,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8409,8410,8411,8223,8223,8223,8223,8223,8223,8223,8223,8223,8223,8223,8223,
 8409,8410,8411,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8409,8410,8411,0,0,0,0,0,8223,8223,8223,8223,8223,8223,8223,
-8409,8410,8411,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8222,8409,8410,8411,0,0,0,0,13608,8223,8223,8223,8223,8223,8223,8223,
+8409,8410,8411,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8222,8409,8410,8411,0,0,0,0,13609,8223,8223,8223,8223,8223,8223,8223,
 8409,8410,8411,8222,0,0,0,0,0,0,8222,0,0,0,0,0,0,0,8601,8602,8603,0,0,0,0,0,0,0,8223,8223,8223,8223,8223,
 8409,8410,8411,0,0,0,8222,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12396,8223,8223,8223,8223,8223,
 8409,8410,8411,0,0,0,0,0,0,0,0,0,0,0,8222,0,0,0,8217,8218,8219,0,0,0,0,0,8223,8223,8223,8223,8223,8223,8223,
@@ -191,7 +191,7 @@
 8223,8223,8223,8223,8601,8602,8603,0,0,0,8601,8602,8602,8602,8603,8223,8223,8223,8223,8223,8223,8223,8223,8223,8223,8223,8223,8223,8223,8223,8223,8223,8223
 </data>
  </layer>
- <objectgroup color="#ff0000" id="7" name="Warp">
+ <objectgroup color="#00ff00" id="7" name="Warp">
   <object id="10" x="128" y="624" width="16" height="16">
    <properties>
     <property name="map" value="town"/>
@@ -230,7 +230,12 @@
    <property name="message" value="Caution: Slippery."/>
    <property name="name" value="Sign"/>
   </properties>
-  <object id="8" x="144" y="592" width="16" height="16"/>
+  <object id="8" x="144" y="592" width="16" height="16">
+   <properties>
+    <property name="message" value="Ice puzzles ahead! Try not to fall."/>
+    <property name="name" value="Sign"/>
+   </properties>
+  </object>
   <object id="15" x="256" y="448" width="16" height="16">
    <properties>
     <property name="message" value="Escape hatch"/>
@@ -320,6 +325,6 @@
     <property name="wild" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="16" x="144" y="176" width="240" height="112"/>
+  <object id="16" x="144" y="192" width="240" height="96"/>
  </objectgroup>
 </map>

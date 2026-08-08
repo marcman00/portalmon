@@ -8,6 +8,7 @@
     "map:build": "python scripts/build-town-map.py",
     "map:test": "python -m unittest scripts/test_town_map.py",
 	"map:gym": "python scripts/build-tiled-gym.py",
+	"map:lab": "python scripts/build-tiled-gym.py Lab",
     "map:tiled": "python scripts/build-tiled-overworld.py",
     "predev": "node scripts/build-index.mjs",
     "dev": "vite",

@@ -26,7 +26,7 @@ export const TOWN_MAP: OverworldMapDef = {
 	interactions: [
 		{ position: TILED_DOORS[5], kind: "center" },
 	],
-	// People and signs are painted into the Tiled Obstacle layer, so the runtime
-	// only supplies their dialogue and trainer behavior.
+	// Most people and signs are painted into the map. Progression-gated actors,
+	// such as Rey, supply a runtime sprite through their trainer definition.
 	npcs: resolveMapActables(TILED_ACTABLES, TILED_COLLISION_RECTS),
 };

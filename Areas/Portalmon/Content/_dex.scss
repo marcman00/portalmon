@@ -1,12 +1,7 @@
 // =========================================
-// ONBOARDING (Welcome + StarterConfirm)
+// SHARED GLaDOS PROMPTS
 // =========================================
-.pk-welcome,
-.pk-starter-confirm {
-    padding: 1.25rem 1.5rem 1rem;
-}
-
-.pk-welcome-inner {
+.pk-rest-warning-inner {
     max-width: 520px;
     margin: 0 auto;
 }
@@ -37,13 +32,7 @@
     strong        { color: $s-text; }
 }
 
-.pk-welcome-footer {
-    margin-top: 0.65rem !important;
-    color: $pk-muted;
-    font-size: 0.8rem;
-}
-
-.pk-btn-begin {
+.pk-btn-action {
     background: transparent;
     border: 2px solid $pk-red;
     color: $pk-red;
@@ -55,12 +44,6 @@
     border-radius: 5px;
     transition: background-color 150ms, color 150ms;
     &:hover { background: $pk-red; color: #fff; }
-}
-
-.pk-confirm-portrait {
-    @include pk-circle-portrait(66px, 2rem);
-    background: $s-bg-dark;
-    border: 2px solid $s-border;
 }
 
 .pk-glados-speech.pk-typing {
@@ -78,45 +61,7 @@
     50%       { opacity: 0; }
 }
 
-// =========================================
-// STARTER SELECT
-// =========================================
-.pk-starter-select {
-    padding: 1.25rem;
-}
-
-.pk-starter-title {
-    color: $s-text;
-}
-
-.pk-starter-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    padding: 0.9rem;
-    background: $s-bg-mid;
-    border: 2px solid $s-border;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: border-color 200ms, box-shadow 200ms;
-    &:hover { border-color: $pk-red; box-shadow: 0 0 10px rgba(233,69,96,0.2); }
-}
-
-.pk-starter-portrait {
-    @include pk-circle-portrait(72px, 2.2rem);
-    background: $s-bg-dark;
-    border: 2px solid $s-border;
-    margin-bottom: 0.65rem;
-}
-
-.pk-starter-name  { font-weight: 700; font-size: 0.95rem; color: $s-text; margin-bottom: 0.2rem; }
-.pk-starter-stats { width: 100%; }
-.pk-stat-label    { font-size: 0.58rem; text-transform: uppercase; color: $s-text-muted; }
-.pk-stat-value    { font-size: 0.82rem; font-weight: 700; color: $s-accent; font-family: monospace; }
-.pk-starter-prompt { font-size: 0.72rem; font-weight: 700; color: $pk-red; text-transform: uppercase; letter-spacing: 0.05em; }
 .pk-trainer-name-input { max-width: 180px; }
-.pk-glados-label { white-space: nowrap; }
 
 
 // =========================================

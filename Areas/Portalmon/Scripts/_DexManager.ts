@@ -301,7 +301,7 @@ export class DexEntry
 			if (this.evolvesFromSpecies) tags.push("Unlock Form");
 			else if (this.evolvesToSpecies) tags.push("Base Form");
 
-			if (this.species.portalUnlock === "after_secret_defeated")
+			if (this.species.portalUnlock === "after_champion_defeated")
 			{
 				tags.push("Imported");
 				tags.push("Postgame");

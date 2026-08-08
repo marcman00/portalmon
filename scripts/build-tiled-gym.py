@@ -1,4 +1,4 @@
-"""Export Gym1's Tiled data into the small runtime map definition.
+"""Export Tiled gym maps into their small runtime map definitions.
 
 Gym maps render their TMX layers directly. Gameplay data stays in Tiled:
 
@@ -15,13 +15,18 @@ Gym maps render their TMX layers directly. Gameplay data stays in Tiled:
 from __future__ import annotations
 
 import json
+import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parent.parent
-SOURCE_PATH = ROOT / "Gym1.tmx"
-OUTPUT_PATH = ROOT / "Areas/Portalmon/Scripts/overworld/Gym1.generated.ts"
+TILED_MAPS = (
+    ("Gym1.tmx", "Gym1.generated.ts", "GYM1"),
+    ("Gym2.tmx", "Gym2.generated.ts", "GYM2"),
+    ("Gym3.tmx", "Gym3.generated.ts", "GYM3"),
+    ("Lab.tmx", "Lab.generated.ts", "LAB"),
+)
 
 
 def properties(element: ET.Element) -> dict[str, str]:
@@ -81,6 +86,7 @@ def actables(root: ET.Element, tile_width: int, tile_height: int) -> list[dict[s
         object_id = int(object_.get("id", "0"))
         object_properties = merged_properties(actable_group, object_)
         trainer_id = object_properties.get("trainerId", "").strip()
+        script_id = object_properties.get("scriptId", "").strip()
         x, y = one_tile_object(object_, tile_width, tile_height, "Actables")
         if (x, y) in positions:
             raise ValueError(f"Multiple Actables objects share tile {x},{y}")
@@ -89,22 +95,27 @@ def actables(root: ET.Element, tile_width: int, tile_height: int) -> list[dict[s
         if facing not in {"up", "down", "left", "right"}:
             raise ValueError(f"Actables object {object_id} has invalid facing: {facing}")
         entry: dict[str, object] = {"id": object_id, "position": {"x": x, "y": y}, "facing": facing}
+        if script_id:
+            entry["scriptId"] = script_id
         if trainer_id:
             entry["trainerId"] = trainer_id
         else:
             name = object_properties.get("name", "").strip()
             message = object_properties.get("message", "").strip()
-            if not name or not message:
-                raise ValueError(f"Actables object {object_id} needs non-empty 'name' and 'message' properties")
+            if not name or (not message and not script_id):
+                raise ValueError(f"Actables object {object_id} needs a name and either message or scriptId")
             entry["name"] = name
-            entry["message"] = message
+            if message:
+                entry["message"] = message
         result.append(entry)
     return result
 
 
 def wild_zones(root: ET.Element, tile_width: int, tile_height: int) -> list[dict[str, int]]:
-    wild_group = group(root, "Wild")
+    wild_group = group(root, "Wild", required=False)
     result: list[dict[str, int]] = []
+    if wild_group is None:
+        return result
     for object_ in wild_group.findall("object"):
         if merged_properties(wild_group, object_).get("wild") != "true":
             continue
@@ -153,7 +164,10 @@ def ice_tiles(layers: list[tuple[ET.Element, list[int]]], width: int) -> list[di
 
 
 def warps(root: ET.Element, tile_width: int, tile_height: int) -> list[dict[str, object]]:
+    """Expand each rectangular Tiled Warp object into its trigger tiles."""
+
     result: list[dict[str, object]] = []
+    destinations: dict[tuple[int, int], tuple[str, str]] = {}
     warp_group = group(root, "Warp", required=False)
     if warp_group is None:
         return result
@@ -165,8 +179,31 @@ def warps(root: ET.Element, tile_width: int, tile_height: int) -> list[dict[str,
         target_spawn = object_properties.get("spawn", "").strip()
         if not target_map or not target_spawn:
             raise ValueError(f"Warp object {object_.get('id')} needs non-empty 'map' and 'spawn' properties")
-        x, y = one_tile_object(object_, tile_width, tile_height, "Warp")
-        result.append({"position": {"x": x, "y": y}, "targetMapId": target_map, "targetSpawnId": target_spawn})
+        object_id = object_.get("id", "?")
+        x = exact_tile(float(object_.get("x", "0")), tile_width, f"Warp object {object_id} X")
+        y = exact_tile(float(object_.get("y", "0")), tile_height, f"Warp object {object_id} Y")
+        width = exact_tile(float(object_.get("width", "0")), tile_width, f"Warp object {object_id} width")
+        height = exact_tile(float(object_.get("height", "0")), tile_height, f"Warp object {object_id} height")
+        if width <= 0 or height <= 0:
+            raise ValueError(f"Warp object {object_id} must cover at least one tile")
+        destination = (target_map, target_spawn)
+        for tile_y in range(y, y + height):
+            for tile_x in range(x, x + width):
+                position = (tile_x, tile_y)
+                existing = destinations.get(position)
+                if existing is not None:
+                    if existing != destination:
+                        raise ValueError(
+                            f"Warp objects overlap at {tile_x},{tile_y} with different destinations: "
+                            f"{existing} and {destination}"
+                        )
+                    continue
+                destinations[position] = destination
+                result.append({
+                    "position": {"x": tile_x, "y": tile_y},
+                    "targetMapId": target_map,
+                    "targetSpawnId": target_spawn,
+                })
     return result
 
 
@@ -191,7 +228,9 @@ def spawns(root: ET.Element, tile_width: int, tile_height: int) -> list[dict[str
 
 
 def portals(root: ET.Element, tile_width: int, tile_height: int) -> list[dict[str, object]]:
-    portal_group = group(root, "Portals")
+    portal_group = group(root, "Portals", required=False)
+    if portal_group is None:
+        return []
     layer_properties = properties(portal_group)
     layer_directional_exit = layer_properties.get("directionalExit", "false") == "true"
     result: list[dict[str, object]] = []
@@ -321,8 +360,8 @@ def validate_slides(
                 pending.append(destination)
 
 
-def main() -> None:
-    root = ET.parse(SOURCE_PATH).getroot()
+def export_map(source_path: Path, output_path: Path, prefix: str) -> None:
+    root = ET.parse(source_path).getroot()
     width = int(root.get("width", "0"))
     height = int(root.get("height", "0"))
     tile_width = int(root.get("tilewidth", "0"))
@@ -335,7 +374,7 @@ def main() -> None:
         source = tileset_reference.get("source")
         if source is None:
             raise ValueError("Gym maps only support external tilesets")
-        tileset_path = SOURCE_PATH.parent / source
+        tileset_path = source_path.parent / source
         tileset = ET.parse(tileset_path).getroot()
         image = tileset.find("image")
         if image is None or image.get("source") is None:
@@ -349,6 +388,8 @@ def main() -> None:
             "firstGid": int(tileset_reference.get("firstgid", "0")),
             "tileCount": tile_count,
             "columns": columns,
+            "tileWidth": int(tileset.get("tilewidth", "0")),
+            "tileHeight": int(tileset.get("tileheight", "0")),
             "spacing": int(tileset.get("spacing", "0")),
             "margin": int(tileset.get("margin", "0")),
         })
@@ -363,7 +404,8 @@ def main() -> None:
     warp_defs = warps(root, tile_width, tile_height)
     actable_defs = actables(root, tile_width, tile_height)
     wild_defs = wild_zones(root, tile_width, tile_height)
-    validate_portal_visuals(layers, width, portal_defs)
+    if portal_defs:
+        validate_portal_visuals(layers, width, portal_defs)
     for spawn in spawn_defs:
         position = spawn["position"]
         if (position["x"], position["y"]) in blocked_tiles:
@@ -371,23 +413,36 @@ def main() -> None:
     validate_slides(width, height, blocked_tiles, ice, portal_defs, spawn_defs, warp_defs)
 
     output = [
-        "// Generated from Gym1.tmx by scripts/build-tiled-gym.py. Do not edit.",
+        f"// Generated from {source_path.name} by scripts/build-tiled-gym.py. Do not edit.",
         'import { MapActableDef, MapCollisionRect, MapEncounterZone, MapPoint, MapPortalDef, MapSpawnDef, MapTilesetDef, MapWarpDef } from "./OverworldMapTypes";',
         "",
-        f"export const GYM1_WIDTH = {width};",
-        f"export const GYM1_HEIGHT = {height};",
-        "export const GYM1_TILESETS: MapTilesetDef[] = " + json.dumps(tilesets) + ";",
-        "export const GYM1_TILE_LAYERS: number[][] = " + json.dumps([gids for _, gids in layers]) + ";",
-        "export const GYM1_COLLISION_RECTS: MapCollisionRect[] = " + json.dumps(collision_rects) + ";",
-        "export const GYM1_ICE_TILES: MapPoint[] = " + json.dumps(ice) + ";",
-        "export const GYM1_PORTALS: MapPortalDef[] = " + json.dumps(portal_defs) + ";",
-        "export const GYM1_SPAWNS: MapSpawnDef[] = " + json.dumps(spawn_defs) + ";",
-        "export const GYM1_WARPS: MapWarpDef[] = " + json.dumps(warp_defs) + ";",
-        "export const GYM1_ACTABLES: MapActableDef[] = " + json.dumps(actable_defs) + ";",
-        "export const GYM1_WILD_ZONES: MapEncounterZone[] = " + json.dumps(wild_defs) + ";",
+        f"export const {prefix}_WIDTH = {width};",
+        f"export const {prefix}_HEIGHT = {height};",
+        f"export const {prefix}_TILESETS: MapTilesetDef[] = " + json.dumps(tilesets) + ";",
+        f"export const {prefix}_TILE_LAYERS: number[][] = " + json.dumps([gids for _, gids in layers]) + ";",
+        f"export const {prefix}_COLLISION_RECTS: MapCollisionRect[] = " + json.dumps(collision_rects) + ";",
+        f"export const {prefix}_ICE_TILES: MapPoint[] = " + json.dumps(ice) + ";",
+        f"export const {prefix}_PORTALS: MapPortalDef[] = " + json.dumps(portal_defs) + ";",
+        f"export const {prefix}_SPAWNS: MapSpawnDef[] = " + json.dumps(spawn_defs) + ";",
+        f"export const {prefix}_WARPS: MapWarpDef[] = " + json.dumps(warp_defs) + ";",
+        f"export const {prefix}_ACTABLES: MapActableDef[] = " + json.dumps(actable_defs) + ";",
+        f"export const {prefix}_WILD_ZONES: MapEncounterZone[] = " + json.dumps(wild_defs) + ";",
         "",
     ]
-    OUTPUT_PATH.write_text("\n".join(output), encoding="utf-8")
+    output_path.write_text("\n".join(output), encoding="utf-8")
+
+
+def main() -> None:
+    requested = {value.lower() for value in sys.argv[1:]}
+    selected = [entry for entry in TILED_MAPS if not requested or Path(entry[0]).stem.lower() in requested or entry[2].lower() in requested]
+    if requested and not selected:
+        raise ValueError(f"Unknown Tiled map selection: {', '.join(sorted(requested))}")
+    for source_name, output_name, prefix in selected:
+        export_map(
+            ROOT / source_name,
+            ROOT / "Areas/Portalmon/Scripts/overworld" / output_name,
+            prefix,
+        )
 
 
 if __name__ == "__main__":

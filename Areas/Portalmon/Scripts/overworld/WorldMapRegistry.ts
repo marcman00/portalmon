@@ -1,11 +1,17 @@
 import { OverworldMapDef, OverworldMapId } from "./OverworldMapTypes";
 import { GYM1_MAP } from "./Gym1Map";
+import { GYM2_MAP } from "./Gym2Map";
+import { GYM3_MAP } from "./Gym3Map";
+import { LAB_MAP } from "./LabMap";
 import { validateWorldTrainerPlacements } from "./MapActables";
 import { TOWN_MAP } from "./TownMap";
 
 export const WORLD_MAPS: Record<OverworldMapId, OverworldMapDef> = {
 	town: TOWN_MAP,
 	gym1: GYM1_MAP,
+	gym2: GYM2_MAP,
+	gym3: GYM3_MAP,
+	lab: LAB_MAP,
 };
 
 validateWorldTrainerPlacements(Object.values(WORLD_MAPS));

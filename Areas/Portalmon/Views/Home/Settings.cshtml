@@ -10,7 +10,7 @@
 			maxlength="15"
 			placeholder="Enter your name"
 			data-bind="value: pendingTrainerName, valueUpdate: 'input'" />
-		<button type="button" class="btn btn-sm pk-btn-begin"
+		<button type="button" class="btn btn-sm pk-btn-action"
 			data-bind="click: saveTrainerName, disable: !pendingTrainerName().trim() || pendingTrainerName().trim() === trainerName()">
 			Save
 		</button>

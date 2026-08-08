@@ -1,7 +1,7 @@
 import { DialogueSequence } from "../OverworldDialogue";
 
 export type WalkDirection = "up" | "down" | "left" | "right";
-export type OverworldMapId = "town" | "gym1";
+export type OverworldMapId = "town" | "gym1" | "gym2" | "gym3" | "lab";
 
 export interface MapPoint
 {
@@ -60,6 +60,8 @@ export interface MapTilesetDef
 	firstGid: number;
 	tileCount: number;
 	columns: number;
+	tileWidth?: number;
+	tileHeight?: number;
 	spacing: number;
 	margin: number;
 }
@@ -81,6 +83,8 @@ export interface MapActableDef
 	name?: string;
 	message?: string;
 	trainerId?: string;
+	/** Opaque controller-owned interaction identifier authored in Tiled. */
+	scriptId?: string;
 }
 
 /** A reusable map destination for recovery, scripted movement, and future interiors. */
@@ -115,12 +119,16 @@ export interface MapNpcDef
 	initialFacing: WalkDirection;
 	/** When present, TALK starts this trainer's configured battle. */
 	trainerId?: string;
+	/** Opaque controller-owned interaction identifier authored in Tiled. */
+	scriptId?: string;
 	/** Dialogue shown after this trainer has been defeated. */
 	afterBattleDialogue?: DialogueSequence;
 	/** Omit when the actor is already drawn into the map's background image. */
 	spritePath?: string;
-	/** Zero-based tile in a single-row 16×16 NPC sprite sheet. */
+	/** Zero-based, row-major tile in a 16×16 NPC sprite sheet. */
 	spriteTileIndex?: number;
+	/** Transparent pixels separating sprite-sheet rows. */
+	spriteRowGap?: number;
 	dialogue: DialogueSequence;
 }
 

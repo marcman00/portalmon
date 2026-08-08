@@ -83,7 +83,7 @@
 						class="pk-card-badge pk-card-badge--medallion pk-card-badge--champ"
 						data-bind="css: { 'pk-badge-earned': isChampionshipDefeated() },
 						           enable: isChampionshipDefeated(),
-						           click: function() { $data.showBadgeFor('rey'); }">
+						   click: function() { $data.showBadgeFor('glados'); }">
 					<img class="pk-card-badge-img" data-bind="attr: { src: championBadgeImage, alt: 'Champion badge' }" />
 				</button>
 				<!-- /ko -->
@@ -111,7 +111,7 @@
 		</div>
 	</div>
 
-	<!-- SECTION 3: SECRET BOSS (GLaDOS cake trap) -->
+	<!-- SECTION 3: OPTIONAL POSTGAME BOSS -->
 	<hr class="pk-divider">
 	<!-- ko ifnot: isSecretUnlocked() -->
 	<div class="section-label">???</div>
@@ -128,35 +128,33 @@
 		</div>
 	</div>
 	<div class="text-center small mt-1" style="color: var(--bs-secondary-color); font-size: 0.7rem;">
-		Defeat the Champion to reveal a secret challenger
+		Complete the simulation to reveal a secret challenger
 	</div>
 	<!-- /ko -->
 
 	<!-- ko if: isSecretUnlocked() && !isSecretDefeated() -->
-	<div class="section-label" style="color: #ff99cc;">Congratulations!</div>
-	<div class="secret-card mb-2 revealed pk-cake-card">
+	<div class="section-label" style="color: #ff99cc;">Postgame Anomaly</div>
+	<div class="secret-card mb-2 revealed">
 		<div class="secret-inner d-flex align-items-center gap-3">
-			<div class="secret-portrait pk-cake-portrait">
-				<span>&#x1F382;</span>
+			<div class="secret-portrait">
+				<span data-bind="text: secretPortraitEmoji"></span>
 			</div>
 			<div class="secret-info flex-grow-1">
-				<div class="secret-name fw-bold" style="color: #ff99cc;">Accept your trophy...</div>
-				<div class="secret-subtitle small" style="color: #cc77aa;">
-					You've earned it. There will be cake.
-				</div>
+				<div class="secret-name fw-bold" style="color: #ff99cc;" data-bind="text: secretName"></div>
+				<div class="secret-subtitle small" style="color: #cc77aa;" data-bind="text: secretSubtitle"></div>
 			</div>
 		</div>
 	</div>
 	<!-- /ko -->
 	<!-- ko if: isSecretDefeated() -->
-	<div class="section-label">GLaDOS</div>
+	<div class="section-label" data-bind="text: secretName"></div>
 	<div class="secret-card mb-2 revealed defeated">
 		<div class="secret-inner d-flex align-items-center gap-3">
 			<div class="pk-portrait-badge-wrap pk-portrait-badge-wrap--secret">
 				<div class="secret-portrait">
 					<!-- ko if: secretPortraitImage -->
 					<img class="trainer-portrait-img"
-						 data-bind="attr: { src: secretPortraitImage, alt: 'GLaDOS' }" />
+						 data-bind="attr: { src: secretPortraitImage, alt: secretName }" />
 					<!-- /ko -->
 					<!-- ko ifnot: secretPortraitImage -->
 					<span>&#x1F916;</span>
@@ -166,15 +164,15 @@
 				<!-- ko if: secretBadgeImage -->
 				<button type="button"
 						class="pk-card-badge pk-card-badge--medallion pk-card-badge--secret pk-badge-earned"
-						data-bind="click: function() { $data.showBadgeFor('glados'); }">
-					<img class="pk-card-badge-img" data-bind="attr: { src: secretBadgeImage, alt: 'Portal badge' }" />
+						data-bind="click: function() { $data.showBadgeFor('rey'); }">
+					<img class="pk-card-badge-img" data-bind="attr: { src: secretBadgeImage, alt: 'Developer badge' }" />
 				</button>
 				<!-- /ko -->
 			</div>
 			<div class="secret-info flex-grow-1">
-				<div class="secret-name fw-bold">GLaDOS</div>
+				<div class="secret-name fw-bold" data-bind="text: secretName"></div>
 				<div class="secret-subtitle small" style="color: #8899aa; font-style: italic;">
-					&#x2713; The cake was real this time.
+					&#x2713; Developer containment successful.
 				</div>
 			</div>
 		</div>
