@@ -1,0 +1,3 @@
+# Pre-optimization image backups written by scripts/optimize-images.py.
+# The downscaled PNG beside each one is the file the game ships.
+*.orig.png

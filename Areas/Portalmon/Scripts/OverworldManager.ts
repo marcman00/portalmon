@@ -29,10 +29,29 @@ interface SpriteFrameRect
 	height: number;
 }
 
+/**
+ * A map's tile layers flattened into a single canvas. Tiles taller or wider
+ * than one cell hang outside the logical map bounds, so the canvas is padded
+ * and the padding is subtracted again when the viewport is blitted.
+ */
+interface PrerenderedMap
+{
+	canvas: HTMLCanvasElement;
+	overdrawTop: number;
+	overdrawRight: number;
+}
+
 const TILE_SIZE = 16;
 const VIEWPORT_WIDTH = 240;
 const VIEWPORT_HEIGHT = 160;
 const MOVE_DURATION_MS = 135;
+/**
+ * While the overworld screen is not the active screen there is nothing to draw,
+ * so the loop backs off to a slow poll instead of re-arming at display rate.
+ * A hidden 60fps loop is invisible in the standalone harness but competes with
+ * everything else on a real host page.
+ */
+const IDLE_POLL_MS = 200;
 const PLAYER_PIXEL_SCALE = 1;
 /** Medium encounter rate, evaluated only after a completed step in a Wild zone. */
 const WILD_ENCOUNTER_CHANCE = 0.12;
@@ -108,6 +127,10 @@ export class OverworldManager
 	private readonly keyboardHeld: Set<WalkDirection> = new Set();
 	private readonly pointerHeld: Set<WalkDirection> = new Set();
 	private readonly collisionLabels: Map<string, string> = new Map();
+	/** Fully composited tile layers per map, blitted as one drawImage per frame. */
+	private readonly prerenderedMaps: Map<OverworldMapId, PrerenderedMap> = new Map();
+	/** Maps whose images have all finished decoding. Loaded images never unload. */
+	private readonly readyMaps: Set<OverworldMapId> = new Set();
 
 	private player: MapPoint = { ...WORLD_MAPS.town.defaultSpawn };
 	private facing: WalkDirection = WORLD_MAPS.town.defaultFacing;
@@ -116,6 +139,11 @@ export class OverworldManager
 	private mapInputReady: boolean = false;
 	private wildEncounterCooldown: number = 0;
 	private lastCanvas: HTMLCanvasElement | null = null;
+	private lastContext: CanvasRenderingContext2D | null = null;
+	private lastDatasetValues: string = "";
+	private frameHandle: number | null = null;
+	private idleTimer: number | null = null;
+	private disposed: boolean = false;
 
 	constructor(
 		isInputEnabled: () => boolean,
@@ -162,7 +190,7 @@ export class OverworldManager
 		document.addEventListener("keydown", this.handleKeyDown);
 		document.addEventListener("keyup", this.handleKeyUp);
 		document.addEventListener("pointerup", this.releasePointerDirections);
-		requestAnimationFrame(this.renderLoop);
+		this.frameHandle = requestAnimationFrame(this.renderLoop);
 	}
 
 	public pressDirection = (direction: WalkDirection, event?: Event): boolean =>
@@ -234,7 +262,7 @@ export class OverworldManager
 				{
 					this.dialogue.open({
 						speaker: npc.name,
-						lines: [...npc.dialogue.lines, "He doesn't acknowledge challengers who haven't defeated GLaDOS."],
+						lines: [...npc.dialogue.lines, "(He doesn't acknowledge challengers who haven't defeated GLaDOS.)"],
 					});
 					return;
 				}
@@ -351,7 +379,19 @@ export class OverworldManager
 		return this.isInputEnabled() && this.mapInputReady && this.areMapAssetsReady(this.currentMap());
 	}
 
+	/**
+	 * Memoized because it runs twice per frame and walks every NPC. A decoded
+	 * image never reverts to undecoded, so the first true answer is permanent.
+	 */
 	private areMapAssetsReady(map: OverworldMapDef): boolean
+	{
+		if (this.readyMaps.has(map.id)) return true;
+		if (!this.computeMapAssetsReady(map)) return false;
+		this.readyMaps.add(map.id);
+		return true;
+	}
+
+	private computeMapAssetsReady(map: OverworldMapDef): boolean
 	{
 		const backgroundReady = map.backgroundImagePath
 			? (this.mapBackgroundImages.get(map.backgroundImagePath)?.naturalWidth ?? 0) > 0
@@ -362,18 +402,51 @@ export class OverworldManager
 		return map.npcs.every(npc => !npc.spritePath || (this.npcImages.get(npc.spritePath)?.naturalWidth ?? 0) > 0);
 	}
 
+	/** Stops the render loop and releases the document-level input listeners. */
+	public dispose(): void
+	{
+		this.disposed = true;
+		if (this.frameHandle !== null) cancelAnimationFrame(this.frameHandle);
+		if (this.idleTimer !== null) window.clearTimeout(this.idleTimer);
+		if (this.statusTimer !== null) window.clearTimeout(this.statusTimer);
+		this.frameHandle = null;
+		this.idleTimer = null;
+		this.statusTimer = null;
+		document.removeEventListener("keydown", this.handleKeyDown);
+		document.removeEventListener("keyup", this.handleKeyUp);
+		document.removeEventListener("pointerup", this.releasePointerDirections);
+	}
+
+	/**
+	 * Re-querying the document every frame is wasted work once the canvas is
+	 * known, and the cost scales with the host page's DOM size.
+	 */
+	private resolveCanvas(): HTMLCanvasElement | null
+	{
+		if (this.lastCanvas?.isConnected) return this.lastCanvas;
+		return document.getElementById("pk-overworld-canvas") as HTMLCanvasElement | null;
+	}
+
 	private renderLoop = (now: number): void =>
 	{
+		this.frameHandle = null;
+		let drew = false;
 		try
 		{
-			const canvas = document.getElementById("pk-overworld-canvas") as HTMLCanvasElement | null;
+			const canvas = this.resolveCanvas();
 			if (canvas !== this.lastCanvas)
 			{
 				this.lastCanvas = canvas;
+				this.lastContext = null;
+				this.lastDatasetValues = "";
 				this.mapInputReady = false;
 			}
 			this.updateMovement(now);
-			if (canvas && this.isInputEnabled()) this.draw(canvas, now);
+			if (canvas && this.isInputEnabled())
+			{
+				this.draw(canvas, now);
+				drew = true;
+			}
 		}
 		catch (error)
 		{
@@ -382,9 +455,28 @@ export class OverworldManager
 		}
 		finally
 		{
-			requestAnimationFrame(this.renderLoop);
+			this.scheduleNextFrame(drew);
 		}
 	};
+
+	/** Exactly one re-arm path per frame so the loop can never double-start. */
+	private scheduleNextFrame(drew: boolean): void
+	{
+		if (this.disposed) return;
+		if (drew)
+		{
+			this.frameHandle = requestAnimationFrame(this.renderLoop);
+			return;
+		}
+		this.idleTimer = window.setTimeout(
+			() =>
+			{
+				this.idleTimer = null;
+				if (!this.disposed) this.frameHandle = requestAnimationFrame(this.renderLoop);
+			},
+			IDLE_POLL_MS,
+		);
+	}
 
 	private updateMovement(now: number): void
 	{
@@ -547,21 +639,19 @@ export class OverworldManager
 	{
 		if (canvas.width !== VIEWPORT_WIDTH) canvas.width = VIEWPORT_WIDTH;
 		if (canvas.height !== VIEWPORT_HEIGHT) canvas.height = VIEWPORT_HEIGHT;
-		const context = canvas.getContext("2d");
+		const context = this.lastContext ?? canvas.getContext("2d");
 		if (!context) return;
+		this.lastContext = context;
 		context.imageSmoothingEnabled = false;
 		context.clearRect(0, 0, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
 
 		const renderPlayer = this.getRenderPlayer(now);
 		const camera = this.getCameraPosition(renderPlayer);
 		const map = this.currentMap();
-		canvas.dataset.cameraX = camera.x.toFixed(2);
-		canvas.dataset.cameraY = camera.y.toFixed(2);
-		canvas.dataset.mapId = map.id;
 		this.drawTerrain(context, camera, map);
 		this.drawObjects(context, camera, map);
 		const actorsReady = this.areMapAssetsReady(map);
-		canvas.dataset.actorsReady = actorsReady ? "true" : "false";
+		this.publishDebugState(canvas, camera, map, actorsReady);
 		if (!actorsReady)
 		{
 			this.mapInputReady = false;
@@ -578,6 +668,31 @@ export class OverworldManager
 		actors.sort((left, right) => left.y - right.y);
 		for (const actor of actors) actor.draw();
 		this.mapInputReady = true;
+	}
+
+	/**
+	 * Mirrors the camera and readiness state onto the canvas for debugging.
+	 * Written only when a value actually changes: an unconditional write is
+	 * four attribute mutations per frame, and every MutationObserver on the
+	 * host page has to run against each one.
+	 */
+	private publishDebugState(
+		canvas: HTMLCanvasElement,
+		camera: MapPoint,
+		map: OverworldMapDef,
+		actorsReady: boolean,
+	): void
+	{
+		const cameraX = camera.x.toFixed(2);
+		const cameraY = camera.y.toFixed(2);
+		const readyFlag = actorsReady ? "true" : "false";
+		const signature = `${cameraX}|${cameraY}|${map.id}|${readyFlag}`;
+		if (signature === this.lastDatasetValues) return;
+		this.lastDatasetValues = signature;
+		canvas.dataset.cameraX = cameraX;
+		canvas.dataset.cameraY = cameraY;
+		canvas.dataset.mapId = map.id;
+		canvas.dataset.actorsReady = readyFlag;
 	}
 
 	private drawTerrain(context: CanvasRenderingContext2D, camera: MapPoint, map: OverworldMapDef): void
@@ -634,6 +749,27 @@ export class OverworldManager
 	{
 		if (!map.tilesets?.length || !map.tileLayers) return;
 
+		// Tile layers are static, so compositing them per frame redraws the same
+		// pixels forever. Gym 1 alone is four layers over ~176 visible cells,
+		// which is ~700 drawImage calls and ~700 tileset lookups every frame.
+		const prerendered = this.getPrerenderedMap(map);
+		if (prerendered)
+		{
+			context.drawImage(
+				prerendered.canvas,
+				Math.round(camera.x),
+				Math.round(camera.y) + prerendered.overdrawTop,
+				VIEWPORT_WIDTH,
+				VIEWPORT_HEIGHT,
+				0,
+				0,
+				VIEWPORT_WIDTH,
+				VIEWPORT_HEIGHT,
+			);
+			return;
+		}
+
+		// Fallback for the frames before every tileset image has decoded.
 		const firstX = Math.max(0, Math.floor(camera.x / TILE_SIZE));
 		const lastX = Math.min(map.width - 1, Math.ceil((camera.x + VIEWPORT_WIDTH) / TILE_SIZE));
 		const firstY = Math.max(0, Math.floor(camera.y / TILE_SIZE));
@@ -668,6 +804,77 @@ export class OverworldManager
 				}
 			}
 		}
+	}
+
+	/**
+	 * Composites every tile layer of a map into one canvas. Built once per map,
+	 * the first time all of its tileset images have decoded, and reused for the
+	 * rest of the session because tile layers never change at runtime.
+	 */
+	private getPrerenderedMap(map: OverworldMapDef): PrerenderedMap | null
+	{
+		const cached = this.prerenderedMaps.get(map.id);
+		if (cached) return cached;
+
+		const tilesets = map.tilesets;
+		const layers = map.tileLayers;
+		if (!tilesets?.length || !layers) return null;
+
+		const images = tilesets.map(tileset => this.tiledTilesetImages.get(tileset.imagePath));
+		if (images.some(image => !image || image.naturalWidth <= 0)) return null;
+
+		// Tiles bigger than one cell hang above and to the right of their cell,
+		// so pad the canvas rather than clipping them at the map edges.
+		let overdrawTop = 0;
+		let overdrawRight = 0;
+		for (const tileset of tilesets)
+		{
+			overdrawTop = Math.max(overdrawTop, (tileset.tileHeight ?? TILE_SIZE) - TILE_SIZE);
+			overdrawRight = Math.max(overdrawRight, (tileset.tileWidth ?? TILE_SIZE) - TILE_SIZE);
+		}
+
+		const canvas = document.createElement("canvas");
+		canvas.width = map.width * TILE_SIZE + overdrawRight;
+		canvas.height = map.height * TILE_SIZE + overdrawTop;
+		const context = canvas.getContext("2d");
+		if (!context) return null;
+		context.imageSmoothingEnabled = false;
+
+		for (const layer of layers)
+		{
+			for (let y = 0; y < map.height; y++)
+			{
+				for (let x = 0; x < map.width; x++)
+				{
+					const gid = layer[y * map.width + x] & 0x1FFFFFFF;
+					if (gid === 0) continue;
+					const tilesetIndex = tilesets.findIndex(candidate =>
+						gid >= candidate.firstGid && gid < candidate.firstGid + candidate.tileCount,
+					);
+					if (tilesetIndex < 0) continue;
+					const tileset = tilesets[tilesetIndex];
+					const image = images[tilesetIndex]!;
+					const tileIndex = gid - tileset.firstGid;
+					const tileWidth = tileset.tileWidth ?? TILE_SIZE;
+					const tileHeight = tileset.tileHeight ?? TILE_SIZE;
+					context.drawImage(
+						image,
+						tileset.margin + (tileIndex % tileset.columns) * (tileWidth + tileset.spacing),
+						tileset.margin + Math.floor(tileIndex / tileset.columns) * (tileHeight + tileset.spacing),
+						tileWidth,
+						tileHeight,
+						x * TILE_SIZE,
+						y * TILE_SIZE + TILE_SIZE - tileHeight + overdrawTop,
+						tileWidth,
+						tileHeight,
+					);
+				}
+			}
+		}
+
+		const prerendered: PrerenderedMap = { canvas, overdrawTop, overdrawRight };
+		this.prerenderedMaps.set(map.id, prerendered);
+		return prerendered;
 	}
 
 	private drawObjects(context: CanvasRenderingContext2D, camera: MapPoint, map: OverworldMapDef): void

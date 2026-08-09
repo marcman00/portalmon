@@ -35,266 +35,157 @@ export class SoundHandler
 	// ========================================
 	// Private Properties
 	// ========================================
-	private introMusic: HTMLAudioElement | null = null;
-	private battleMusic: HTMLAudioElement | null = null;
-	private backgroundMusic: HTMLAudioElement | null = null;
-	private gymMusic: HTMLAudioElement | null = null;
-	private bossMusic: HTMLAudioElement | null = null;
-	private championMusic: HTMLAudioElement | null = null;
-	private creditsMusic: HTMLAudioElement | null = null;
-	private currentMusicTrack: HTMLAudioElement | null = null; // Track which music is playing
-
-	private moveSounds: Record<string, HTMLAudioElement> = {};
-	private containSound: HTMLAudioElement | null = null;
-	private victorySound: HTMLAudioElement | null = null;
-	private onSound: HTMLAudioElement | null = null;
-	private throwSound: HTMLAudioElement | null = null;
-	private wiggleSound: HTMLAudioElement | null = null;
-	private battleStartSound: HTMLAudioElement | null = null;
-	private healSound: HTMLAudioElement | null = null;
+	/**
+	 * Music and effect elements are created on first use, keyed by URL.
+	 *
+	 * Creating every element up front made the browser open one request per
+	 * track the moment the page parsed, before the player had even powered the
+	 * handheld on. Thirteen parallel media downloads compete with the rest of
+	 * the host page for connections and bandwidth, and the player may never
+	 * reach most of those tracks in a session.
+	 */
+	private readonly musicTracks: Record<string, HTMLAudioElement> = {};
+	/** Round-robin pools of effect elements, keyed by URL. */
+	private readonly effectPools: Record<string, HTMLAudioElement[]> = {};
+	/** URL of the track that should be playing, independent of whether sound is on. */
+	private currentMusicPath: string | null = null;
 
 	private isSoundEnabled: boolean;
 	private musicVolume: number = 0.3; // 30% volume for background music
 	private sfxVolume: number = 0.5; // 50% volume for sound effects
 
-	/**
-	 * Initialize the sound handler - loads all audio files
-	 */
+	/** How many simultaneous copies of one effect can overlap. */
+	private static readonly EFFECT_POOL_SIZE = 4;
+
 	constructor(enabled: boolean)
 	{
 		this.isSoundEnabled = enabled;
-
-		// Initialize background music
-		this.introMusic = new Audio(this.INTRO_MUSIC);
-		this.introMusic.loop = true;
-		this.introMusic.volume = this.musicVolume;
-
-		// Initialize boss music
-		this.bossMusic = new Audio(this.BOSS_MUSIC);
-		this.bossMusic.loop = true;
-		this.bossMusic.volume = this.musicVolume;
-
-		// Initialize battle music
-		this.battleMusic = new Audio(this.BATTLE_MUSIC);
-		this.battleMusic.loop = true;
-		this.battleMusic.volume = this.musicVolume;
-
-		// Initialize background music
-		this.backgroundMusic = new Audio(this.BACKGROUND_MUSIC);
-		this.backgroundMusic.loop = true;
-		this.backgroundMusic.volume = this.musicVolume;
-
-		// Initialize gym music
-		this.gymMusic = new Audio(this.GYM_MUSIC);
-		this.gymMusic.loop = true;
-		this.gymMusic.volume = this.musicVolume;
-
-		// Initialize champion music
-		this.championMusic = new Audio(this.CHAMPION_MUSIC);
-		this.championMusic.loop = true;
-		this.championMusic.volume = this.musicVolume;
-
-		// Initialize champion music
-		this.creditsMusic = new Audio(this.CREDITS_MUSIC);
-		this.creditsMusic.loop = true;
-		this.creditsMusic.volume = this.musicVolume;
-
-		this.onSound = this.createSoundEffect(this.ON_SOUND);
-		this.throwSound = this.createSoundEffect(this.THROW_SOUND);
-		this.wiggleSound = this.createSoundEffect(this.WIGGLE_SOUND);
-		this.battleStartSound = this.createSoundEffect(this.BATTLE_START_SOUND);
-		this.containSound = this.createSoundEffect(this.CONTAIN_SOUND);
-		this.healSound = this.createSoundEffect(this.HEAL_SOUND);
 	}
 
 	/**
-	 * Helper to create a sound effect with proper settings
+	 * Returns the looping music element for a URL, creating it on first use.
+	 * preload is 'none' so nothing is fetched until the track actually plays.
 	 */
-	private createSoundEffect(path: string): HTMLAudioElement
+	private getMusicTrack(path: string): HTMLAudioElement
 	{
-		const sound = new Audio(path);
-		sound.volume = this.sfxVolume;
-		sound.preload = 'auto';
-		return sound;
-	}
-
-	private getMoveSoundEffect(fileName: string): HTMLAudioElement
-	{
-		const cached = this.moveSounds[fileName];
+		const cached = this.musicTracks[path];
 		if (cached) return cached;
 
-		const sound = this.createSoundEffect(this.MOVE_AUDIO_BASE_PATH + fileName);
-		this.moveSounds[fileName] = sound;
-		return sound;
+		const track = new Audio();
+		track.preload = 'none';
+		track.src = path;
+		track.loop = true;
+		track.volume = this.musicVolume;
+		this.musicTracks[path] = track;
+		return track;
 	}
 
 	/**
-	 * Start playing background music
+	 * Returns a free element from the pool for a URL, or the oldest one if all
+	 * copies are still playing. Reusing a fixed set of elements avoids the
+	 * unbounded cloneNode-per-play churn the previous implementation had.
 	 */
-	public playIntroMusic(): void
+	private getEffect(path: string): HTMLAudioElement
 	{
-		if (!this.isSoundEnabled || !this.introMusic) return;
+		const pool = this.effectPools[path] ?? (this.effectPools[path] = []);
+		const free = pool.find(candidate => candidate.paused || candidate.ended);
+		if (free) return free;
 
-		// Stop any currently playing music
-		this.stopAllMusic();
+		if (pool.length < SoundHandler.EFFECT_POOL_SIZE)
+		{
+			const sound = new Audio();
+			// 'auto' is correct here: the first play of an effect should not
+			// stall, and effects are small compared with the music tracks.
+			sound.preload = 'auto';
+			sound.src = path;
+			sound.volume = this.sfxVolume;
+			pool.push(sound);
+			return sound;
+		}
 
-		// Set background music as current track
-		this.currentMusicTrack = this.introMusic;
-		this.currentMusicTrack.currentTime = 0;
+		return pool[0];
+	}
 
-		this.currentMusicTrack.play().catch(() => {});
+	private getMoveSoundPath(fileName: string): string
+	{
+		return this.MOVE_AUDIO_BASE_PATH + fileName;
 	}
 
 	/**
-	 * Start playing background music
+	 * Opt-in warm-up for the effects the player is about to need. Call this
+	 * after power-on rather than fetching everything during page load.
 	 */
-	public playBattleMusic(): void
+	public preloadCoreEffects(): void
 	{
-		if (!this.isSoundEnabled || !this.battleMusic) return;
-
-		// Stop any currently playing music
-		this.stopAllMusic();
-
-		// Set background music as current track
-		this.currentMusicTrack = this.battleMusic;
-		this.currentMusicTrack.currentTime = 0;
-
-		this.currentMusicTrack.play().catch(() => {});
+		for (const path of [this.ON_SOUND, this.THROW_SOUND, this.WIGGLE_SOUND, this.BATTLE_START_SOUND, this.CONTAIN_SOUND, this.HEAL_SOUND])
+		{
+			this.getEffect(path).load();
+		}
 	}
 
 	/**
-	 * Start playing background music
+	 * Starts fetching a track without playing it. Music elements are created
+	 * with preload='none', so the first play of a track otherwise begins its
+	 * download at the moment it is supposed to be audible. Callers use this
+	 * when they know a switch is coming and have animation time to hide it in.
 	 */
-	public playGymMusic(): void
+	private warmUpMusic(path: string): void
 	{
-		if (!this.isSoundEnabled || !this.gymMusic) return;
-
-		// Stop any currently playing music
-		this.stopAllMusic();
-
-		// Set background music as current track
-		this.currentMusicTrack = this.gymMusic;
-		this.currentMusicTrack.currentTime = 0;
-
-		this.currentMusicTrack.play().catch(() => {});
+		const track = this.getMusicTrack(path);
+		if (track.preload === 'auto') return;
+		track.preload = 'auto';
+		track.load();
 	}
+
+	/** Warm the track a wild encounter switches to after its start sting. */
+	public warmUpBattleMusic(): void { this.warmUpMusic(this.BATTLE_MUSIC); }
 
 	/**
-	* Start playing background music
-	*/
-	public playChampionMusic(): void
+	 * Switches to a track, stopping whatever was playing. The track element and
+	 * its download are created here, on demand, rather than at construction.
+	 */
+	private playMusic(path: string): void
 	{
-		if (!this.isSoundEnabled || !this.championMusic) return;
-
-		// Stop any currently playing music
 		this.stopAllMusic();
+		this.currentMusicPath = path;
+		if (!this.isSoundEnabled) return;
 
-		// Set background music as current track
-		this.currentMusicTrack = this.championMusic;
-		this.currentMusicTrack.currentTime = 0;
-
-		this.currentMusicTrack.play().catch(() => { });
+		const track = this.getMusicTrack(path);
+		track.currentTime = 0;
+		track.play().catch(() => {});
 	}
 
-	/**
-	* Start playing credits music
-	*/
-	public playCreditsMusic(): void
-	{
-		if (!this.isSoundEnabled || !this.creditsMusic) return;
+	public playIntroMusic(): void { this.playMusic(this.INTRO_MUSIC); }
 
-		// Stop any currently playing music
-		this.stopAllMusic();
+	public playBattleMusic(): void { this.playMusic(this.BATTLE_MUSIC); }
 
-		// Set background music as current track
-		this.currentMusicTrack = this.creditsMusic;
-		this.currentMusicTrack.currentTime = 0;
+	public playGymMusic(): void { this.playMusic(this.GYM_MUSIC); }
 
-		this.currentMusicTrack.play().catch(() => { });
-	}
+	public playChampionMusic(): void { this.playMusic(this.CHAMPION_MUSIC); }
 
-	/**
- * Start playing background music
- */
-	public playBackgroundMusic(): void
-	{
-		if (!this.isSoundEnabled || !this.backgroundMusic) return;
+	public playCreditsMusic(): void { this.playMusic(this.CREDITS_MUSIC); }
 
-		// Stop any currently playing music
-		this.stopAllMusic();
-
-		// Set background music as current track
-		this.currentMusicTrack = this.backgroundMusic;
-		this.currentMusicTrack.currentTime = 0;
-
-		this.currentMusicTrack.play().catch(() => {});
-	}
+	public playBackgroundMusic(): void { this.playMusic(this.BACKGROUND_MUSIC); }
 
 	/**
 	 * Start playing boss music (replaces background music)
 	 */
-	public playBossMusic(): void
-	{
-		if (!this.isSoundEnabled || !this.bossMusic) return;
-
-		// Stop any currently playing music
-		this.stopAllMusic();
-
-		// Set boss music as current track
-		this.currentMusicTrack = this.bossMusic;
-		this.currentMusicTrack.currentTime = 0;
-
-		this.currentMusicTrack.play().catch(() => {});
-	}
+	public playBossMusic(): void { this.playMusic(this.BOSS_MUSIC); }
 
 	/**
-	 * Stop all music tracks
+	 * Stop every track that has actually been created. Tracks the player never
+	 * reached were never instantiated and need no cleanup.
 	 */
 	private stopAllMusic(): void
 	{
-		if (this.introMusic)
+		for (const key in this.musicTracks)
 		{
-			this.introMusic.pause();
-			this.introMusic.currentTime = 0;
+			const track = this.musicTracks[key];
+			track.pause();
+			track.currentTime = 0;
 		}
 
-		if (this.backgroundMusic)
-		{
-			this.backgroundMusic.pause();
-			this.backgroundMusic.currentTime = 0;
-		}
-
-		if (this.gymMusic)
-		{
-			this.gymMusic.pause();
-			this.gymMusic.currentTime = 0;
-		}
-
-		if (this.championMusic)
-		{
-			this.championMusic.pause();
-			this.championMusic.currentTime = 0;
-		}
-
-		if (this.battleMusic)
-		{
-			this.battleMusic.pause();
-			this.battleMusic.currentTime = 0;
-		}
-
-		if (this.bossMusic)
-		{
-			this.bossMusic.pause();
-			this.bossMusic.currentTime = 0;
-		}
-
-		if (this.creditsMusic)
-		{
-			this.creditsMusic.pause();
-			this.creditsMusic.currentTime = 0;
-		}
-
-		this.currentMusicTrack = null;
+		this.currentMusicPath = null;
 	}
 
 	/**
@@ -311,7 +202,7 @@ export class SoundHandler
 	public playMoveSound(fileName?: string, onEnded?: () => void): void
 	{
 		if (!this.isSoundEnabled || !fileName) return;
-		this.playSoundEffect(this.getMoveSoundEffect(fileName), onEnded);
+		this.playSoundEffect(this.getMoveSoundPath(fileName), onEnded);
 	}
 
 	/**
@@ -319,8 +210,8 @@ export class SoundHandler
 	 */
 	public playContainSound(): void
 	{
-		if (!this.isSoundEnabled || !this.containSound) return;
-		this.playSoundEffect(this.containSound);
+		if (!this.isSoundEnabled) return;
+		this.playSoundEffect(this.CONTAIN_SOUND);
 	}
 
 	/**
@@ -328,8 +219,8 @@ export class SoundHandler
 	 */
 	public playBattleStartSound(): void
 	{
-		if (!this.isSoundEnabled || !this.battleStartSound) return;
-		this.playSoundEffect(this.battleStartSound, () => this.playBattleMusic());
+		if (!this.isSoundEnabled) return;
+		this.playSoundEffect(this.BATTLE_START_SOUND, () => this.playBattleMusic());
 	}
 
 	/**
@@ -337,8 +228,8 @@ export class SoundHandler
 	 */
 	public playRestSound(): void
 	{
-		if (!this.isSoundEnabled || !this.healSound) return;
-		this.playSoundEffect(this.healSound);
+		if (!this.isSoundEnabled) return;
+		this.playSoundEffect(this.HEAL_SOUND);
 	}
 
 	/**
@@ -350,16 +241,7 @@ export class SoundHandler
 	public playUltSound(moveName?: string, onEnded?: () => void): void
 	{
 		if (!this.isSoundEnabled || !moveName) return;
-		this.playSoundEffect(this.getMoveSoundEffect(moveName), onEnded);
-	}
-
-	/**
-	 * Play victory sound effect
-	 */
-	public playVictorySound(): void
-	{
-		if (!this.isSoundEnabled || !this.victorySound) return;
-		this.playSoundEffect(this.victorySound);
+		this.playSoundEffect(this.getMoveSoundPath(moveName), onEnded);
 	}
 
 	/**
@@ -367,8 +249,8 @@ export class SoundHandler
 	 */
 	public playOnSound(): void
 	{
-		if (!this.isSoundEnabled || !this.onSound) return;
-		this.playSoundEffect(this.onSound);
+		if (!this.isSoundEnabled) return;
+		this.playSoundEffect(this.ON_SOUND);
 	}
 
 	/**
@@ -376,8 +258,8 @@ export class SoundHandler
 	 */
 	public playThrowSound(): void
 	{
-		if (!this.isSoundEnabled || !this.onSound) return;
-		this.playSoundEffect(this.throwSound);
+		if (!this.isSoundEnabled) return;
+		this.playSoundEffect(this.THROW_SOUND);
 	}
 
 	/**
@@ -385,35 +267,43 @@ export class SoundHandler
 	 */
 	public playWigglesound(): void
 	{
-		if (!this.isSoundEnabled || !this.onSound) return;
-		this.playSoundEffect(this.wiggleSound);
+		if (!this.isSoundEnabled) return;
+		this.playSoundEffect(this.WIGGLE_SOUND);
 	}
 
 	/**
-	 * Helper method to play a sound effect (handles cloning and cleanup)
+	 * Plays an effect from the pool for its URL.
+	 *
+	 * The 'ended' listener is registered once per play with { once: true }, and
+	 * a rejected play() still invokes onEnded so callers that chain music off
+	 * an effect are not left waiting on an event that will never fire.
 	 */
-	private playSoundEffect(sound: HTMLAudioElement, onEnded?: () => void): void
+	private playSoundEffect(path: string, onEnded?: () => void): void
 	{
-		// Clone the audio element so multiple sounds can play simultaneously
-		const soundClone = sound.cloneNode(true) as HTMLAudioElement;
-		soundClone.volume = this.sfxVolume;
+		const sound = this.getEffect(path);
+		sound.volume = this.sfxVolume;
+		sound.currentTime = 0;
 
-		const playPromise = soundClone.play();
+		let finished = false;
+		const finish = (): void =>
+		{
+			if (finished) return;
+			finished = true;
+			onEnded?.();
+		};
 
+		sound.addEventListener('ended', finish, { once: true });
+
+		const playPromise = sound.play();
 		if (playPromise !== undefined)
 		{
 			playPromise.catch((error) =>
 			{
 				console.warn('Sound effect failed to play:', error);
+				sound.removeEventListener('ended', finish);
+				finish();
 			});
 		}
-
-		// Clean up the clone after it finishes
-		soundClone.addEventListener('ended', () =>
-		{
-			soundClone.remove();
-			onEnded?.();  // Play something else if applicable
-		});
 	}
 
 	/**
@@ -422,41 +312,7 @@ export class SoundHandler
 	 */
 	public toggleSound(): boolean
 	{
-		this.isSoundEnabled = !this.isSoundEnabled;
-
-		if (!this.isSoundEnabled)
-		{
-			this.stopAllMusic();
-		}
-		else
-		{
-			// Resume whichever track was set as current
-			if (this.currentMusicTrack === this.bossMusic)
-			{
-				this.playBossMusic();
-			}
-			else if (this.currentMusicTrack === this.championMusic)
-			{
-				this.playChampionMusic();
-			}
-			else if (this.currentMusicTrack === this.backgroundMusic)
-			{
-				this.playBackgroundMusic();
-			}
-			else if (this.currentMusicTrack === this.gymMusic)
-			{
-				this.playGymMusic();
-			}
-			else if (this.currentMusicTrack === this.creditsMusic)
-			{
-				this.playCreditsMusic();
-			}
-			else if (this.currentMusicTrack === this.introMusic)
-			{
-				this.playIntroMusic();
-			}
-		}
-
+		this.setSoundEnabled(!this.isSoundEnabled);
 		return this.isSoundEnabled;
 	}
 
@@ -472,20 +328,15 @@ export class SoundHandler
 
 		if (!enabled)
 		{
+			// Pause in place; keep currentMusicPath so re-enabling resumes the
+			// same track instead of guessing at battle music.
+			const resumePath = this.currentMusicPath;
 			this.stopAllMusic();
+			this.currentMusicPath = resumePath;
+			return;
 		}
-		else
-		{
-			// Resume whichever track was set as current
-			if (this.currentMusicTrack === this.bossMusic)
-			{
-				this.playBossMusic();
-			}
-			else
-			{
-				this.playBattleMusic();
-			}
-		}
+
+		if (this.currentMusicPath) this.playMusic(this.currentMusicPath);
 	}
 
 	/**
@@ -495,15 +346,9 @@ export class SoundHandler
 	public setMusicVolume(volume: number): void
 	{
 		this.musicVolume = Math.max(0, Math.min(1, volume));
-
-		if (this.battleMusic)
+		for (const key in this.musicTracks)
 		{
-			this.battleMusic.volume = this.musicVolume;
-		}
-
-		if (this.bossMusic)
-		{
-			this.bossMusic.volume = this.musicVolume;
+			this.musicTracks[key].volume = this.musicVolume;
 		}
 	}
 
@@ -514,85 +359,41 @@ export class SoundHandler
 	public setSfxVolume(volume: number): void
 	{
 		this.sfxVolume = Math.max(0, Math.min(1, volume));
-		for (const key in this.moveSounds)
+		for (const key in this.effectPools)
 		{
-			this.moveSounds[key].volume = this.sfxVolume;
+			for (const sound of this.effectPools[key]) sound.volume = this.sfxVolume;
 		}
 	}
 
 	/**
-	 * Clean up audio resources
+	 * Release every audio element and drop its buffered data. Detaching src and
+	 * calling load() is what actually frees the decoded audio; the previous
+	 * implementation only called remove(), which does nothing for elements that
+	 * were never in the document.
 	 */
 	public cleanup(): void
 	{
 		this.stopAllMusic();
 
-		if (this.battleMusic)
+		const release = (sound: HTMLAudioElement): void =>
 		{
-			this.battleMusic.remove();
-			this.battleMusic = null;
+			sound.pause();
+			sound.removeAttribute('src');
+			sound.load();
+		};
+
+		for (const key in this.musicTracks)
+		{
+			release(this.musicTracks[key]);
+			delete this.musicTracks[key];
 		}
 
-		if (this.bossMusic)
+		for (const key in this.effectPools)
 		{
-			this.bossMusic.remove();
-			this.bossMusic = null;
+			for (const sound of this.effectPools[key]) release(sound);
+			delete this.effectPools[key];
 		}
 
-		if (this.gymMusic)
-		{
-			this.gymMusic.remove();
-			this.gymMusic = null;
-		}
-
-		if (this.backgroundMusic)
-		{
-			this.bossMusic.remove();
-			this.bossMusic = null;
-		}
-
-		if (this.championMusic)
-		{
-			this.championMusic.remove();
-			this.championMusic = null;
-		}
-
-		if (this.creditsMusic)
-		{
-			this.creditsMusic.remove();
-			this.creditsMusic = null;
-		}
-
-		if (this.introMusic)
-		{
-			this.bossMusic.remove();
-			this.bossMusic = null;
-		}
-
-		this.currentMusicTrack = null;
-
-		for (const key in this.moveSounds)
-		{
-			this.moveSounds[key].remove();
-		}
-		this.moveSounds = {};
-
-		if (this.containSound)
-		{
-			this.containSound.remove();
-			this.containSound = null;
-		}
-
-		if (this.victorySound)
-		{
-			this.victorySound.remove();
-			this.victorySound = null;
-		}
-
-		if (this.onSound)
-		{
-			this.onSound.remove();
-			this.onSound = null;
-		}
+		this.currentMusicPath = null;
 	}
 }

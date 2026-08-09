@@ -147,7 +147,7 @@ Catching is available in eligible wild encounters, with chance based primarily o
 
 Evolution is battle-count based rather than level based. When a party member reaches its threshold, its evolution is queued into a future encounter. Evolved forms remain excluded from normal wild selection until caught.
 
-Rest fully heals the party and permanently forfeits hard-mode victory eligibility after confirmation.
+Winning a wild battle heals nothing; damage persists between encounters. The only free heal is containment: successfully catching a species that is already in the party fully restores that member. Clearing a gym fully restores the party as a progression checkpoint. Rest fully heals the party and permanently forfeits hard-mode victory eligibility after confirmation, and the Enrichment Center door and faint recovery both restore to full.
 
 The Dex tracks seen/caught state, party membership, creature details, moves, evolution, and ultimate information. The Battle Simulator is a separate overlay and can also be exposed for local testing through the existing query-parameter path.
 

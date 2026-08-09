@@ -171,12 +171,14 @@ class PortalmonController
 		const onGymBattleReady: GymBattleReadyCallback = async (label) =>
 		{
 			if (this.battleTransition.isPlaying()) return;
+			// beginGymBattle has already run, so the trainer and the whole enemy
+			// party are known and their art can be warmed during the transition.
 			await this.battleTransition.play("gold", () =>
 			{
 				this.battleContext(label);
 				this.inEncounter(true);
 				this.activeOverlay("none");
-			});
+			}, [...this.combatManager.enemyArtSources(), ...this.combatManager.partyArtSources()]);
 		};
 
 		this.gymBattleManager = new GymBattleManager(this.cache, this.combatManager, onGymBattleReady, this.soundHandler);
@@ -244,6 +246,10 @@ class PortalmonController
 		this.isShowingLogo(true);
 
 		this.soundHandler.playOnSound();
+		// Power-on is the first user gesture and the logo holds the screen for
+		// several seconds, which is the right moment to fetch the effects the
+		// player will hit first. Doing it earlier would compete with page load.
+		this.soundHandler.preloadCoreEffects();
 
 		// Give the logo ~3 seconds of screen time before entering the game.
 		// Increase the timeout if the sound is longer than 3 s.
@@ -443,12 +449,16 @@ class PortalmonController
 
 		this.soundHandler.stopBackgroundMusic();
 		this.soundHandler.playBattleStartSound();
+		// The start sound chains into battle music when it ends, and that track
+		// is created with preload='none'. Warming it now means the download
+		// happens during the transition instead of after the sting finishes.
+		this.soundHandler.warmUpBattleMusic();
 
 		await this.battleTransition.play(portalColor, () =>
 		{
 			this.combatManager.beginEncounterWith(species.id);
 			this.inEncounter(true);
-		});
+		}, [species.portraitImage, ...this.combatManager.partyArtSources()]);
 	};
 
 	/** Fully restores a wiped party and returns it to the configured Enrichment Center point. */
@@ -957,8 +967,15 @@ ko.bindingHandlers["typewriter"] = {
 
 $(() =>
 {
+	// The bundle may be served on host pages that do not contain the game.
+	// ko.applyBindings with a null root binds the entire document, which walks
+	// the whole host DOM and leaves a 60fps render loop running on a page that
+	// has no canvas, so bail out before constructing anything.
+	const root = document.getElementById("portalmon");
+	if (!root) return;
+
 	const controller = new PortalmonController();
-	ko.applyBindings(controller, document.getElementById("portalmon"));
+	ko.applyBindings(controller, root);
 // Keyboard focus-trap handler for portal overlay accessibility (WAI-ARIA §2.4.7)
 (() =>
 {
@@ -980,10 +997,7 @@ $(() =>
 export class PortalmonCache
 {
 	// These are not part of cache
-	static readonly _cacheName: string = "PortalmonCache";
-	static readonly _version: number = 2;
-
-	public version: number;
+	static readonly _cacheName: string = "Portalmon2Cache";
 
 	/**
 	 * Record of caught creatures: { speciesId: count }
@@ -1065,13 +1079,8 @@ export class PortalmonCache
 			try
 			{
 				const data = JSON.parse(cachedData);
-				if (data.version !== PortalmonCache._version)
-				{
-					this.initCache();
-					return;
-				}
+
 				isNew = false;
-				this.version = data.version;
 				this.caughtCreatures = data.caughtCreatures || {};
 				this.seenCreatures = data.seenCreatures || {};
 				this.hasChosenStarter = data.hasChosenStarter || false;
@@ -1100,7 +1109,6 @@ export class PortalmonCache
 	}
 	private initCache(): void
 	{
-		this.version = PortalmonCache._version;
 		this.caughtCreatures = {};
 		this.seenCreatures = {};
 		this.hasChosenStarter = false;

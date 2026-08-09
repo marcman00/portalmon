@@ -4,7 +4,7 @@
 	<!-- ko if: badgeModalVisible() -->
 	<div class="pk-badge-modal-overlay" data-bind="click: closeBadgeModal">
 		<div class="pk-badge-modal" data-bind="click: function(){}, clickBubble: false">
-			<img class="pk-badge-modal-img" data-bind="attr: { src: badgeModalImage() }" />
+			<img class="pk-badge-modal-img" decoding="async" data-bind="attr: { src: badgeModalImage() }" />
 			<div class="pk-badge-modal-title" data-bind="text: badgeModalTitle"></div>
 			<div class="pk-badge-modal-desc" data-bind="text: badgeModalDesc"></div>
 		</div>
@@ -26,7 +26,7 @@
 				<div class="pk-portrait-badge-wrap">
 					<div class="trainer-portrait">
 						<!-- ko if: portraitImage -->
-						<img class="trainer-portrait-img"
+						<img class="trainer-portrait-img" loading="lazy" decoding="async"
 							 data-bind="attr: { src: portraitImage, alt: name }" />
 						<!-- /ko -->
 						<!-- ko ifnot: portraitImage -->
@@ -40,7 +40,7 @@
 							data-bind="css: { 'pk-badge-earned': isDefeated() },
 							           enable: isDefeated(),
 							           click: function() { $parent.showBadge($data); }">
-						<img class="pk-card-badge-img" data-bind="attr: { src: badgeImage, alt: (specialty || 'Gym') + ' badge' }" />
+						<img class="pk-card-badge-img" loading="lazy" decoding="async" data-bind="attr: { src: badgeImage, alt: (specialty || 'Gym') + ' badge' }" />
 					</button>
 					<!-- /ko -->
 				</div>
@@ -70,7 +70,7 @@
 			<div class="pk-portrait-badge-wrap pk-portrait-badge-wrap--champ">
 				<div class="champ-portrait">
 					<!-- ko if: championPortraitImage -->
-					<img class="trainer-portrait-img"
+					<img class="trainer-portrait-img" loading="lazy" decoding="async"
 						 data-bind="attr: { src: championPortraitImage }" />
 					<!-- /ko -->
 					<!-- ko ifnot: championPortraitImage -->
@@ -84,7 +84,7 @@
 						data-bind="css: { 'pk-badge-earned': isChampionshipDefeated() },
 						           enable: isChampionshipDefeated(),
 						   click: function() { $data.showBadgeFor('glados'); }">
-					<img class="pk-card-badge-img" data-bind="attr: { src: championBadgeImage, alt: 'Champion badge' }" />
+					<img class="pk-card-badge-img" loading="lazy" decoding="async" data-bind="attr: { src: championBadgeImage, alt: 'Champion badge' }" />
 				</button>
 				<!-- /ko -->
 			</div>
@@ -153,7 +153,7 @@
 			<div class="pk-portrait-badge-wrap pk-portrait-badge-wrap--secret">
 				<div class="secret-portrait">
 					<!-- ko if: secretPortraitImage -->
-					<img class="trainer-portrait-img"
+					<img class="trainer-portrait-img" loading="lazy" decoding="async"
 						 data-bind="attr: { src: secretPortraitImage, alt: secretName }" />
 					<!-- /ko -->
 					<!-- ko ifnot: secretPortraitImage -->
@@ -165,7 +165,7 @@
 				<button type="button"
 						class="pk-card-badge pk-card-badge--medallion pk-card-badge--secret pk-badge-earned"
 						data-bind="click: function() { $data.showBadgeFor('rey'); }">
-					<img class="pk-card-badge-img" data-bind="attr: { src: secretBadgeImage, alt: 'Developer badge' }" />
+					<img class="pk-card-badge-img" loading="lazy" decoding="async" data-bind="attr: { src: secretBadgeImage, alt: 'Developer badge' }" />
 				</button>
 				<!-- /ko -->
 			</div>

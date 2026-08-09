@@ -26,6 +26,9 @@
     overflow: hidden;
     background: #67b94c;
     box-shadow: 0 0 18px rgba(0, 0, 0, 0.8);
+    // Keeps the 60fps canvas from invalidating layout or paint outside the
+    // stage, which matters on a host page with a much larger surrounding DOM.
+    contain: layout paint;
 }
 
 .pk-overworld-canvas {
@@ -34,6 +37,10 @@
     height: 100%;
     image-rendering: pixelated;
     image-rendering: crisp-edges;
+    // Promote to its own compositor layer so the scanline overlay and bezel
+    // above it composite on the GPU instead of repainting every frame.
+    transform: translateZ(0);
+    will-change: transform;
 }
 
 .pk-overworld-hud {

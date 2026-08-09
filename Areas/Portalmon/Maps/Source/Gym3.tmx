@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="38" height="36" tilewidth="16" tileheight="16" infinite="0" nextlayerid="8" nextobjectid="123">
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="38" height="36" tilewidth="16" tileheight="16" infinite="0" nextlayerid="8" nextobjectid="124">
  <tileset firstgid="1" source="pokemon.tsx"/>
  <tileset firstgid="1317" source="PortalTileset.tsx"/>
  <tileset firstgid="1321" source="indoortileset.tsx"/>
@@ -67,7 +67,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,1317,0,0,0,0,0,0,0,0,0,0,1318,0,0,0,0,0,0,0,1317,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1317,0,0,0,0,0,0,0,1317,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1317,0,0,0,0,0,0,0,1317,0,0,0,0,1317,0,1318,0,1319,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,1317,0,1317,0,1317,0,1317,0,0,0,1317,0,1318,0,1317,0,1318,0,1317,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -85,6 +85,9 @@
 </data>
  </layer>
  <layer id="3" name="Obstacles" width="38" height="36">
+  <properties>
+   <property name="walkable" type="bool" value="false"/>
+  </properties>
   <data encoding="csv">
 319,320,320,320,320,320,320,320,320,320,320,320,320,320,320,320,320,320,320,320,320,320,320,320,320,320,320,320,348,348,349,349,349,349,349,349,349,349,
 347,348,348,348,348,348,348,348,348,349,349,349,349,348,348,348,348,348,348,348,348,348,348,348,348,349,348,348,348,348,348,348,349,349,349,349,349,349,
@@ -107,7 +110,7 @@
 347,348,348,348,349,0,0,0,0,0,0,0,0,0,347,349,0,0,0,0,0,0,0,0,0,347,348,348,348,349,349,348,348,348,348,348,349,349,
 347,348,348,348,349,0,108,0,0,0,0,0,0,0,403,404,0,108,0,0,0,0,0,108,0,347,348,348,348,349,349,348,348,348,348,348,349,349,
 347,348,348,348,349,0,0,0,0,108,0,0,0,0,431,432,0,0,0,0,108,0,0,0,0,347,348,348,0,0,0,0,0,0,0,348,349,349,
-347,348,348,348,349,0,0,0,0,0,0,0,0,0,347,349,0,108,0,0,0,0,0,108,0,347,348,348,0,1317,0,1318,0,1319,0,348,349,349,
+347,348,348,348,349,0,0,0,0,0,0,0,0,0,347,349,0,108,0,0,0,0,0,108,0,347,348,348,0,0,0,0,0,0,0,348,349,349,
 347,348,348,348,349,320,320,320,320,320,320,320,320,320,347,349,320,320,320,320,320,320,320,320,320,347,348,348,0,108,0,108,0,108,0,348,349,349,
 347,348,348,348,349,376,376,376,376,376,376,376,376,376,347,349,376,376,376,376,376,376,376,376,376,347,348,348,0,0,0,0,0,0,0,348,349,349,
 347,348,348,348,349,0,0,0,0,0,0,0,0,0,403,404,0,0,0,0,0,0,0,0,0,347,348,348,0,0,0,108,0,0,0,348,349,349,
@@ -432,7 +435,6 @@
   </object>
  </objectgroup>
  <objectgroup color="#55ff00" id="5" name="Warp">
-  <object id="64" x="256" y="208" width="16" height="16"/>
   <object id="66" x="96" y="384" width="16" height="16">
    <properties>
     <property name="map" value="gym3"/>
@@ -691,6 +693,12 @@
     <property name="spawn" value="gym3-exit"/>
    </properties>
   </object>
+  <object id="123" x="256" y="208" width="16" height="16">
+   <properties>
+    <property name="map" value="gym3"/>
+    <property name="spawn" value="gym3-start-over"/>
+   </properties>
+  </object>
  </objectgroup>
  <objectgroup color="#ff00ff" id="6" name="Spawns">
   <object id="65" x="144" y="512" width="16" height="16">
@@ -700,7 +708,7 @@
   </object>
   <object id="104" x="144" y="336" width="16" height="16">
    <properties>
-    <property name="spawn" value="gym-trial2"/>
+    <property name="spawn" value="gym3-trial2"/>
    </properties>
   </object>
   <object id="105" x="144" y="208" width="16" height="16">
@@ -710,17 +718,17 @@
   </object>
   <object id="106" x="320" y="208" width="16" height="16">
    <properties>
-    <property name="spawn" value="gym-trial4"/>
+    <property name="spawn" value="gym3-trial4"/>
    </properties>
   </object>
   <object id="107" x="320" y="336" width="16" height="16">
    <properties>
-    <property name="spawn" value="gym-trial5"/>
+    <property name="spawn" value="gym3-trial5"/>
    </properties>
   </object>
   <object id="108" x="320" y="464" width="16" height="16">
    <properties>
-    <property name="spawn" value="gym-trial6"/>
+    <property name="spawn" value="gym3-trial6"/>
    </properties>
   </object>
   <object id="109" x="144" y="544" width="16" height="16">
@@ -730,12 +738,12 @@
   </object>
   <object id="114" x="496" y="400" width="16" height="16">
    <properties>
-    <property name="spawn" value="gym-trial7"/>
+    <property name="spawn" value="gym3-trial7"/>
    </properties>
   </object>
   <object id="115" x="464" y="256" width="16" height="16">
    <properties>
-    <property name="spawn" value="gym-trial8"/>
+    <property name="spawn" value="gym3-trial8"/>
    </properties>
   </object>
  </objectgroup>

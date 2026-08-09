@@ -9,7 +9,7 @@
 			 data-bind="click: function() { dm.selectCreature($data); },
 			            attr: { title: species.name }">
 			<!-- ko if: species.portraitImage -->
-			<img class="pk-dex-party-slot-img" data-bind="attr: { src: species.portraitImage, alt: species.name }" />
+			<img class="pk-dex-party-slot-img" decoding="async" data-bind="attr: { src: species.portraitImage, alt: species.name }" />
 			<!-- /ko -->
 			<!-- ko ifnot: species.portraitImage -->
 			<span class="pk-dex-party-slot-label" data-bind="text: species.name.substring(0, 3).toUpperCase()"></span>
@@ -79,7 +79,7 @@
 
 							<div class="pk-dex-card-portrait">
 								<!-- ko if: isCaught() && species.portraitImage -->
-								<img class="pk-dex-card-img" data-bind="attr: { src: species.portraitImage, alt: species.name }" />
+								<img class="pk-dex-card-img" loading="lazy" decoding="async" data-bind="attr: { src: species.portraitImage, alt: species.name }" />
 								<!-- /ko -->
 								<!-- ko if: isCaught() && !species.portraitImage -->
 								<span class="pk-dex-card-fallback" data-bind="text: species.name.substring(0, 2).toUpperCase()"></span>
@@ -148,7 +148,7 @@
 
 					<div class="pk-dex-detail-portrait mb-2">
 						<!-- ko if: isCaught() && detailSpriteSrc() -->
-						<img class="pk-dex-detail-img" data-bind="attr: { src: detailSpriteSrc(), alt: species.name }" />
+						<img class="pk-dex-detail-img" decoding="async" data-bind="attr: { src: detailSpriteSrc(), alt: species.name }" />
 						<!-- /ko -->
 						<!-- ko if: isCaught() && !detailSpriteSrc() -->
 						<span class="pk-dex-detail-portrait-fallback" data-bind="text: species.name.substring(0, 2).toUpperCase()"></span>

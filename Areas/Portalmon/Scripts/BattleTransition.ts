@@ -1,4 +1,5 @@
 import { wait } from "./HelperFunctions";
+import { preloadImages } from "./AssetPreloader";
 
 export type TransitionColor = "blue" | "orange" | "gold" | "red";
 
@@ -95,11 +96,23 @@ export class BattleTransition
 
 	/**
 	 * Plays the full transition sequence.
-	 * @param color   Portal color (drives flash tint + vortex particles)
-	 * @param onBlack Called during the black hold — start the battle here
+	 *
+	 * @param color        Portal color (drives flash tint + vortex particles)
+	 * @param onBlack      Called during the black hold — start the battle here
+	 * @param preloadArt   Image URLs the battlefield is about to show. They are
+	 *                     fetched and decoded while the flash, vortex, and iris
+	 *                     play, and the iris does not open until they are ready
+	 *                     or the preloader's own timeout gives up. Without this
+	 *                     the browser starts loading trainer and creature art
+	 *                     only when `onBlack` binds it, so the art pops in after
+	 *                     the battlefield is already visible.
 	 */
-	public async play(color: TransitionColor, onBlack: () => void): Promise<void>
+	public async play(color: TransitionColor, onBlack: () => void, preloadArt: readonly (string | undefined | null)[] = []): Promise<void>
 	{
+		// Started before the first phase so the whole animation doubles as
+		// loading time. Never rejects, so it needs no guard here.
+		const artReady = preloadImages(preloadArt);
+
 		this.portalColor(color);
 		this.phase("flash");
 		await wait(400);
@@ -111,7 +124,10 @@ export class BattleTransition
 		await wait(600);
 		this.phase("black");
 		onBlack();
-		await wait(400);
+		// The black hold keeps its minimum length and absorbs whatever decode
+		// time is left, so a fast load is not slowed down and a slow one does
+		// not reveal half-painted sprites.
+		await Promise.all([wait(400), artReady]);
 		this.phase("iris-open");
 		await wait(600);
 		this.phase("intro");

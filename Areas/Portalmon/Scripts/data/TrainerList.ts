@@ -69,6 +69,7 @@ export const TrainerDefs: Record<string, TrainerDef> = {
 		winQuote: "Don't hang your head. You're better than when you walked in.",
 		transitionColor: "gold",
 		specialty: "Availability",
+		mapIntro: "You made it to my gym. Now let's find out whether you belong in it.",
 
 		badgeImage: "/Areas/Portalmon/Content/Images/Badges/Coach.png",	},
 

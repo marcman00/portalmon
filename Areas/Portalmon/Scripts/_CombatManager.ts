@@ -739,13 +739,15 @@ export class CombatManager
 				this.dexManager.refreshFromCache();
 			}
 
+			// The only heal the player gets for free. Containing a species that
+			// is already in the party fully restores that member; nothing else
+			// on the team recovers, here or after any other battle.
 			const partyMember = this.playerParty().find(p => p.speciesId === enemySpeciesId);
 			if (partyMember)
 			{
 				partyMember.hpCurrent(partyMember.hpMax);
 				this.addLog(`${partyMember.name} was fully restored!`);
 			}
-			this.healBenchedPartyPercent(20);
 
 			this.addLog(`${this.enemyActive().name} contained successfully.`);
 			this.endBattle("contain");
@@ -759,27 +761,6 @@ export class CombatManager
 
 		this.isBusy(false);
 	};
-
-	/** Heals benched party members (everyone except the current active creature) by a percentage */
-	private healBenchedPartyPercent(percent: number): void
-	{
-		const activeId = this.playerActive()?.id;
-		for (const member of this.playerParty())
-		{
-			if (member.id === activeId) continue;
-
-			const healAmount = Math.floor(member.hpMax * percent / 100);
-			if (healAmount <= 0) continue;
-
-			const oldHp = member.hpCurrent();
-			const newHp = Math.min(member.hpMax, oldHp + healAmount);
-			if (newHp > oldHp)
-			{
-				member.hpCurrent(newHp);
-				this.addLog(`${member.name} recovered ${newHp - oldHp} HP.`);
-			}
-		}
-	}
 
 
 	// =========================================
@@ -1135,6 +1116,42 @@ export class CombatManager
 	}
 
 	// =========================================
+	// BATTLE ART SOURCES
+	// =========================================
+
+	/**
+	 * Every image the battlefield binds for the player's side. The battle
+	 * transition preloads these so a swap mid-battle is instant too, not only
+	 * the creature that is sent out first.
+	 */
+	public partyArtSources(): string[]
+	{
+		const sources: string[] = [];
+		for (const member of this.playerParty())
+		{
+			if (member.behindImage) sources.push(member.behindImage);
+			if (member.portraitImage) sources.push(member.portraitImage);
+		}
+		return sources;
+	}
+
+	/**
+	 * Every image the battlefield binds for the enemy side. Only meaningful
+	 * once the battle has been set up, so gym callers must invoke it after
+	 * beginGymBattle. A wild encounter has no enemy yet when its transition
+	 * starts and passes the species art directly instead.
+	 */
+	public enemyArtSources(): string[]
+	{
+		const sources: string[] = [this.trainerBattleImage(), this.trainerPortrait()];
+		for (const enemy of this.gymEnemyParty)
+		{
+			if (enemy.portraitImage) sources.push(enemy.portraitImage);
+		}
+		return sources.filter(source => !!source);
+	}
+
+	// =========================================
 	// BATTLE STATE
 	// =========================================
 
@@ -1165,9 +1182,10 @@ export class CombatManager
 			}
 			else
 			{
-				// All gym enemies defeated
+				// All gym enemies defeated. Clearing a gym is the one battle
+				// outcome that still restores the party, as a progression
+				// checkpoint; ordinary wild wins now heal nothing.
 				this.healPartyPercent(100);
-				this.healBenchedPartyPercent(20);
 				this.endBattle("gym-win");
 				this.savePartyHealth();
 				if (this.gymVictoryCallback)
@@ -1181,8 +1199,9 @@ export class CombatManager
 		}
 		else
 		{
-			this.healPartyPercent(50);
-			this.healBenchedPartyPercent(20);
+			// Winning a wild battle carries no recovery. Damage persists until
+			// the player contains that species, clears a gym, rests, or reaches
+			// the Enrichment Center.
 			this.endBattle("win");
 			return false;
 		}
@@ -1218,7 +1237,7 @@ export class CombatManager
 		{
 			case "win":
 				this.announcerLine("VICTORY. SYSTEM STABLE.");
-				this.footerHint("Battle complete. Party recovered 50% HP + bench recovered 20% HP.");
+				this.footerHint("Battle complete. Your Portalmon keep the damage they took.");
 				break;
 			case "gym-win":
 				// Show trainer lose reaction with portrait
@@ -1228,11 +1247,11 @@ export class CombatManager
 					this.trainerDialogue(this.gymDefeatQuote);
 				}
 				this.announcerLine(`${this.gymTrainerName}: "${this.gymDefeatQuote}"`);
-				this.footerHint(`${this.gymBattleLabel()} — cleared! Party recovered 100% HP + bench recovered 20% HP.`);
+				this.footerHint(`${this.gymBattleLabel()} — cleared! Party fully restored.`);
 				break;
 			case "contain":
 				this.announcerLine("CONTAINMENT CONFIRMED.");
-				this.footerHint(`${this.enemyActive().name} added to the Containment Deck and fully healed + bench recovered 20% HP. Press DEX to add it to your Global Buffer (bench).`);
+				this.footerHint(`${this.enemyActive().name} added to the Containment Deck and fully healed. Press DEX to add it to your Global Buffer (bench).`);
 				break;
 			case "run":
 				this.announcerLine("Got away safely!");
