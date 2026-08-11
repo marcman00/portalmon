@@ -21,6 +21,21 @@
 				<div class="gba-speaker-dot"></div>
 				<div class="gba-speaker-dot"></div>
 			</div>
+
+			<!-- Battery meter — one segment drains per encounter, recharges on a timer -->
+			<div class="gba-battery" role="img"
+				 data-bind="visible: isPoweredOn(),
+							attr: {
+								title: 'Battery ' + Math.round(batteryPercent()) + '%',
+								'aria-label': 'Battery ' + Math.round(batteryPercent()) + ' percent'
+							}">
+				<div class="gba-battery-body">
+					<div class="gba-battery-fill"
+						 data-bind="style: { width: batteryPercent() + '%' },
+									css: { 'gba-battery-fill--low': isBatteryLow() }"></div>
+				</div>
+				<div class="gba-battery-cap"></div>
+			</div>
 		</div>
 
 		<!-- ===== SINGLE FLEX ROW: [left controls] [screen] [right controls] ===== -->

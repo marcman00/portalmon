@@ -133,6 +133,9 @@ class PortalmonController
 	/** True when the battery is fully depleted and recharging */
 	public isBatteryDepleted: KnockoutComputed<boolean>;
 
+	/** True when one encounter's worth of charge or less remains — turns the shell meter red */
+	public isBatteryLow: KnockoutComputed<boolean>;
+
 	/** The current depleted-screen message (randomly selected when battery hits 0) */
 	public depletedMessage: KnockoutObservable<{ text: string; showGlados: boolean }> = ko.observable({ text: "", showGlados: false });
 
@@ -230,6 +233,11 @@ class PortalmonController
 		});
 
 		this.isBatteryDepleted = ko.pureComputed(() => this.batteryPercent() <= 0);
+		// Derived from the segment size rather than a fixed 10 so the warning
+		// still means "last encounter" if MAX_ENCOUNTERS changes. The epsilon
+		// absorbs float drift, since 100 / 9 does not divide evenly.
+		this.isBatteryLow = ko.pureComputed(() =>
+			this.batteryPercent() <= PortalmonController.DRAIN_PER_ENCOUNTER + 1e-9);
 		this.initBattery();
 	}
 
@@ -286,7 +294,7 @@ class PortalmonController
 	/** Battles won/caught while a creature is in the party to unlock its evolution */
 	private static readonly BATTLES_TO_EVOLVE = 3;
 	/** Maximum encounters on a full battery */
-	private static readonly MAX_ENCOUNTERS = 10;
+	private static readonly MAX_ENCOUNTERS = 9;
 	/** Battery drain per encounter (percentage points) */
 	private static readonly DRAIN_PER_ENCOUNTER = 100 / PortalmonController.MAX_ENCOUNTERS;
 	/** Recharge interval: gain one segment every (60/MAX_ENCOUNTERS) minutes */
@@ -342,29 +350,18 @@ class PortalmonController
 	 *     work identically to beginEncounter().
 	 */
 
-	private _batteryTimer: ReturnType<typeof setInterval> | null = null;
+	private _batteryTimer: ReturnType<typeof setTimeout> | null = null;
 
 	/**
 	 * Initialises battery state from cache.
-	 * Applies any recharge that accrued while the page was closed, then starts the tick.
+	 * Applies any recharge that accrued while the page was closed, then arms the tick.
 	 */
 	private initBattery = (): void =>
 	{
-		// Apply offline recharge
-		if (this.cache.lastRechargeTime > 0 && this.cache.batteryPercent < 100)
-		{
-			const elapsed = Date.now() - this.cache.lastRechargeTime;
-			const segments = Math.floor(elapsed / PortalmonController.RECHARGE_INTERVAL_MS);
-			if (segments > 0)
-			{
-				this.cache.batteryPercent = Math.min(100, this.cache.batteryPercent + segments * PortalmonController.DRAIN_PER_ENCOUNTER);
-				this.cache.lastRechargeTime = Date.now();
-				this.cache.saveCache();
-			}
-		}
+		if (this.applyRecharge()) this.cache.saveCache();
 		this.batteryPercent(this.cache.batteryPercent);
 		if (this.cache.batteryPercent <= 0) this.pickDepletedMessage();
-		this.startBatteryTick();
+		this.scheduleBatteryTick();
 	};
 
 	/**
@@ -405,39 +402,64 @@ class PortalmonController
 		this.cache.saveCache();
 		this.batteryPercent(newPct);
 		if (newPct <= 0) this.pickDepletedMessage();
+		this.scheduleBatteryTick();
 	};
 
 	/**
-	 * Ticks every second to apply gradual recharge.
+	 * Applies whole recharge segments accrued since lastRechargeTime.
+	 * Returns true when persisted state changed and the caller should save.
 	 */
-	private startBatteryTick = (): void =>
+	private applyRecharge = (): boolean =>
 	{
-		if (this._batteryTimer) clearInterval(this._batteryTimer);
-
-		this._batteryTimer = setInterval(() =>
+		if (this.cache.batteryPercent >= 100)
 		{
-			if (this.cache.batteryPercent >= 100)
-			{
-				this.cache.lastRechargeTime = 0;
-				this.cache.saveCache();
-				this.batteryPercent(100);
-				return;
-			}
+			if (this.cache.lastRechargeTime === 0) return false;
+			this.cache.lastRechargeTime = 0;
+			return true;
+		}
 
-			if (this.cache.lastRechargeTime <= 0) return;
+		if (this.cache.lastRechargeTime <= 0) return false;
 
-			const elapsed = Date.now() - this.cache.lastRechargeTime;
-			if (elapsed >= PortalmonController.RECHARGE_INTERVAL_MS)
-			{
-				const segments = Math.floor(elapsed / PortalmonController.RECHARGE_INTERVAL_MS);
-				const newPct = Math.min(100, this.cache.batteryPercent + segments * PortalmonController.DRAIN_PER_ENCOUNTER);
-				this.cache.batteryPercent = newPct;
-				this.cache.lastRechargeTime = Date.now();
-				this.cache.saveCache();
-				this.batteryPercent(newPct);
+		const elapsed = Date.now() - this.cache.lastRechargeTime;
+		const segments = Math.floor(elapsed / PortalmonController.RECHARGE_INTERVAL_MS);
+		if (segments <= 0) return false;
 
-			}
-		}, 1000);
+		this.cache.batteryPercent = Math.min(100, this.cache.batteryPercent + segments * PortalmonController.DRAIN_PER_ENCOUNTER);
+		// Advance by whole segments so the leftover remainder still counts toward
+		// the next one instead of being forfeited on every catch-up.
+		this.cache.lastRechargeTime += segments * PortalmonController.RECHARGE_INTERVAL_MS;
+		if (this.cache.batteryPercent >= 100) this.cache.lastRechargeTime = 0;
+		return true;
+	};
+
+	/**
+	 * Recharge is a pure function of lastRechargeTime and the clock, so there is
+	 * nothing to poll for. Arm a single timeout for the next segment boundary and
+	 * let it reschedule itself; nothing is armed while the battery is full.
+	 * Applying segments from elapsed time keeps a late timer (laptop sleep,
+	 * background-tab throttling) self-correcting.
+	 */
+	private scheduleBatteryTick = (): void =>
+	{
+		if (this._batteryTimer)
+		{
+			clearTimeout(this._batteryTimer);
+			this._batteryTimer = null;
+		}
+
+		if (this.cache.batteryPercent >= 100 || this.cache.lastRechargeTime <= 0) return;
+
+		const interval = PortalmonController.RECHARGE_INTERVAL_MS;
+		const elapsed = Date.now() - this.cache.lastRechargeTime;
+		const wait = Math.max(0, interval - (elapsed % interval));
+
+		this._batteryTimer = setTimeout(() =>
+		{
+			this._batteryTimer = null;
+			if (this.applyRecharge()) this.cache.saveCache();
+			this.batteryPercent(this.cache.batteryPercent);
+			this.scheduleBatteryTick();
+		}, wait);
 	};
 
 	private initiateWildEncounter = async (species: SpeciesDef, portalColor: TransitionColor = "blue"): Promise<void> =>
@@ -584,9 +606,14 @@ class PortalmonController
 			normling: "Normling is adaptable, dependable, and almost aggressively normal. A suspicious quality.",
 			ressie: "Ressie is resilient, curious, and difficult to discourage. I have tried.",
 		};
+		// SpeciesDef carries creatureDescription, not description. Any species
+		// without a blurb falls through to the bare prompt rather than
+		// interpolating "undefined" into the line.
+		const blurb = descriptions[species.id] ?? species.creatureDescription;
+
 		this.overworldManager.dialogue.openChoice({
 			speaker: "GLaDOS",
-			lines: [`${descriptions[species.id] ?? species.description} Choose ${species.name}?`],
+			lines: [blurb ? `${blurb} Choose ${species.name}?` : `Choose ${species.name}?`],
 		}, [
 			{ label: "YES", action: () => this.chooseStarterFromPortal(species) },
 			{ label: "NO", action: () => this.overworldManager.dialogue.open({ speaker: "GLaDOS", lines: ["Caution. How novel. The other portals remain available."] }) },

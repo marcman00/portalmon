@@ -285,6 +285,49 @@
     }
 }
 
+// Shell battery meter. Sits in the top-right corner, after the speaker.
+// The auto margin that right-aligns the group stays on .gba-speaker so the
+// layout holds when this element is hidden with the device powered off.
+.gba-battery {
+    margin-left: 10px;
+    display: flex;
+    align-items: center;
+    gap: 1px;
+    flex-shrink: 0;
+}
+
+.gba-battery-body {
+    width: 28px;
+    height: 13px;
+    border: 1.5px solid var(--gba-shell-label);
+    border-radius: 3px;
+    padding: 1.5px;
+    display: flex;
+    align-items: stretch;
+    overflow: hidden;
+    opacity: 0.85;
+}
+
+.gba-battery-fill {
+    min-width: 0;
+    border-radius: 1.5px;
+    background: var(--color-green, #28a745);
+    transition: width 400ms ease, background 300ms ease;
+}
+
+// Red once the last segment is all that's left.
+.gba-battery-fill--low {
+    background: var(--color-red, #dc3545);
+}
+
+.gba-battery-cap {
+    width: 2px;
+    height: 5px;
+    border-radius: 0 1.5px 1.5px 0;
+    background: var(--gba-shell-label);
+    opacity: 0.85;
+}
+
 .gba-speaker {
     margin-left: auto;
     display: grid;
