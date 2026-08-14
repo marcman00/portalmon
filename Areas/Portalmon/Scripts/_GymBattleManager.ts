@@ -18,8 +18,8 @@ interface GymBattleStateData
 
 class GymBattleState
 {
-	private static readonly _key = "PortalKombatGymState";
-	private static readonly _version = 3;
+	private static readonly _key = "PortalmonGym";
+	private static readonly _version = 1;
 
 	public defeats: Record<string, boolean>;
 	public championDefeated: boolean;

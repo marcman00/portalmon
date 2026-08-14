@@ -1,4 +1,5 @@
 import { OverworldDialogue } from "./OverworldDialogue";
+import { perfProbe } from "./PerfProbe";
 import {
 	MapInteractionDef,
 	MapNpcDef,
@@ -141,6 +142,8 @@ export class OverworldManager
 	private lastCanvas: HTMLCanvasElement | null = null;
 	private lastContext: CanvasRenderingContext2D | null = null;
 	private lastDatasetValues: string = "";
+	private sortedNpcs: MapNpcDef[] = [];
+	private sortedNpcsMapId: OverworldMapId | null = null;
 	private frameHandle: number | null = null;
 	private idleTimer: number | null = null;
 	private disposed: boolean = false;
@@ -202,7 +205,9 @@ export class OverworldManager
 				this.dialogue.moveChoice(direction === "left" || direction === "up" ? -1 : 1);
 			return true;
 		}
-		if (!this.canAcceptMovement()) return true;
+		const accepted = this.canAcceptMovement();
+		if (perfProbe.enabled) perfProbe.markInput(accepted);
+		if (!accepted) return true;
 		this.pointerHeld.add(direction);
 		this.tryStartMove(performance.now(), direction);
 		return true;
@@ -334,7 +339,9 @@ export class OverworldManager
 			}
 			return;
 		}
-		if (!this.canAcceptMovement()) return;
+		const accepted = this.canAcceptMovement();
+		if (perfProbe.enabled && !event.repeat) perfProbe.markInput(accepted);
+		if (!accepted) return;
 		event.preventDefault();
 		this.keyboardHeld.add(direction);
 		this.tryStartMove(performance.now(), direction);
@@ -431,6 +438,7 @@ export class OverworldManager
 	{
 		this.frameHandle = null;
 		let drew = false;
+		const probing = perfProbe.enabled;
 		try
 		{
 			const canvas = this.resolveCanvas();
@@ -444,8 +452,10 @@ export class OverworldManager
 			this.updateMovement(now);
 			if (canvas && this.isInputEnabled())
 			{
+				const drawStartedAt = probing ? performance.now() : 0;
 				this.draw(canvas, now);
 				drew = true;
+				if (probing) perfProbe.recordDraw(performance.now() - drawStartedAt, canvas);
 			}
 		}
 		catch (error)
@@ -455,6 +465,7 @@ export class OverworldManager
 		}
 		finally
 		{
+			if (probing) perfProbe.recordFrame(now, drew);
 			this.scheduleNextFrame(drew);
 		}
 	};
@@ -651,30 +662,47 @@ export class OverworldManager
 		this.drawTerrain(context, camera, map);
 		this.drawObjects(context, camera, map);
 		const actorsReady = this.areMapAssetsReady(map);
-		this.publishDebugState(canvas, camera, map, actorsReady);
+		if (perfProbe.publishDataset) this.publishDebugState(canvas, camera, map, actorsReady);
 		if (!actorsReady)
 		{
 			this.mapInputReady = false;
 			return;
 		}
 
-		const actors: Array<{ y: number; draw: () => void }> = [
-			{ y: renderPlayer.y, draw: () => this.drawPlayer(context, now, renderPlayer, camera) },
-			...map.npcs.map(npc => ({
-				y: npc.position.y,
-				draw: () => this.drawNpc(context, camera, map, npc),
-			})),
-		];
-		actors.sort((left, right) => left.y - right.y);
-		for (const actor of actors) actor.draw();
+		// Painter's order by feet. NPC positions are static per map, so the
+		// sorted list is cached and only the player has to be placed each frame.
+		// The previous form allocated an array plus one closure per NPC every
+		// frame; that is invisible locally and shows up as GC pressure against a
+		// host page with a much larger retained heap.
+		const npcs = this.getSortedNpcs(map);
+		let playerDrawn = false;
+		for (const npc of npcs)
+		{
+			if (!playerDrawn && renderPlayer.y <= npc.position.y)
+			{
+				this.drawPlayer(context, now, renderPlayer, camera);
+				playerDrawn = true;
+			}
+			this.drawNpc(context, camera, map, npc);
+		}
+		if (!playerDrawn) this.drawPlayer(context, now, renderPlayer, camera);
 		this.mapInputReady = true;
+	}
+
+	/** NPCs sorted by their draw order, rebuilt only when the map changes. */
+	private getSortedNpcs(map: OverworldMapDef): readonly MapNpcDef[]
+	{
+		if (this.sortedNpcsMapId === map.id) return this.sortedNpcs;
+		this.sortedNpcs = map.npcs.slice().sort((left, right) => left.position.y - right.position.y);
+		this.sortedNpcsMapId = map.id;
+		return this.sortedNpcs;
 	}
 
 	/**
 	 * Mirrors the camera and readiness state onto the canvas for debugging.
-	 * Written only when a value actually changes: an unconditional write is
-	 * four attribute mutations per frame, and every MutationObserver on the
-	 * host page has to run against each one.
+	 * Only written while the profiler is enabled. The camera changes every frame
+	 * during movement, so these are four attribute mutations per frame, and on a
+	 * real host page every registered MutationObserver runs against each one.
 	 */
 	private publishDebugState(
 		canvas: HTMLCanvasElement,
