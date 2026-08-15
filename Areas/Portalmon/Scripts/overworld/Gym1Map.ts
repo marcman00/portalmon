@@ -26,7 +26,7 @@ export const GYM1_MAP: OverworldMapDef = {
 	backgroundColor: "#051526",
 	defaultSpawn: { x: 8, y: 38 },
 	defaultFacing: "up",
-	statusText: "Ice Gym · keep moving on ice",
+	statusText: "Ice Gym - keep moving on ice",
 	tilesets: GYM1_TILESETS.map(tileset => ({
 		...tileset,
 		imagePath: tileset.imagePath === "/indoortileset.png"
@@ -38,7 +38,6 @@ export const GYM1_MAP: OverworldMapDef = {
 					: portalTilesetImagePath,
 	})),
 	tileLayers: GYM1_TILE_LAYERS,
-	objects: [],
 	collisionRects: GYM1_COLLISION_RECTS,
 	collisionPoints: [],
 	encounterZones: GYM1_WILD_ZONES,

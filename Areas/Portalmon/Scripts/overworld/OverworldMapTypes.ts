@@ -29,16 +29,6 @@ export interface MapEncounterZone extends MapPoint
 	height: number;
 }
 
-export interface MapObjectDef
-{
-	atlasIndex: number;
-	position: MapPoint;
-	width: number;
-	height: number;
-	offsetX?: number;
-	offsetY?: number;
-}
-
 export interface MapWarpDef
 {
 	position: MapPoint;
@@ -125,7 +115,7 @@ export interface MapNpcDef
 	afterBattleDialogue?: DialogueSequence;
 	/** Omit when the actor is already drawn into the map's background image. */
 	spritePath?: string;
-	/** Zero-based, row-major tile in a 16×16 NPC sprite sheet. */
+	/** Zero-based, row-major tile in a 16x16 NPC sprite sheet. */
 	spriteTileIndex?: number;
 	/** Transparent pixels separating sprite-sheet rows. */
 	spriteRowGap?: number;
@@ -142,15 +132,12 @@ export interface OverworldMapDef
 	defaultSpawn: MapPoint;
 	defaultFacing: WalkDirection;
 	statusText: string;
-	/** Static precomposed map image. When set, tileAt is not used. */
+	/** Static precomposed map image. Takes precedence over tileLayers. */
 	backgroundImagePath?: string;
-	/** Atlas tile lookup for legacy/small maps such as interiors. */
-	tileAt?: (x: number, y: number) => number;
 	/** TMX tile layers, rendered in source order when a precomposed image is unavailable. */
 	tileLayers?: number[][];
 	/** TMX tilesets, in the same order they are declared by the source map. */
 	tilesets?: MapTilesetDef[];
-	objects: MapObjectDef[];
 	collisionRects: MapCollisionRect[];
 	collisionPoints: MapCollisionPoint[];
 	/** Tiles that may start a random wild encounter after a completed movement step. */

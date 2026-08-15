@@ -1,9 +1,9 @@
-﻿import { SoundHandler } from "./SoundManager";
+import { SoundHandler } from "./SoundManager";
 
 /**
- * CatchAnimator — drives the Portalmon catch-ball animation sequence.
+ * CatchAnimator - drives the Portalmon catch-ball animation sequence.
  *
- * ─── WIRING REQUIRED ────────────────────────────────────────────────────────
+ * --- WIRING REQUIRED --------------------------------------------------------
  *
  * 1. Add to PortalmonController:
  *
@@ -19,7 +19,7 @@
  *
  * 2. Add to CombatManager:
  *
- *      // Pure roll — same catch-rate logic as contain(), NO side effects.
+ *      // Pure roll - same catch-rate logic as contain(), NO side effects.
  *      public computeCatchResult(): boolean { ... }
  *
  *      // Apply the pre-rolled result: update dex/party, announcer, end battle or
@@ -31,7 +31,7 @@
  *                         enable: canAct() && canContain() && !$root.catchAnim.isActive()
  *      - Enemy sprite:    add  data-bind="visible: !$root.catchAnim.isActive() || $root.catchAnim.enemyVisible()"
  *      - Ball element:    add inside .pk-battlefield (see Encounter.cshtml)
- * ────────────────────────────────────────────────────────────────────────────
+ * ----------------------------------------------------------------------------
  */
 export class CatchAnimator
 {
@@ -39,7 +39,7 @@ export class CatchAnimator
 	public isActive: KnockoutObservable<boolean> = ko.observable(false);
 
 	/**
-	 * Current animation phase — bound to CSS classes on the ball element.
+	 * Current animation phase - bound to CSS classes on the ball element.
 	 * 'idle' | 'flying' | 'absorbing' | 'wiggling' | 'settling' | 'caught' | 'escaped'
 	 */
 	public phase: KnockoutObservable<string> = ko.observable('idle');
@@ -64,7 +64,7 @@ export class CatchAnimator
 	 * Plays the full animation sequence then resolves.
 	 * Call applyCatchResult() after this promise resolves.
 	 *
-	 * @param wiggles  0–2 wiggles before resolution
+	 * @param wiggles  0-2 wiggles before resolution
 	 * @param caught   Whether the catch succeeds
 	 */
 	public play = async (wiggles: number, caught: boolean, sh: SoundHandler): Promise<void> =>
@@ -78,17 +78,17 @@ export class CatchAnimator
 		await this.delay(80);
 		sh.playThrowSound();
 
-		// ── 1. Ball flies to enemy (matches pk-catch-throw duration) ──────────
+		// -- 1. Ball flies to enemy (matches pk-catch-throw duration) ----------
 		this.phase('flying');
 		await this.delay(700);
 
-		// ── 2. Enemy disappears, ball flashes to show absorption ──────────────
+		// -- 2. Enemy disappears, ball flashes to show absorption --------------
 		this.enemyVisible(false);
 		this.phase('absorbing');
 		await this.delay(350);
 
-		// ── 3. Wiggles ────────────────────────────────────────────────────────
-		// Toggling 'settling' → 'wiggling' forces the CSS animation to restart
+		// -- 3. Wiggles --------------------------------------------------------
+		// Toggling 'settling' -> 'wiggling' forces the CSS animation to restart
 		// cleanly on each iteration rather than continuing from where it left off.
 		for (let i = 0; i < wiggles; i++)
 		{
@@ -99,7 +99,7 @@ export class CatchAnimator
 			await this.delay(650);
 		}
 
-		// ── 4. Resolution ─────────────────────────────────────────────────────
+		// -- 4. Resolution -----------------------------------------------------
 		if (caught)
 		{
 			this.phase('caught');

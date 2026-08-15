@@ -4,8 +4,8 @@
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<title>Portalmon (local)</title>
-  <script type="module" crossorigin src="/assets/index-CfTPE7Yg.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-DsZuENjd.css">
+  <script type="module" crossorigin src="/assets/index-x0sBQw9r.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-CMnj72SV.css">
 </head>
 <body>
 	<div id="portalmon-page">
@@ -33,7 +33,7 @@
 				<div class="gba-speaker-dot"></div>
 			</div>
 
-			<!-- Battery meter — one segment drains per encounter, recharges on a timer -->
+			<!-- Battery meter - one segment drains per encounter, recharges on a timer -->
 			<div class="gba-battery" role="img"
 				 data-bind="visible: isPoweredOn(),
 							attr: {
@@ -84,7 +84,7 @@
 							}"></button>
 				</div>
 				<div style="display:flex;flex-direction:column;gap:5px;align-items:center;">
-					<!-- ENC button removed — portals on the idle screen replace it -->
+					<!-- ENC button removed - portals on the idle screen replace it -->
 					<button type="button" class="gba-pill-btn" data-bind="click: toggleStart">START</button>
 					<!-- ko if: isSimUnlocked() -->
 					<button type="button" class="gba-pill-btn" data-bind="click: toggleSim">SIM</button>
@@ -100,16 +100,16 @@
 							data-bind="visible: battleTransition.phase() === 'vortex' || battleTransition.phase() === 'iris-close'"></canvas>
 
 					<!-- ============================================================ -->
-					<!-- POWER-OFF SCREEN — shown before the player clicks "turn on" -->
+					<!-- POWER-OFF SCREEN - shown before the player clicks "turn on" -->
 					<!-- ============================================================ -->
 					<!-- ko if: !isPoweredOn() && !isShowingLogo() -->
 					<div class="pk-power-off-screen" data-bind="click: powerOn">
-						<div class="pk-power-icon">⏻</div>
+						<div class="pk-power-icon">&#9211;</div>
 						<div class="pk-power-hint">Click to turn on</div>
 					</div>
 					<!-- /ko -->
 					<!-- ============================================================ -->
-					<!-- LOGO SPLASH — shown for ~3 s after clicking "turn on"       -->
+					<!-- LOGO SPLASH - shown for ~3 s after clicking "turn on"       -->
 					<!-- ============================================================ -->
 					<!-- ko if: isShowingLogo() -->
 					<div class="pk-logo-screen">
@@ -120,7 +120,7 @@
 					</div>
 					<!-- /ko -->
 					<!-- ============================================================ -->
-					<!-- ALL GAME CONTENT — hidden until powered on                  -->
+					<!-- ALL GAME CONTENT - hidden until powered on                  -->
 					<!-- ============================================================ -->
 					<!-- ko if: isPoweredOn() -->
 				<!-- ko if: _statusToast() -->
@@ -131,7 +131,7 @@
 					<div class="gba-screen-base" data-bind="css: { 'gba-dimmed': activeOverlay() !== 'none', 'pk-transition-flash': battleTransition.phase() === 'flash', 'pk-transition-iris-close': battleTransition.phase() === 'iris-close', 'pk-transition-black': battleTransition.phase() === 'black', 'pk-transition-iris-open': battleTransition.phase() === 'iris-open', 'pk-transition-vortex': battleTransition.phase() === 'vortex' }">
 						<div data-bind="with: combatManager, as: 'cm'" class="pk-battle">
 
-	<!-- ===== IDLE STATE — the overworld is shown when no encounter is running ===== -->
+	<!-- ===== IDLE STATE - the overworld is shown when no encounter is running ===== -->
 	<!-- ko ifnot: isEncounterActive() -->
 	<div class="pk-overworld" data-bind="with: $root.overworldManager">
 	<div class="pk-overworld-stage">
@@ -143,10 +143,10 @@
 		<div class="pk-overworld-hud" aria-live="polite">
 			<span class="pk-overworld-status" data-bind="text: statusText"></span>
 			<span class="pk-overworld-position"
-				  data-bind="text: currentMapName() + ' · ' + positionLabel()"></span>
+				  data-bind="text: currentMapName() + ' - ' + positionLabel()"></span>
 		</div>
 		<div class="pk-overworld-help" data-bind="visible: !dialogue.visible()">
-			MOVE: D-PAD / ARROWS / WASD · TALK: A / ENTER / E
+			MOVE: D-PAD / ARROWS / WASD - TALK: A / ENTER / E
 		</div>
 
 		<div class="pk-dialogue-box"
@@ -169,16 +169,16 @@
 		<div class="pk-lab-wake" data-bind="css: { 'is-active': $root.isLabWakeActive }, click: $root.skipLabWake">
 			<div class="pk-lab-wake__lid pk-lab-wake__lid--top"></div>
 			<div class="pk-lab-wake__lid pk-lab-wake__lid--bottom"></div>
-			<div class="pk-lab-wake__hint">E · WAKE UP</div>
+			<div class="pk-lab-wake__hint">E - WAKE UP</div>
 		</div>
 	</div>
 </div>
 
 	<!-- /ko -->
-	<!-- ===== ACTIVE ENCOUNTER — only rendered while a battle is in progress ===== -->
+	<!-- ===== ACTIVE ENCOUNTER - only rendered while a battle is in progress ===== -->
 	<!-- ko if: isEncounterActive() -->
 
-	<!-- SIM LOSS OVERLAY — simpler dismiss for simulation mode -->
+	<!-- SIM LOSS OVERLAY - simpler dismiss for simulation mode -->
 	<!-- ko if: isSimBattle() && isBattleEnded() && playerParty().every(function(p) { return p.isFainted(); }) -->
 	<div class="pk-revive-overlay">
 		<div class="pk-sim-banner d-flex align-items-center justify-content-center gap-2 mb-3">
@@ -344,7 +344,7 @@
 				<!-- ko foreach: playerParty -->
 				<div class="pk-bench-portrait-slot pk-bench-portrait-slot--player"
 					 data-bind="css: { 'pk-bench-fainted': isFainted(), 'pk-bench-active': id === cm.playerActive().id },
-					            attr: { title: name + ' • ' + type + ' • ' + hpCurrent() + '/' + hpMax + ' HP' }">
+					            attr: { title: name + ' - ' + type + ' - ' + hpCurrent() + '/' + hpMax + ' HP' }">
 					<!-- ko if: portraitImage -->
 					<img class="pk-bench-portrait-img" loading="lazy" decoding="async" data-bind="attr: { src: portraitImage, alt: name }" />
 					<!-- /ko -->
@@ -399,7 +399,7 @@
 		<!-- /ko -->
 	</div>
 
-	<!-- CATCH BALL — absolutely positioned inside the battlefield.
+	<!-- CATCH BALL - absolutely positioned inside the battlefield.
 		 Visibility and phase are driven by CatchAnimator on the controller. -->
 	<!-- ko if: $root.catchAnim.isActive() -->
 	<img src="/assets/ball-BpelByRq.png"
@@ -418,7 +418,7 @@
 		 data-bind="css: { 'pk-battle-intro-panel': $root.battleTransition.phase() === 'iris-open' || $root.battleTransition.phase() === 'intro' }">
 		<div class="row g-0">
 
-			<!-- TEXT BOX (left) — always visible so the announcer result stays readable -->
+			<!-- TEXT BOX (left) - always visible so the announcer result stays readable -->
 			<div class="col-7">
 				<div class="pk-text-box">
 					<!-- Trainer dialogue portrait (gym battles) -->
@@ -448,7 +448,7 @@
 			<!-- ACTION BUTTONS (right) -->
 			<div class="col-5">
 
-				<!-- POST-BATTLE RESULT PANEL — replaces action buttons after battle ends -->
+				<!-- POST-BATTLE RESULT PANEL - replaces action buttons after battle ends -->
 				<!-- ko if: isBattleEnded() -->
 				<div class="pk-result-panel">
 					<!-- All party fainted: revival overlay handles it; hide CONTINUE so nothing bleeds through -->
@@ -1030,7 +1030,7 @@
 			</div>
 		</div>
 		<div class="secret-lock-label">
-			<div class="secret-lock-icon">🔒</div>
+			<div class="secret-lock-icon">&#128274;</div>
 			<div class="secret-lock-text">???</div>
 		</div>
 	</div>
@@ -1450,14 +1450,14 @@
 						</div>
 					</div>
 					<!-- /ko -->
-					<!-- REST WARNING — GLaDOS hard-mode forfeit confirmation -->
+					<!-- REST WARNING - GLaDOS hard-mode forfeit confirmation -->
 					<!-- ko if: isShowingRestWarning() -->
 					<div class="pk-rest-warning">
 	<div class="pk-victory-scanlines"></div>
 	<div class="pk-rest-warning-inner">
 
 		<div class="d-flex align-items-center gap-3 mb-3">
-			<div class="pk-glados-portrait" aria-hidden="true">🤖</div>
+			<div class="pk-glados-portrait" aria-hidden="true">&#129302;</div>
 			<div>
 				<div class="pk-glados-name">GLaDOS</div>
 				<div class="pk-glados-title">WARNING: Aperture Science Rest Protocol</div>
@@ -1507,25 +1507,25 @@
 </div>
 
 					<!-- /ko -->
-					<!-- CHAMPIONSHIP VICTORY SCREEN — topmost layer, above all overlays -->
+					<!-- CHAMPIONSHIP VICTORY SCREEN - topmost layer, above all overlays -->
 					<!-- ko if: isShowingVictoryScreen() -->
 					<div class="pk-victory-screen">
 
 	<!-- Scanline texture sits on top of everything like the rest of the screen -->
 	<div class="pk-victory-scanlines"></div>
 
-	<!-- ── HEADER ──────────────────────────────────────────────────── -->
+	<!-- -- HEADER ---------------------------------------------------- -->
 	<div class="pk-victory-header">
-		<div class="pk-victory-trophy">🏆</div>
+		<div class="pk-victory-trophy">&#127942;</div>
 		<div class="pk-victory-eyebrow">SIMULATION COMPLETE</div>
 		<!-- ko if: isHardModeVictory() -->
 		<div class="pk-victory-hard-mode">HARD MODE</div>
 		<!-- /ko -->
 		<div class="pk-victory-trainer" data-bind="text: trainerName"></div>
-		<div class="pk-victory-subtitle">GLaDOS Defeated · Main Test Complete</div>
+		<div class="pk-victory-subtitle">GLaDOS Defeated - Main Test Complete</div>
 	</div>
 
-	<!-- ── PARTY ROSTER ─────────────────────────────────────────────── -->
+	<!-- -- PARTY ROSTER ----------------------------------------------- -->
 	<div class="pk-victory-party" data-bind="foreach: combatManager.playerParty">
 		<div class="pk-victory-card" data-bind="css: { 'pk-victory-card--fainted': isFainted() }">
 
@@ -1568,11 +1568,11 @@
 		</div>
 	</div>
 
-	<!-- ── FOOTER ───────────────────────────────────────────────────── -->
+	<!-- -- FOOTER ----------------------------------------------------- -->
 	<div class="pk-victory-footer">
 		<div class="pk-victory-glados">
 			Unexpected. And yet here we are.
-			<span class="pk-victory-glados-attr">— GLaDOS</span>
+			<span class="pk-victory-glados-attr">- GLaDOS</span>
 		</div>
 		<button type="button" class="pk-victory-dismiss"
 				data-bind="click: dismissVictoryScreen">

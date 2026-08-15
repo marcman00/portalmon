@@ -67,7 +67,7 @@ def person(name: str, hair: str, shirt: str, accent: str, accessory: str) -> Ima
         rect(draw, (10, 3, 11, 5), hair)
 
     # Body, hands, and feet all reach the lower edge so placement on a map is
-    # visually unambiguous—there is no tall-sprite anchor to configure.
+    # visually unambiguous - there is no tall-sprite anchor to configure.
     rect(draw, (3, 8, 12, 13), OUTLINE)
     rect(draw, (4, 8, 11, 12), shirt)
     rect(draw, (4, 13, 6, 15), OUTLINE)

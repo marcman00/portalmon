@@ -91,7 +91,7 @@ function damageNumber(targetSelector: string, amount: number | string, color: st
 }
 
 /**
- * Ultimate name banner — center-screen monospace text with scale bounce.
+ * Ultimate name banner - center-screen monospace text with scale bounce.
  */
 async function ultNameBanner(name: string, color: string, duration: number = 800): Promise<void>
 {

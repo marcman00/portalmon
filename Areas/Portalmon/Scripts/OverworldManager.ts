@@ -118,11 +118,9 @@ export class OverworldManager
 	private readonly isTrainerChallengeUnlockedCallback: (trainerId: string) => boolean;
 	private readonly runScriptedInteractionCallback: (scriptId: string) => boolean;
 	private readonly resolveWarpCallback: (sourceMapId: OverworldMapId, warp: MapWarpDef) => MapWarpDef | null;
-	private readonly terrainImage: HTMLImageElement = new Image();
 	private readonly playerImage: HTMLImageElement = new Image();
 	private readonly mapBackgroundImages: Map<string, HTMLImageElement> = new Map();
 	private readonly tiledTilesetImages: Map<string, HTMLImageElement> = new Map();
-	private readonly objectCutouts: Map<number, HTMLCanvasElement> = new Map();
 	private readonly npcImages: Map<string, HTMLImageElement> = new Map();
 	private readonly npcFacings: Map<string, WalkDirection> = new Map();
 	private readonly keyboardHeld: Set<WalkDirection> = new Set();
@@ -169,8 +167,6 @@ export class OverworldManager
 		this.isTrainerChallengeUnlockedCallback = isTrainerChallengeUnlockedCallback;
 		this.runScriptedInteractionCallback = runScriptedInteractionCallback;
 		this.resolveWarpCallback = resolveWarpCallback;
-		this.terrainImage.addEventListener("load", this.prepareObjectCutouts);
-		this.terrainImage.src = "/Areas/Portalmon/Content/Images/Overworld/prototype-tiles.png";
 		this.playerImage.src = "/Areas/Portalmon/Content/Images/Overworld/atlas-walk-16.png";
 		for (const map of Object.values(WORLD_MAPS))
 		{
@@ -280,7 +276,7 @@ export class OverworldManager
 						action: () =>
 						{
 							if (!this.startTrainerBattleCallback(npc.trainerId!, npc.afterBattleDialogue?.lines[0] ?? ""))
-								this.showTemporaryStatus("Battle unavailable · prepare your party first");
+								this.showTemporaryStatus("Battle unavailable - prepare your party first");
 						},
 					},
 					{ label: "NO", action: () => undefined },
@@ -290,7 +286,7 @@ export class OverworldManager
 			this.dialogue.open(npc.dialogue);
 			return;
 		}
-		this.showTemporaryStatus("Nothing there · face someone and press TALK");
+		this.showTemporaryStatus("Nothing there - face someone and press TALK");
 	};
 
 	/** Move the player to an explicitly configured destination without a warp source tile. */
@@ -400,11 +396,13 @@ export class OverworldManager
 
 	private computeMapAssetsReady(map: OverworldMapDef): boolean
 	{
+		// A map with neither a background nor tilesets has no terrain to wait on.
+		// WorldMapRegistry rejects such maps, so this is a guard, not a real case.
 		const backgroundReady = map.backgroundImagePath
 			? (this.mapBackgroundImages.get(map.backgroundImagePath)?.naturalWidth ?? 0) > 0
 			: map.tilesets
 				? map.tilesets.every(tileset => (this.tiledTilesetImages.get(tileset.imagePath)?.naturalWidth ?? 0) > 0)
-			: this.terrainImage.naturalWidth > 0;
+			: true;
 		if (!backgroundReady || this.playerImage.naturalWidth <= 0) return false;
 		return map.npcs.every(npc => !npc.spritePath || (this.npcImages.get(npc.spritePath)?.naturalWidth ?? 0) > 0);
 	}
@@ -561,12 +559,12 @@ export class OverworldManager
 		const map = this.currentMap();
 		if (destination.x < 0 || destination.x >= map.width || destination.y < 0 || destination.y >= map.height)
 		{
-			this.showTemporaryStatus("Boundary reached · still snapped to the map");
+			this.showTemporaryStatus("Boundary reached - still snapped to the map");
 			return;
 		}
 		if (collision)
 		{
-			this.showTemporaryStatus(`Blocked · ${collision}`);
+			this.showTemporaryStatus(`Blocked - ${collision}`);
 			return;
 		}
 
@@ -660,7 +658,6 @@ export class OverworldManager
 		const camera = this.getCameraPosition(renderPlayer);
 		const map = this.currentMap();
 		this.drawTerrain(context, camera, map);
-		this.drawObjects(context, camera, map);
 		const actorsReady = this.areMapAssetsReady(map);
 		if (perfProbe.publishDataset) this.publishDebugState(canvas, camera, map, actorsReady);
 		if (!actorsReady)
@@ -744,33 +741,7 @@ export class OverworldManager
 			);
 			return;
 		}
-		if (map.tileLayers && map.tilesets?.length)
-		{
-			this.drawTiledLayers(context, camera, map);
-			return;
-		}
-		if (this.terrainImage.naturalWidth <= 0) return;
-		if (!map.tileAt) return;
-
-		const firstX = Math.max(0, Math.floor(camera.x / TILE_SIZE));
-		const lastX = Math.min(map.width - 1, Math.ceil((camera.x + VIEWPORT_WIDTH) / TILE_SIZE));
-		const firstY = Math.max(0, Math.floor(camera.y / TILE_SIZE));
-		const lastY = Math.min(map.height - 1, Math.ceil((camera.y + VIEWPORT_HEIGHT) / TILE_SIZE));
-		for (let y = firstY; y <= lastY; y++)
-		{
-			for (let x = firstX; x <= lastX; x++)
-			{
-				const tileIndex = map.tileAt(x, y);
-				this.drawAtlasCell(
-					context,
-					tileIndex,
-					Math.round(x * TILE_SIZE - camera.x),
-					Math.round(y * TILE_SIZE - camera.y),
-					TILE_SIZE,
-					TILE_SIZE,
-				);
-			}
-		}
+		if (map.tileLayers && map.tilesets?.length) this.drawTiledLayers(context, camera, map);
 	}
 
 	private drawTiledLayers(context: CanvasRenderingContext2D, camera: MapPoint, map: OverworldMapDef): void
@@ -905,24 +876,6 @@ export class OverworldManager
 		return prerendered;
 	}
 
-	private drawObjects(context: CanvasRenderingContext2D, camera: MapPoint, map: OverworldMapDef): void
-	{
-		if (this.terrainImage.naturalWidth <= 0) return;
-		for (const object of map.objects)
-		{
-			this.drawWorldAtlasCell(
-				context,
-				object.atlasIndex,
-				object.position,
-				object.width,
-				object.height,
-				camera,
-				object.offsetX ?? 0,
-				object.offsetY ?? 0,
-			);
-		}
-	}
-
 	private drawPlayer(context: CanvasRenderingContext2D, now: number, renderPlayer: MapPoint, camera: MapPoint): void
 	{
 		if (this.playerImage.naturalWidth <= 0) return;
@@ -1004,94 +957,6 @@ export class OverworldManager
 			x: this.clamp(desiredX, 0, Math.max(0, map.width * TILE_SIZE - VIEWPORT_WIDTH)),
 			y: this.clamp(desiredY, 0, Math.max(0, map.height * TILE_SIZE - VIEWPORT_HEIGHT)),
 		};
-	}
-
-	private drawWorldAtlasCell(
-		context: CanvasRenderingContext2D,
-		index: number,
-		worldPosition: MapPoint,
-		width: number,
-		height: number,
-		camera: MapPoint,
-		offsetX: number = 0,
-		offsetY: number = 0,
-	): void
-	{
-		const destinationX = Math.round(worldPosition.x * TILE_SIZE - camera.x + offsetX);
-		const destinationY = Math.round(worldPosition.y * TILE_SIZE - camera.y + offsetY);
-		const cutout = this.objectCutouts.get(index);
-		if (cutout)
-		{
-			context.drawImage(cutout, destinationX, destinationY, width, height);
-			return;
-		}
-		this.drawAtlasCell(
-			context,
-			index,
-			destinationX,
-			destinationY,
-			width,
-			height,
-		);
-	}
-
-	private prepareObjectCutouts = (): void =>
-	{
-		for (const index of [14, 15])
-		{
-			const canvas = document.createElement("canvas");
-			canvas.width = 314;
-			canvas.height = 314;
-			const context = canvas.getContext("2d", { willReadFrequently: true });
-			if (!context) continue;
-			context.imageSmoothingEnabled = false;
-			const sourceWidth = this.terrainImage.naturalWidth / 4;
-			const sourceHeight = this.terrainImage.naturalHeight / 4;
-			context.drawImage(
-				this.terrainImage,
-				(index % 4) * sourceWidth,
-				Math.floor(index / 4) * sourceHeight,
-				sourceWidth,
-				sourceHeight,
-				0,
-				0,
-				canvas.width,
-				canvas.height,
-			);
-
-			const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-			const pixels = imageData.data;
-			for (let offset = 0; offset < pixels.length; offset += 4)
-			{
-				const red = pixels[offset];
-				const green = pixels[offset + 1];
-				const blue = pixels[offset + 2];
-				const maximum = Math.max(red, green, blue);
-				const minimum = Math.min(red, green, blue);
-				const isNeutralObjectPixel = maximum - minimum <= 50;
-				const isBlueSignPixel = index === 14 && blue > red * 1.2 && blue > green * 1.05;
-				if (!isNeutralObjectPixel && !isBlueSignPixel) pixels[offset + 3] = 0;
-			}
-			context.putImageData(imageData, 0, 0);
-			this.objectCutouts.set(index, canvas);
-		}
-	};
-
-	private drawAtlasCell(context: CanvasRenderingContext2D, index: number, x: number, y: number, width: number, height: number): void
-	{
-		const sourceWidth = this.terrainImage.naturalWidth / 4;
-		const sourceHeight = this.terrainImage.naturalHeight / 4;
-		context.drawImage(
-			this.terrainImage,
-			(index % 4) * sourceWidth,
-			Math.floor(index / 4) * sourceHeight,
-			sourceWidth,
-			sourceHeight,
-			x,
-			y,
-			width,
-			height,
-		);
 	}
 
 	private buildCollisionMap(): void

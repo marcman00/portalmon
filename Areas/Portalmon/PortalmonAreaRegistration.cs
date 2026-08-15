@@ -1,4 +1,4 @@
-﻿using System.Web.Mvc;
+using System.Web.Mvc;
 
 namespace Epic.Infrastructure.Portal.MVC.Areas.Portalmon
 {

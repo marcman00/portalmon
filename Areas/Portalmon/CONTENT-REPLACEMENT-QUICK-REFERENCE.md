@@ -54,7 +54,7 @@ Important fields:
 - `type`: one of `Availability`, `Performance`, `Security`, or `Manageable`.
   Dual types use `"Type/Type"`.
 - `base`: HP, attack, defense, and speed. Existing entries are the best balance
-  reference; evolutions are generally about 15–20% stronger in key stats.
+  reference; evolutions are generally about 15-20% stronger in key stats.
 - `moveIds`: exactly three IDs from `MoveList.ts`.
 - `portraitImage`: front/enemy/Dex artwork.
 - `behindImage`: player-side battle artwork. It is optional, but should normally

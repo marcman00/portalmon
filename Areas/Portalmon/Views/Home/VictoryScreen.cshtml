@@ -1,20 +1,20 @@
-﻿<div class="pk-victory-screen">
+<div class="pk-victory-screen">
 
 	<!-- Scanline texture sits on top of everything like the rest of the screen -->
 	<div class="pk-victory-scanlines"></div>
 
-	<!-- ── HEADER ──────────────────────────────────────────────────── -->
+	<!-- -- HEADER ---------------------------------------------------- -->
 	<div class="pk-victory-header">
-		<div class="pk-victory-trophy">🏆</div>
+		<div class="pk-victory-trophy">&#127942;</div>
 		<div class="pk-victory-eyebrow">SIMULATION COMPLETE</div>
 		<!-- ko if: isHardModeVictory() -->
 		<div class="pk-victory-hard-mode">HARD MODE</div>
 		<!-- /ko -->
 		<div class="pk-victory-trainer" data-bind="text: trainerName"></div>
-		<div class="pk-victory-subtitle">GLaDOS Defeated · Main Test Complete</div>
+		<div class="pk-victory-subtitle">GLaDOS Defeated - Main Test Complete</div>
 	</div>
 
-	<!-- ── PARTY ROSTER ─────────────────────────────────────────────── -->
+	<!-- -- PARTY ROSTER ----------------------------------------------- -->
 	<div class="pk-victory-party" data-bind="foreach: combatManager.playerParty">
 		<div class="pk-victory-card" data-bind="css: { 'pk-victory-card--fainted': isFainted() }">
 
@@ -57,11 +57,11 @@
 		</div>
 	</div>
 
-	<!-- ── FOOTER ───────────────────────────────────────────────────── -->
+	<!-- -- FOOTER ----------------------------------------------------- -->
 	<div class="pk-victory-footer">
 		<div class="pk-victory-glados">
 			Unexpected. And yet here we are.
-			<span class="pk-victory-glados-attr">— GLaDOS</span>
+			<span class="pk-victory-glados-attr">- GLaDOS</span>
 		</div>
 		<button type="button" class="pk-victory-dismiss"
 				data-bind="click: dismissVictoryScreen">

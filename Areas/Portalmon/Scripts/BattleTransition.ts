@@ -10,7 +10,7 @@ const COLOR_RGB: Record<TransitionColor, [number, number, number]> = {
 	red:    [220, 50, 50],
 };
 
-// ─── Vortex particle (round orb with glow — matches boot screen style) ───
+// --- Vortex particle (round orb with glow - matches boot screen style) ---
 
 class VortexParticle
 {
@@ -73,19 +73,19 @@ class VortexParticle
 	}
 }
 
-// ─── Battle transition ─────────────────────────────────────────────
+// --- Battle transition ---------------------------------------------
 
 /**
  * Pokemon-style battle entrance transition with portal vortex effect.
  *
- *   idle → flash → vortex → iris-close → black → iris-open → intro → idle
+ *   idle -> flash -> vortex -> iris-close -> black -> iris-open -> intro -> idle
  *
  * The `play(color, onBlack)` callback injects battle-start logic
  * at the right moment (while screen is fully black).
  */
 export class BattleTransition
 {
-	/** Current transition phase — drives CSS class bindings */
+	/** Current transition phase - drives CSS class bindings */
 	public phase = ko.observable<string>("idle");
 
 	/** Portal color for flash tint and vortex particles */
@@ -98,7 +98,7 @@ export class BattleTransition
 	 * Plays the full transition sequence.
 	 *
 	 * @param color        Portal color (drives flash tint + vortex particles)
-	 * @param onBlack      Called during the black hold — start the battle here
+	 * @param onBlack      Called during the black hold - start the battle here
 	 * @param preloadArt   Image URLs the battlefield is about to show. They are
 	 *                     fetched and decoded while the flash, vortex, and iris
 	 *                     play, and the iris does not open until they are ready
@@ -141,7 +141,7 @@ export class BattleTransition
 		return this.phase() !== "idle";
 	}
 
-	// ─── Vortex canvas particle system ─────────────────────────────
+	// --- Vortex canvas particle system -----------------------------
 
 	private startVortex(): void
 	{
@@ -160,7 +160,7 @@ export class BattleTransition
 
 		const draw = (): void =>
 		{
-			// Solid black background — fully covers the content beneath
+			// Solid black background - fully covers the content beneath
 			ctx.fillStyle = "#000";
 			ctx.fillRect(0, 0, canvas.width, canvas.height);
 

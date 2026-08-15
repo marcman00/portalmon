@@ -7,32 +7,32 @@ building can be edited without affecting another.
 
 ## Ownership and important files
 
-- `OverworldMapTypes.ts` — shared map, object, collision, NPC, and warp shapes.
-- `TownMap.ts` — outdoor town layout only.
-- `CenterBuildingMap.ts` — center-building interior only.
-- `WorldMapRegistry.ts` — registers map IDs and definitions.
-- `../OverworldManager.ts` — generic movement, input, camera, drawing, actors,
+- `OverworldMapTypes.ts` - shared map, object, collision, NPC, and warp shapes.
+- `TownMap.ts` - outdoor town layout only.
+- `CenterBuildingMap.ts` - center-building interior only.
+- `WorldMapRegistry.ts` - registers map IDs and definitions.
+- `../OverworldManager.ts` - generic movement, input, camera, drawing, actors,
   collision lookup, and map transitions.
-- `../OverworldDialogue.ts` — reusable typewriter dialogue state.
-- `../../Views/Home/Overworld.cshtml` — canvas HUD and dialogue markup.
-- `../../Content/_overworld.scss` — overworld and dialogue presentation.
-- `../../Content/Images/Overworld/` — terrain, player, and NPC images.
+- `../OverworldDialogue.ts` - reusable typewriter dialogue state.
+- `../../Views/Home/Overworld.cshtml` - canvas HUD and dialogue markup.
+- `../../Content/_overworld.scss` - overworld and dialogue presentation.
+- `../../Content/Images/Overworld/` - terrain, player, and NPC images.
 
 ## Coordinates, tiles, and camera
 
-- The logical screen is 240×160 pixels.
-- One map tile is 16×16 logical pixels.
+- The logical screen is 240x160 pixels.
+- One map tile is 16x16 logical pixels.
 - Coordinates start at `(0,0)` in the top-left.
 - `x` increases rightward and `y` increases downward.
 - Player, NPC, collision, and warp positions use tile coordinates.
 - Object `width`, `height`, `offsetX`, and `offsetY` use logical pixels.
 
-The camera follows the player automatically when a map exceeds the 15×10-tile
-viewport and clamps at map edges. A 15×10 interior stays fixed.
+The camera follows the player automatically when a map exceeds the 15x10-tile
+viewport and clamps at map edges. A 15x10 interior stays fixed.
 
 ## Editing an existing map
 
-Edit that map's module—for example `CenterBuildingMap.ts`:
+Edit that map's module - for example `CenterBuildingMap.ts`:
 
 ```ts
 export const CENTER_BUILDING_MAP: OverworldMapDef = {
@@ -43,9 +43,8 @@ export const CENTER_BUILDING_MAP: OverworldMapDef = {
 	backgroundColor: "#c9ced0",
 	defaultSpawn: { x: 7, y: 8 },
 	defaultFacing: "up",
-	statusText: "Center Building · step onto the south door to exit",
-	tileAt: (x, y) => 5,
-	objects: [],
+	statusText: "Center Building - step onto the south door to exit",
+	backgroundImagePath: "/Areas/Portalmon/Content/Images/Overworld/Overworld.png",
 	collisionRects: [],
 	collisionPoints: [],
 	warps: [],
@@ -54,8 +53,9 @@ export const CENTER_BUILDING_MAP: OverworldMapDef = {
 };
 ```
 
-`tileAt(x, y)` returns an atlas index for every tile. It may use conditionals
-for roads/walls or read from a numeric tile array in a future authored map.
+Terrain comes from either `backgroundImagePath`, a single precomposed image, or
+`tileLayers` plus `tilesets` exported from TMX. A map must supply one of the two.
+`backgroundImagePath` wins when both are present.
 
 ## Editing the static town
 
@@ -64,12 +64,12 @@ The outdoor town is deliberately precomposed. The browser loads one finished
 
 Town visuals and gameplay geometry share one editable source:
 
-- `town-layout.json` — map size, roads, buildings, ponds, trees, decorations,
+- `town-layout.json` - map size, roads, buildings, ponds, trees, decorations,
   gym slots, spawn, and important points.
-- `../../../../scripts/build-town-map.py` — named tileset crops and drawing
+- `../../../../scripts/build-town-map.py` - named tileset crops and drawing
   recipes for houses, gyms, the Center, park, and technical district.
-- `TownLayout.generated.ts` — generated collision/door data; do not edit it.
-- `../../Content/Images/Overworld/enrichment-town.png` — generated runtime PNG.
+- `TownLayout.generated.ts` - generated collision/door data; do not edit it.
+- `../../Content/Images/Overworld/enrichment-town.png` - generated runtime PNG.
 
 From the repository root, regenerate and test after editing:
 
@@ -79,7 +79,7 @@ python -m unittest scripts/test_town_map.py
 npm.cmd run build
 ```
 
-Coordinates in `town-layout.json` are 16×16 logical tiles. Buildings with
+Coordinates in `town-layout.json` are 16x16 logical tiles. Buildings with
 `kind: "gym"` keep a stable `gymSlot` (`0`, `1`, or `2`), so trainer identities
 can be replaced without redrawing or renaming the physical gyms.
 
@@ -101,7 +101,7 @@ objects use non-empty `map` and `spawn` properties; `spawn` identifies a safe
 arrival point in the target map's `Spawns` layer. `Actables` objects require
 non-empty `name` and `message` string properties. A rectangle in the `Wild`
 object layer with `wild = true` creates a random-encounter zone. All such objects
-must be one 16×16 tile aligned to the map grid. Door 5 currently opens the
+must be one 16x16 tile aligned to the map grid. Door 5 currently opens the
 Enrichment Center healing sequence.
 
 `npm.cmd run build` does **not** run `map:tiled`. Run the exporter before every
@@ -128,7 +128,7 @@ quicksand fully authored in Tiled.
 ### Actables (talkable people and signs)
 
 Everything the player can talk to is one `Actables` object in its TMX map.
-Names are **not** unique — several signs are named `Sign` — so
+Names are **not** unique - several signs are named `Sign` - so
 each actable is keyed by its Tiled object ID, and `TownMap.ts` turns each one
 into an `npcs` entry whose dialogue is `{ speaker: name, lines: [message] }`.
 Ordinary dialogue stays in TMX; trainer mechanics and dialogue stay in the
@@ -148,61 +148,17 @@ therefore carry no `spritePath`, and the renderer draws nothing extra for them.
 Door 5 is also the current faint-recovery destination. Do not renumber or
 remove it without updating `RecoveryDestination.ts` at the same time.
 
-## Legacy interior terrain atlas
-
-`prototype-tiles.png` is split as a 4×4 atlas:
-
-| Index | Current tile |
-|---:|---|
-| 0 | Grass |
-| 1 | Dark grass |
-| 2 | Flower grass |
-| 3 | Dirt path |
-| 4 | Grass/path edge |
-| 5 | Stone floor |
-| 6 | Water |
-| 7 | Water edge |
-| 8 | Tree |
-| 9 | Stump |
-| 10 | Facility wall |
-| 11 | Doorway |
-| 12 | Metal roof |
-| 13 | Orange-roof building |
-| 14 | Facility sign |
-| 15 | Boulder |
-
-The Portalmon Center interior still uses this atlas.
-
-To replace the terrain atlas, keep a 4×4 grid or update
-`OverworldManager.drawAtlasCell`. If meanings change, update map indices and
-this table. Cells 14 and 15 currently receive runtime background removal in
-`prepareObjectCutouts`; update that method if those cells stop being the sign
-and boulder.
-
 ## Objects and collision
 
-Visible objects and collision are deliberately separate. An object does not
-block movement until matching collision is added.
+Visible scenery and collision are deliberately separate. Scenery is authored in
+the TMX tile layers or baked into the precomposed background image, and it does
+not block movement until matching collision is added.
 
 ```ts
-objects: [
-	{
-		atlasIndex: 15,
-		position: { x: 6, y: 4 },
-		width: 24,
-		height: 24,
-		offsetX: -4,
-		offsetY: -8,
-	},
-],
 collisionPoints: [
 	{ x: 6, y: 4, label: "boulder" },
 ],
 ```
-
-For a 24×24 obstacle occupying one tile, `offsetX: -4, offsetY: -8`
-bottom-centers it on that tile. Keep grass-backed art off roads unless it has
-been converted to a transparent cutout.
 
 Use collision rectangles for walls and buildings:
 
@@ -264,12 +220,12 @@ npcs: [
 ],
 ```
 
-The NPC sheet is a 2×2 grid ordered down, left, right, up. Face an adjacent NPC
+The NPC sheet is a 2x2 grid ordered down, left, right, up. Face an adjacent NPC
 and press TALK/Enter/E. Movement locks until dialogue closes.
 
 ## Player sheet and animation
 
-The generated Atlas sheet looks like a 4×4 grid but its subjects are not
+The generated Atlas sheet looks like a 4x4 grid but its subjects are not
 uniformly centered, and one row overlaps the next. Drawing full cells caused
 direction-dependent hovering and a black flake. `PLAYER_FRAME_RECTS` in
 `OverworldManager.ts` contains measured opaque bounds, excludes overlap pixels,
@@ -317,7 +273,7 @@ Test:
 - immediate movement when the overworld first appears;
 - each doorway in both directions, including held/rapid input;
 - collision on both sides of door openings;
-- camera clamping on maps larger than 15×10;
+- camera clamping on maps larger than 15x10;
 - player and NPC visibility after every transition;
 - dialogue after leaving and returning to a map;
 - Door 5 Enrichment Center healing and faint recovery;

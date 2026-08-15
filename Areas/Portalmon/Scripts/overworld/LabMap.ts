@@ -37,7 +37,6 @@ export const LAB_MAP: OverworldMapDef = {
 		imagePath: LAB_TILESET_IMAGES[tileset.imagePath] ?? tileset.imagePath,
 	})),
 	tileLayers: LAB_TILE_LAYERS,
-	objects: [],
 	collisionRects: LAB_COLLISION_RECTS,
 	collisionPoints: [],
 	encounterZones: LAB_WILD_ZONES,

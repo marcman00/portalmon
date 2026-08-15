@@ -1,5 +1,5 @@
 // =========================================
-// PALETTE — game-specific colour constants
+// PALETTE - game-specific colour constants
 // =========================================
 $pk-red: #e94560;
 $pk-green: #48d848;
@@ -10,7 +10,7 @@ $pk-mid-bg: #16213e;
 $pk-border: #0f3460;
 $pk-muted: #8899aa;
 
-// Screen palette — fixed dark, never theme-aware (screen bg is always black)
+// Screen palette - fixed dark, never theme-aware (screen bg is always black)
 $s-bg:         #12181f;   // panel/overlay backgrounds
 $s-bg-mid:     #1a2230;   // secondary panel / header
 $s-bg-dark:    #0c1018;   // recessed / tertiary areas
@@ -21,7 +21,7 @@ $s-border:     #1e3050;   // borders
 $s-accent:     #f0a030;   // accent color (same as $pk-orange)
 
 // =========================================
-// GBA SHELL — SCSS colour variables
+// GBA SHELL - SCSS colour variables
 // (Using SCSS vars, not CSS custom properties, because this file
 //  is @import-ed inside #portalmon { } in style.scss and :root
 //  rules would be incorrectly scoped.)

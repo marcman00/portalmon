@@ -139,6 +139,75 @@ Map-specific coordinates and behavior belong in TMX data or Scripts/overworld mo
 
 Large visual actables are anchored at their bottom-center interaction tile by build-tiled-gym.py. One-tile actables retain their authored tile. GLaDOS in Lab.tmx relies on this behavior.
 
+## Frame profiling
+
+Scripts/PerfProbe.ts is an opt-in profiler for the overworld render loop. It is
+inert unless enabled, and nothing else may depend on it.
+
+    ?perf=1      collect samples, report on demand
+    ?perf=hud    collect samples and show the on-screen overlay
+    ?perf=debug  overlay plus the canvas dataset mirror
+    localStorage.setItem("portalmon:perf", "1")   persists across navigations
+
+The canvas dataset mirror stays off in the first two modes. It writes four
+attributes per frame during movement, which every MutationObserver on the host
+page then runs against, so leaving it on while profiling would provoke the effect
+being measured.
+
+Read results with `portalmonPerf.report()` in the console; `portalmonPerf.reset()`
+clears the sample window and `portalmonPerf.copy()` returns the JSON.
+
+It exists because the game runs in two very different hosts: the standalone Vite
+harness, whose page contains almost nothing else, and the production site, where
+it shares a document with a full application. The same game code can feel very
+different in the two, so the report separates the causes:
+
+- `drawMs` high on one host only means environment-sensitive rasterization.
+  Compare `canvasUpscale`, `devicePixelRatio`, and `canvasPaintedSize`, which the
+  host page's surrounding CSS decides.
+- `drawMs` equal but `postFrameMs` high means the browser's own per-frame work on
+  the surrounding page is spending the frame budget. That is style recalculation,
+  layout, and paint for the whole document, none of which is charged to `drawMs`.
+  `postFrameMs` is a MessageChannel round trip, so it only sees the main thread.
+  Raster, compositing, the GPU process, and present all happen after it resolves
+  and are invisible to it.
+- `drawMs` and `postFrameMs` both low while `frameIntervalMs` stays bad means the
+  main thread is idle and the bottleneck is downstream of it. That is raster or
+  GPU cost, or the renderer not being scheduled at all because another process on
+  the machine is competing. Neither is measurable from inside the page: use a
+  DevTools Performance trace, which has the raster and GPU tracks, and check
+  `chrome://gpu` for software compositing. `longTasks.containers` only names
+  main-thread offenders and will be quiet in this case.
+- `frameIntervalMs.min` is the display's refresh ceiling. A `p50` at twice the
+  `min` is a half-rate vsync lock, not jank, and a tight spread between `p50` and
+  `p95` confirms it: real jank is a wide distribution.
+
+The environment block also decides whether a comparison is even valid.
+`hardwareConcurrency`, `deviceMemory`, and `devicePixelRatio` differing means the
+two reports came from two machines, and no conclusion about the two hosts can be
+drawn until the same machine runs both.
+
+Never profile over Remote Desktop. An RDP session has no hardware compositing and
+presents on a fixed cadence, so the capture describes the remoting channel and
+not the page. Its fingerprint is unmistakable: `frameIntervalMs.min`, `p50`, and
+`p95` within about a millisecond of each other around 31 ms, `drawMs` and
+`postFrameMs` together using a couple of percent of that budget, `reducedMotion`
+true, and a `devicePixelRatio` that does not match the physical display. Nothing
+in the page moves those numbers, including the CSS. Capture at the console.
+- Both healthy but movement still feels bad means input latency or the idle path.
+  Check `inputLatencyMs`, `droppedInputs`, and `idleFrameRatio`. `droppedInputs`
+  counts presses the movement gate refused outright, which produce no frame at
+  all and therefore never show up in the timing numbers.
+
+`idleFrameRatio` is the fraction of loop iterations that fell back to the slow
+poll instead of re-arming on requestAnimationFrame. It should be 0 while the
+overworld is on screen. Anything higher means `isOverworldScreenActive` is
+returning false, or the canvas is not resolving, and movement is running on a
+200 ms timer rather than at display rate.
+
+Run it on both hosts and compare the two reports rather than reasoning about the
+shell CSS, which is shared and therefore cannot by itself explain a difference.
+
 ## Combat and progression
 
 Combat uses one active creature per side and parties of up to three. Turn order is speed-based. Types are Performance, Security, Availability, and Manageable. Statuses and species-specific ultimates are data-driven.
@@ -160,7 +229,7 @@ IDs are wiring. Display names and dialogue are content. Avoid renaming species I
 ## Known constraints
 
 - Audio and much creature artwork are intentionally absent.
-- OverworldManager still contains a legacy prototype-tiles fallback path, but all registered maps use either a background image or Tiled tilesets.
+- Every registered map must supply either `backgroundImagePath` or `tileLayers` plus `tilesets`. There is no other terrain path.
 - Sass emits deprecation warnings for legacy imports and color helpers; the production build currently succeeds.
 - The production bundle reports a chunk-size warning; it is informational.
 - dist-static is generated output and may change hash names after asset/import changes.

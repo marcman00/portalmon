@@ -15,7 +15,6 @@ export const TOWN_MAP: OverworldMapDef = {
 	defaultSpawn: { x: 28, y: 30 },
 	defaultFacing: "up",
 	statusText: "Overworld",
-	objects: [],
 	collisionRects: TILED_COLLISION_RECTS,
 	collisionPoints: [],
 	encounterZones: TILED_WILD_ZONES,

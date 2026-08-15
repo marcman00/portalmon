@@ -1,4 +1,4 @@
-﻿import { PortalKombatType, StatusEffect } from "./TypeList";
+import { PortalKombatType, StatusEffect } from "./TypeList";
 
 export type MoveId = string;
 
@@ -42,7 +42,7 @@ export interface StatusEffectDef
 // ============================================================
 export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 
-	// ── NORMLING / NORMKING ──────────────────────────────────────────────────
+	// -- NORMLING / NORMKING --------------------------------------------------
 	// Normling: reliable scanner with a big spike and a self-buff
 	// Normking: trades the spike for a more powerful hit and a LockOn setup move
 
@@ -54,13 +54,13 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 	"spike_warning": {
 		moveId: "spike_warning", name: "Spike Warning",
 		type: "Performance", power: 22, target: "enemy", hitChance: 80,
-		// A sudden metric spike — hits hard but may be a false positive (misses occasionally).
+		// A sudden metric spike - hits hard but may be a false positive (misses occasionally).
 	},
 	"normalize": {
 		moveId: "normalize", name: "Normalize",
 		type: "Performance", power: 0, target: "self", hitChance: 100,
 		effect: { effectType: "Optimized", maxTurns: 2, effectPower: 20, effectChance: 100 },
-		// Returns to baseline operating conditions — peak efficiency restored.
+		// Returns to baseline operating conditions - peak efficiency restored.
 	},
 	"critical_threshold": {
 		moveId: "critical_threshold", name: "Critical Threshold",
@@ -71,95 +71,95 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 		moveId: "lock_on_report", name: "Lock-On Report",
 		type: "Performance", power: 0, target: "self", hitChance: 100,
 		effect: { effectType: "LockOn", maxTurns: 2, effectPower: 0, effectChance: 100 },
-		// Normking compiles a targeted report — next moves are surgical.
+		// Normking compiles a targeted report - next moves are surgical.
 	},
 
-	// ── CPFNIB ───────────────────────────────────────────────────────────────
-	// Defensive debuffer — throttles enemies and applies Disruption via config changes.
+	// -- CPFNIB ---------------------------------------------------------------
+	// Defensive debuffer - throttles enemies and applies Disruption via config changes.
 	// Two turns of setup (config_lock + ami_apply) followed by a solid mercator_draft hit.
 
 	"config_lock": {
 		moveId: "config_lock", name: "Config Lock",
 		type: "Security", power: 12, target: "enemy", hitChance: 100,
 		effect: { effectType: "Throttled", maxTurns: 2, effectPower: -20, effectChance: 60 },
-		// Locks down the enemy's configuration — 60% chance to Throttle their stats.
+		// Locks down the enemy's configuration - 60% chance to Throttle their stats.
 	},
 	"mercator_draft": {
 		moveId: "mercator_draft", name: "Mercator Draft",
 		type: "Security", power: 16, target: "enemy", hitChance: 100,
-		// Mercator pushes a config change directly — a clean, reliable mid-power strike.
+		// Mercator pushes a config change directly - a clean, reliable mid-power strike.
 	},
 	"ami_apply": {
 		moveId: "ami_apply", name: "AMI Apply",
 		type: "Security", power: 10, target: "enemy", hitChance: 100,
 		effect: { effectType: "Disrupted", maxTurns: 1, effectPower: 0, effectChance: 100 },
-		// Applies a disruptive config update — 10 chip and enemy's next move fires at 40% accuracy.
+		// Applies a disruptive config update - 10 chip and enemy's next move fires at 40% accuracy.
 	},
 
-	// ── MERCATADOR ───────────────────────────────────────────────────────────
-	// Evolved CPFNib — still slow and defensive, but now hits like a truck.
+	// -- MERCATADOR -----------------------------------------------------------
+	// Evolved CPFNib - still slow and defensive, but now hits like a truck.
 	// Keeps mercator_draft as a callback; config_purge sets up Cascading for force_apply.
-	// Loop: config_purge (self-Cascading) → force_apply (1.75× boosted) → mercator_draft → repeat
+	// Loop: config_purge (self-Cascading) -> force_apply (1.75x boosted) -> mercator_draft -> repeat
 
 	"config_purge": {
 		moveId: "config_purge", name: "Config Purge",
 		type: "Security", power: 12, target: "enemy", hitChance: 100,
 		effect: { effectType: "Disrupted", maxTurns: 1, effectPower: 0, effectChance: 100 },
-		// Wipes enemy configuration entirely. Always Disrupts — their next move fires at 40% accuracy.
+		// Wipes enemy configuration entirely. Always Disrupts - their next move fires at 40% accuracy.
 	},
 	"force_apply": {
 		moveId: "force_apply", name: "Force Apply",
 		type: "Security", power: 22, target: "enemy", hitChance: 85,
 		effect: { effectType: "Throttled", maxTurns: 2, effectPower: -20, effectChance: 40 },
-		// Mercatador pushes the config change through without review — heavy damage, 40% chance to Throttle.
+		// Mercatador pushes the config change through without review - heavy damage, 40% chance to Throttle.
 	},
 
-	// ── RESSIE ───────────────────────────────────────────────────────────────
-	// Tanky healer — low attack, but very hard to put down.
+	// -- RESSIE ---------------------------------------------------------------
+	// Tanky healer - low attack, but very hard to put down.
 	// Two steady attack moves (can always alternate) plus a sustain heal.
 
 	"essential_review": {
 		moveId: "essential_review", name: "Essential Review",
 		type: "Availability", power: 14, target: "enemy", hitChance: 100,
-		// Methodically checks each critical requirement — steady, unexciting damage.
+		// Methodically checks each critical requirement - steady, unexciting damage.
 	},
 	"validate_settings": {
 		moveId: "validate_settings", name: "Validate Settings",
 		type: "Availability", power: 16, target: "enemy", hitChance: 100,
 		effect: { effectType: "Disrupted", maxTurns: 1, effectPower: 0, effectChance: 30 },
-		// Confirms everything is correct — forces a correction. 30% chance to Disrupt the enemy's next move.
+		// Confirms everything is correct - forces a correction. 30% chance to Disrupt the enemy's next move.
 	},
 	"self_assess": {
 		moveId: "self_assess", name: "Self Assess",
 		type: "Availability", power: 0, target: "self", hitChance: 100,
 		effect: { effectType: "SelfHealing", maxTurns: 2, effectPower: 10, effectChance: 100 },
-		// Ressie reviews itself — identifies and begins repairing its own issues for 2 turns.
+		// Ressie reviews itself - identifies and begins repairing its own issues for 2 turns.
 	},
 
-	// ── REDPING ──────────────────────────────────────────────────────────────
-	// Fast Security sweeper — gets LockOn from red_alert, then pings fast.
+	// -- REDPING --------------------------------------------------------------
+	// Fast Security sweeper - gets LockOn from red_alert, then pings fast.
 	// Disrupts enemy timing with system_flag to force a wasted move.
 
 	"red_alert": {
 		moveId: "red_alert", name: "Red Alert",
 		type: "Security", power: -6, target: "self", hitChance: 100,
 		effect: { effectType: "LockOn", maxTurns: 2, effectPower: 0, effectChance: 100 },
-		// Something's wrong — Redping sharpens focus and heals 6 HP. Guarantees next 2 attacks connect.
+		// Something's wrong - Redping sharpens focus and heals 6 HP. Guarantees next 2 attacks connect.
 	},
 	"ping_wave": {
 		moveId: "ping_wave", name: "Ping Wave",
 		type: "Security", power: 20, target: "enemy", hitChance: 100,
-		// A rapid burst of pings — Redping's bread and butter attack. Hits harder now that red_alert is a cooldown.
+		// A rapid burst of pings - Redping's bread and butter attack. Hits harder now that red_alert is a cooldown.
 	},
 	"system_flag": {
 		moveId: "system_flag", name: "System Flag",
 		type: "Security", power: 10, target: "enemy", hitChance: 100,
 		effect: { effectType: "Disrupted", maxTurns: 1, effectPower: 0, effectChance: 100 },
-		// Flags the enemy as a critical problem — 10 chip and their next move fires at 40% accuracy.
+		// Flags the enemy as a critical problem - 10 chip and their next move fires at 40% accuracy.
 	},
 
-	// ── REDALERT ─────────────────────────────────────────────────────────────
-	// Availability escalation kit — Yellow Alert locks the target for a long
+	// -- REDALERT -------------------------------------------------------------
+	// Availability escalation kit - Yellow Alert locks the target for a long
 	// incident window, then Orange/Red/Plaid cash that in for bigger damage.
 
 	"yellow_alert": {
@@ -179,65 +179,65 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 		// Full outage escalation. Extremely dangerous once the target is locked.
 	},
 
-	// ── QUERION ──────────────────────────────────────────────────────────────
-	// Manageable utility creature — debuffs enemy stats and sets up LockOn.
+	// -- QUERION --------------------------------------------------------------
+	// Manageable utility creature - debuffs enemy stats and sets up LockOn.
 	// Works like a support that controls the enemy before landing a focused strike.
 
 	"data_pull": {
 		moveId: "data_pull", name: "Data Pull",
 		type: "Manageable", power: 18, target: "enemy", hitChance: 100,
-		// Pulls data from every connected system and weaponizes it — Querion's primary offensive output.
+		// Pulls data from every connected system and weaponizes it - Querion's primary offensive output.
 	},
 	"filter_query": {
 		moveId: "filter_query", name: "Filter Query",
 		type: "Manageable", power: 8, target: "enemy", hitChance: 100,
 		effect: { effectType: "Throttled", maxTurns: 3, effectPower: -20, effectChance: 100 },
-		// Filters out the enemy's capabilities — chip damage and guaranteed 3-turn Throttle.
+		// Filters out the enemy's capabilities - chip damage and guaranteed 3-turn Throttle.
 	},
 	"sort_by_threat": {
 		moveId: "sort_by_threat", name: "Sort By Threat",
 		type: "Manageable", power: -6, target: "self", hitChance: 100,
 		effect: { effectType: "LockOn", maxTurns: 2, effectPower: 0, effectChance: 100 },
-		// Re-sorts the query by highest threat — heals 6 HP and guarantees the next 2 attacks connect.
+		// Re-sorts the query by highest threat - heals 6 HP and guarantees the next 2 attacks connect.
 	},
 
-	// ── OWTAGE ───────────────────────────────────────────────────────────────
-	// Disruptive tank — spreads Contamination like a cascading outage.
+	// -- OWTAGE ---------------------------------------------------------------
+	// Disruptive tank - spreads Contamination like a cascading outage.
 	// High-risk opener with cascade_failure, then incident_report + emergency_patch to sustain.
 
 	"cascade_failure": {
 		moveId: "cascade_failure", name: "Cascade Failure",
 		type: "Availability", power: 20, target: "enemy", hitChance: 85,
 		effect: { effectType: "Contaminated", maxTurns: 3, effectPower: 10, effectChance: 70 },
-		// A total system outage cascades outward — heavy damage with a 70% chance to Contaminate.
+		// A total system outage cascades outward - heavy damage with a 70% chance to Contaminate.
 	},
 	"incident_report": {
 		moveId: "incident_report", name: "Incident Report",
 		type: "Availability", power: 14, target: "enemy", hitChance: 100,
-		// Owtage files an incident report — ironically, as damage.
+		// Owtage files an incident report - ironically, as damage.
 	},
 	"emergency_patch": {
 		moveId: "emergency_patch", name: "Emergency Patch",
 		type: "Availability", power: 0, target: "self", hitChance: 100,
 		effect: { effectType: "SelfHealing", maxTurns: 2, effectPower: 12, effectChance: 100 },
-		// The on-call team rushes a patch — Owtage recovers some HP for 2 turns.
+		// The on-call team rushes a patch - Owtage recovers some HP for 2 turns.
 	},
 
-	// ── HOOTOPSY ──────────────────────────────────────────────────────────
-	// Evolved precision striker — scans first for LockOn, then unleashes a devastating report.
-	// Pattern: outage_scan → full_report (with LockOn bonus) → post_mortem for DoT
+	// -- HOOTOPSY ----------------------------------------------------------
+	// Evolved precision striker - scans first for LockOn, then unleashes a devastating report.
+	// Pattern: outage_scan -> full_report (with LockOn bonus) -> post_mortem for DoT
 
 	"outage_scan": {
 		moveId: "outage_scan", name: "Outage Scan",
 		type: "Availability", power: -6, target: "self", hitChance: 100,
 		effect: { effectType: "LockOn", maxTurns: 2, effectPower: 0, effectChance: 100 },
-		// Hootopsy sweeps for the outage signature — heals 6 HP and guarantees the next 2 attacks connect.
+		// Hootopsy sweeps for the outage signature - heals 6 HP and guarantees the next 2 attacks connect.
 	},
 	"post_mortem": {
 		moveId: "post_mortem", name: "Post Mortem",
 		type: "Availability", power: 18, target: "enemy", hitChance: 100,
 		effect: { effectType: "Contaminated", maxTurns: 2, effectPower: 10, effectChance: 50 },
-		// The incident writeup reveals lingering damage — 50% chance to Contaminate the wound.
+		// The incident writeup reveals lingering damage - 50% chance to Contaminate the wound.
 	},
 	"full_report": {
 		moveId: "full_report", name: "Full Report",
@@ -245,20 +245,20 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 		// A comprehensive outage report lands with brutal force. Slightly lower accuracy for the payoff.
 	},
 
-	// ── PCAW ─────────────────────────────────────────────────────────────────
-	// Performance planner — buffs up and hits for increasing effect.
+	// -- PCAW -----------------------------------------------------------------
+	// Performance planner - buffs up and hits for increasing effect.
 	// Run parallel_review on setup turns; sandwich with capacity_check and hardware_request.
 
 	"capacity_check": {
 		moveId: "capacity_check", name: "Capacity Check",
 		type: "Performance", power: 14, target: "enemy", hitChance: 100,
-		// Measures how much load the enemy can take — then applies it.
+		// Measures how much load the enemy can take - then applies it.
 	},
 	"parallel_review": {
 		moveId: "parallel_review", name: "Parallel Review",
 		type: "Performance", power: 0, target: "self", hitChance: 100,
 		effect: { effectType: "Optimized", maxTurns: 2, effectPower: 20, effectChance: 100 },
-		// Running all team reviews in parallel — efficiency multiplied.
+		// Running all team reviews in parallel - efficiency multiplied.
 	},
 	"hardware_request": {
 		moveId: "hardware_request", name: "Hardware Request",
@@ -266,29 +266,29 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 		// Justifying new hardware with a very direct demonstration of why it's needed.
 	},
 
-	// ── PURRALLEL ───────────────────────────────────────────────────────────
-	// Evolved heavy hitter — the planning paid off. Goes all the way.
+	// -- PURRALLEL -----------------------------------------------------------
+	// Evolved heavy hitter - the planning paid off. Goes all the way.
 	// full_capacity is a stronger 3-turn Optimized; then hardware_upgrade finishes the fight.
 
 	"capacity_exceeded": {
 		moveId: "capacity_exceeded", name: "Capacity Exceeded",
 		type: "Performance", power: 22, target: "enemy", hitChance: 85,
-		// The system is past its limit — an overloaded punch with a slight chance to miss.
+		// The system is past its limit - an overloaded punch with a slight chance to miss.
 	},
 	"hardware_upgrade": {
 		moveId: "hardware_upgrade", name: "Hardware Upgrade",
 		type: "Performance", power: 26, target: "enemy", hitChance: 75,
-		// New hardware arrives — a massive performance uplift delivered directly to the enemy's face.
+		// New hardware arrives - a massive performance uplift delivered directly to the enemy's face.
 	},
 	"full_capacity": {
 		moveId: "full_capacity", name: "Full Capacity",
 		type: "Performance", power: 0, target: "self", hitChance: 100,
 		effect: { effectType: "Optimized", maxTurns: 3, effectPower: 15, effectChance: 100 },
-		// Every resource engaged — Purrallel is fully Optimized for 3 turns.
+		// Every resource engaged - Purrallel is fully Optimized for 3 turns.
 	},
 
-	// ── BEECYERVIEW ──────────────────────────────────────────────────────────
-	// Best-practice tank/support — survives through HA failover healing.
+	// -- BEECYERVIEW ----------------------------------------------------------
+	// Best-practice tank/support - survives through HA failover healing.
 	// compliance_check passively Throttles enemies who aren't following best practices.
 
 	"best_practice_audit": {
@@ -306,11 +306,11 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 		moveId: "ha_failover", name: "HA Failover",
 		type: "Availability", power: 0, target: "self", hitChance: 100,
 		effect: { effectType: "SelfHealing", maxTurns: 2, effectPower: 10, effectChance: 100 },
-		// Failover to the HA standby — a shorter sustained heal burst. This is what Beecyerview is here for.
+		// Failover to the HA standby - a shorter sustained heal burst. This is what Beecyerview is here for.
 	},
 
-	// ── MEMLET ───────────────────────────────────────────────────────────────
-	// Risky Performance attacker — great sizing grants Optimized; overcommit is high-risk/reward.
+	// -- MEMLET ---------------------------------------------------------------
+	// Risky Performance attacker - great sizing grants Optimized; overcommit is high-risk/reward.
 
 	"memory_alloc": {
 		moveId: "memory_alloc", name: "Memory Alloc",
@@ -320,16 +320,16 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 	"overcommit": {
 		moveId: "overcommit", name: "Overcommit",
 		type: "Performance", power: 22, target: "enemy", hitChance: 75,
-		// Promises more memory than exists — sometimes it works out great, sometimes it doesn't.
+		// Promises more memory than exists - sometimes it works out great, sometimes it doesn't.
 	},
 	"size_estimate": {
 		moveId: "size_estimate", name: "Size Estimate",
 		type: "Performance", power: 0, target: "self", hitChance: 100,
 		effect: { effectType: "Optimized", maxTurns: 2, effectPower: 20, effectChance: 100 },
-		// Running gref and hardware math — Memlet arrives at the correct allocation for peak output.
+		// Running gref and hardware math - Memlet arrives at the correct allocation for peak output.
 	},
 
-	// ── ORAKLE ───────────────────────────────────────────────────────────────
+	// -- ORAKLE ---------------------------------------------------------------
 	// Intentionally weak joke creature. Low power, questionable accuracy. Sometimes tries.
 
 	"ponder": {
@@ -348,15 +348,15 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 		// Orakle's strongest move. Coin flip. Named with great self-awareness.
 	},
 
-	// ── PRODLE ───────────────────────────────────────────────────────────────
-	// Manageable puzzle creature — methodically narrows down the answer.
+	// -- PRODLE ---------------------------------------------------------------
+	// Manageable puzzle creature - methodically narrows down the answer.
 	// process_of_elimination guarantees a Throttle; yellow_tile Disrupts; green_tile closes it out.
 
 	"yellow_tile": {
 		moveId: "yellow_tile", name: "Yellow Tile",
 		type: "Manageable", power: 12, target: "enemy", hitChance: 100,
 		effect: { effectType: "Disrupted", maxTurns: 1, effectPower: 0, effectChance: 50 },
-		// Right letter, wrong position — close but disorienting. 50% chance to Disrupt.
+		// Right letter, wrong position - close but disorienting. 50% chance to Disrupt.
 	},
 	"green_tile": {
 		moveId: "green_tile", name: "Green Tile",
@@ -370,15 +370,15 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 		// Prodle has logically determined what the enemy can no longer do. Chip + guaranteed Throttle.
 	},
 
-	// ── DOUGTRIO ─────────────────────────────────────────────────────────────
-	// Legendary — elite coder and cloud expert. Punishes mistakes, optimizes everything.
+	// -- DOUGTRIO -------------------------------------------------------------
+	// Legendary - elite coder and cloud expert. Punishes mistakes, optimizes everything.
 	// rubber_duck_debug finds bugs (Contaminate); cloud_optimize buffs up; tech_consult closes.
 
 	"rubber_duck_debug": {
 		moveId: "rubber_duck_debug", name: "Rubber Duck Debug",
 		type: "Performance", power: 16, target: "enemy", hitChance: 100,
 		effect: { effectType: "Contaminated", maxTurns: 2, effectPower: 8, effectChance: 40 },
-		// Explaining the problem out loud reveals a critical bug in the enemy's code — 40% to Contaminate.
+		// Explaining the problem out loud reveals a critical bug in the enemy's code - 40% to Contaminate.
 	},
 	"cloud_optimize": {
 		moveId: "cloud_optimize", name: "Cloud Optimize",
@@ -389,11 +389,11 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 	"tech_consult": {
 		moveId: "tech_consult", name: "Tech Consult",
 		type: "Performance", power: 24, target: "enemy", hitChance: 90,
-		// Doug reviews the enemy's architecture. The feedback is… pointed.
+		// Doug reviews the enemy's architecture. The feedback is... pointed.
 	},
 
-	// ── AZURITE (Cloud Legendary — Azure) ────────────────────────────
-	// IaaS tank — reliable mid-power hit, guaranteed Throttle, and a risky heavy strike.
+	// -- AZURITE (Cloud Legendary - Azure) ----------------------------
+	// IaaS tank - reliable mid-power hit, guaranteed Throttle, and a risky heavy strike.
 	// VNet Fence locks the enemy down; Ultra Disk Hurl chips reliably; IOPS Burst closes.
 
 	"ultra_disk_hurl": {
@@ -405,7 +405,7 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 		moveId: "vnet_fence", name: "VNet Fence",
 		type: "Security", power: 8, target: "enemy", hitChance: 100,
 		effect: { effectType: "Throttled", maxTurns: 2, effectPower: -20, effectChance: 100 },
-		// Network isolation — 8 chip and guaranteed Throttle. Nothing gets through the virtual fence.
+		// Network isolation - 8 chip and guaranteed Throttle. Nothing gets through the virtual fence.
 	},
 	"iops_burst": {
 		moveId: "iops_burst", name: "IOPS Burst",
@@ -414,7 +414,7 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 	},
 
 
-	// ── GEN 1 POKEMON (GLaDOS cross-dimensional imports) ──────────────
+	// -- GEN 1 POKEMON (GLaDOS cross-dimensional imports) --------------
 	// These creatures were imported from POKEMON_GEN_1.DB.
 
 	"vine_whip": {
@@ -426,7 +426,7 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 		moveId: "sleep_powder", name: "Sleep Powder",
 		type: "Availability", power: 0, target: "enemy", hitChance: 90,
 		effect: { effectType: "Throttled", maxTurns: 3, effectPower: -20, effectChance: 100 },
-		// Puts the enemy to sleep — modeled as a long Throttle. 90% hit (Venusaur has practice).
+		// Puts the enemy to sleep - modeled as a long Throttle. 90% hit (Venusaur has practice).
 	},
 	"leech_seed": {
 		moveId: "leech_seed", name: "Leech Seed",
@@ -467,9 +467,9 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 		// Charizard's nuke. Devastating if it lands.
 	},
 
-	// ── BROADMAWL (Joke — self-sabotaging Broadcom attacker) ────────────
+	// -- BROADMAWL (Joke - self-sabotaging Broadcom attacker) ------------
 	// vMotion still works. The licensing is what hurts. Bundle Tax + License Squeeze
-	// punish the enemy AND Broadmawl — true to form.
+	// punish the enemy AND Broadmawl - true to form.
 
 	"vmotion": {
 		moveId: "vmotion", name: "vMotion",
@@ -489,9 +489,9 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 		// Mandatory licensing bundle. 80% Throttle. The bundle hurts everyone.
 	},
 
-	// ── FOSSLAIX (Joke — unkillable legacy fossil) ──────────────────────
+	// -- FOSSLAIX (Joke - unkillable legacy fossil) ----------------------
 	// Nobody remembers who deployed it. Legacy Hold locks enemies in a 3-turn contract.
-	// Power Cycle heals — turn it off and on again. Always works.
+	// Power Cycle heals - turn it off and on again. Always works.
 
 	"legacy_hold": {
 		moveId: "legacy_hold", name: "Legacy Hold",
@@ -511,7 +511,7 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 		// Turn it off and on again. Always works. The system lives on.
 	},
 
-	// ── FYRD (Defensive reader — read I/O daemon) ───────────────────────
+	// -- FYRD (Defensive reader - read I/O daemon) -----------------------
 	// Blue oni, tai chi stance. Reads data and absorbs it into buffer cache.
 	// Buffer Absorb sustains; Seek Strike disrupts enemy I/O.
 
@@ -533,7 +533,7 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 		// Precision read-head seek. 40% Disrupts enemy I/O.
 	},
 
-	// ── FYWR (Aggressive writer — write I/O daemon) ─────────────────────
+	// -- FYWR (Aggressive writer - write I/O daemon) ---------------------
 	// Red oni, karate stance. Writes 8K blocks with fury.
 	// Write Burst primes Cascading; Flush Strike delivers the payload.
 
@@ -555,7 +555,7 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 		// All dirty buffers flush at once. 50% thermal Contamination. Hits harder without setup needed.
 	},
 
-	// ── GOCKENSMITH (Scientific benchmarker — precision I/O tester) ─────
+	// -- GOCKENSMITH (Scientific benchmarker - precision I/O tester) -----
 	// Wiry gecko in goggles. Runs synthetic I/O workloads and ramp tests.
 	// Ramp Run primes Cascading; Even Stripe delivers max throughput.
 
@@ -574,10 +574,10 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 	"even_stripe": {
 		moveId: "even_stripe", name: "Even Stripe",
 		type: "Performance", power: 22, target: "enemy", hitChance: 90,
-		// Perfectly balanced I/O across all LUNs. Naturally high throughput — no warmup needed.
+		// Perfectly balanced I/O across all LUNs. Naturally high throughput - no warmup needed.
 	},
 
-	// ── PIXELWRAITH (Joke — unreliable Citrix speedster) ────────────────
+	// -- PIXELWRAITH (Joke - unreliable Citrix speedster) ----------------
 	// Glitching ghost with screen-tear artifacts. Fast but everything misses.
 	// Session Drop is powerful but only lands 60%. Reconnect is the only reliable move.
 
@@ -599,7 +599,7 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 		// Drops and reestablishes session. The only move that always works.
 	},
 
-	// ── WRIDAEMON (Relentless writer — fiery write daemon) ──────────────
+	// -- WRIDAEMON (Relentless writer - fiery write daemon) --------------
 	// Fiery red imp with glowing horns. 8K blocks all day every day.
 	// Cycle Burst primes Cascading; Thermal Spike delivers burn + Contamination.
 
@@ -612,7 +612,7 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 		moveId: "thermal_spike", name: "Thermal Spike",
 		type: "Performance", power: 26, target: "enemy", hitChance: 80,
 		effect: { effectType: "Contaminated", maxTurns: 2, effectPower: 8, effectChance: 50 },
-		// I/O overheats under sustained pressure. 50% chance burning Contaminates — write queue backing up.
+		// I/O overheats under sustained pressure. 50% chance burning Contaminates - write queue backing up.
 	},
 	"cycle_burst": {
 		moveId: "cycle_burst", name: "Cycle Burst",
@@ -621,7 +621,7 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 		// Erratic write burst destabilizes enemy I/O scheduling. 50% chance to Disrupt their next move.
 	},
 
-	// ── YIK (Anonymous gossip — doomscrolling yak) ──────────────────────
+	// -- YIK (Anonymous gossip - doomscrolling yak) ----------------------
 	// Hunched yak on phone. Posts anonymously and downvotes.
 	// Incognito Mode buffs; Downvote guarantees a short Throttle.
 
@@ -643,7 +643,7 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 		// The community has spoken. 2-turn Throttle as reputation craters.
 	},
 
-	// ── YODEL (Evolution of Yik — anonymous broadcaster) ────────────────
+	// -- YODEL (Evolution of Yik - anonymous broadcaster) ----------------
 	// Standing bipedal yak in alpine costume. Yodels across mountains.
 	// Masquerade sets up LockOn; Yodel Blast delivers burst + Disruption.
 
@@ -657,7 +657,7 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 		moveId: "masquerade", name: "Masquerade",
 		type: "Security", power: -6, target: "self", hitChance: 100,
 		effect: { effectType: "LockOn", maxTurns: 2, effectPower: 0, effectChance: 100 },
-		// Adjusts masquerade mask — heals 6 HP and guarantees the next 2 attacks connect.
+		// Adjusts masquerade mask - heals 6 HP and guarantees the next 2 attacks connect.
 	},
 	"yodel_blast": {
 		moveId: "yodel_blast", name: "Yodel Blast",
@@ -667,7 +667,7 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 	},
 
 
-	// ── FORTRESS (Evolution of Ressie — castle-bearing world turtle) ────
+	// -- FORTRESS (Evolution of Ressie - castle-bearing world turtle) ----
 	// Full defensive infrastructure. Lockdown shuts enemies down,
 	// Kernel Crush delivers offense, Bastion Wall sustains with healing.
 
@@ -690,7 +690,7 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 	},
 
 
-	// ── GAIER (Defensive setup — Borg duckling) ───────────────────────────
+	// -- GAIER (Defensive setup - Borg duckling) ---------------------------
 	// Fluffy yellow duckling with one red mechanical eye. Quietly assimilates.
 	// Assimilate Throttles; Adapt Protocol self-buffs. Duckling Peck is "normal".
 
@@ -712,7 +712,7 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 		// Systems quietly self-optimize. The assimilation is working.
 	},
 
-	// ── SWANBORG (Evolution of Gaier — Borg swan) ─────────────────────────
+	// -- SWANBORG (Evolution of Gaier - Borg swan) -------------------------
 	// Majestic white swan with Borg plating. Resistance is futile.
 	// Collective Strike hits hard + Throttle; Optical Scan locks on; Elegant Override disrupts.
 
@@ -726,7 +726,7 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 		moveId: "optical_scan", name: "Optical Scan",
 		type: "Security", power: -6, target: "self", hitChance: 100,
 		effect: { effectType: "LockOn", maxTurns: 2, effectPower: 0, effectChance: 100 },
-		// Red optical sensor locks on — heals 6 HP and guarantees the next 2 attacks connect.
+		// Red optical sensor locks on - heals 6 HP and guarantees the next 2 attacks connect.
 	},
 	"elegant_override": {
 		moveId: "elegant_override", name: "Elegant Override",
@@ -735,8 +735,8 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 		// Graceful cybernetic wing sweep rewrites the enemy\'s next command. 40% Disrupted.
 	},
 
-	// ── AMAZONITE (Legendary — AWS stone lion) ─────────────────────────────
-	// Smooth teal stone golem. IaaS attacker — fast, burst-oriented.
+	// -- AMAZONITE (Legendary - AWS stone lion) -----------------------------
+	// Smooth teal stone golem. IaaS attacker - fast, burst-oriented.
 	// EC2 Burst chips; S3 Dump hits hard; VPC Lockdown buffs.
 
 	"ec2_burst": {
@@ -756,7 +756,7 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 		// Hardens VPC security groups and route tables.
 	},
 
-	// ── COBALTITE (Legendary Evo of Azurite — three-headed crystal cerberus) ──
+	// -- COBALTITE (Legendary Evo of Azurite - three-headed crystal cerberus) --
 	// Ampere Override primes Cascading; Egress Toll chips + Contaminates;
 	// VM Limit Crush is the nuke.
 
@@ -770,7 +770,7 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 		moveId: "egress_toll", name: "Egress Toll",
 		type: "Security", power: 14, target: "enemy", hitChance: 100,
 		effect: { effectType: "Contaminated", maxTurns: 3, effectPower: 8, effectChance: 60 },
-		// Routes traffic out — the bills start adding up. 60% Contamination.
+		// Routes traffic out - the bills start adding up. 60% Contamination.
 	},
 	"vm_limit_crush": {
 		moveId: "vm_limit_crush", name: "VM Limit Crush",
@@ -778,7 +778,7 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 		// All three heads exceed vCPU quota simultaneously. No warmup required.
 	},
 
-	// ── GRAVITONITE (Legendary Evo of Amazonite — three-headed stone hydra) ──
+	// -- GRAVITONITE (Legendary Evo of Amazonite - three-headed stone hydra) --
 	// Graviton Crunch primes Cascading; Egress Drain chips + Contaminates;
 	// Provisioned IOPS is the nuke.
 
@@ -786,13 +786,13 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 		moveId: "graviton_crunch", name: "Graviton Crunch",
 		type: "Performance", power: 12, target: "enemy", hitChance: 100,
 		effect: { effectType: "Disrupted", maxTurns: 1, effectPower: 0, effectChance: 70 },
-		// All three heads crush with Graviton force. 70% chance to Disrupt — enemy staggers before the follow-up.
+		// All three heads crush with Graviton force. 70% chance to Disrupt - enemy staggers before the follow-up.
 	},
 	"egress_drain": {
 		moveId: "egress_drain", name: "Egress Drain",
 		type: "Performance", power: 16, target: "enemy", hitChance: 100,
 		effect: { effectType: "Contaminated", maxTurns: 3, effectPower: 8, effectChance: 60 },
-		// Data pours out — someone gotta pay per GB. 60% Contamination.
+		// Data pours out - someone gotta pay per GB. 60% Contamination.
 	},
 	"provisioned_iops": {
 		moveId: "provisioned_iops", name: "Provisioned IOPS",
@@ -801,7 +801,7 @@ export const MoveLibrary: Record<MoveId, PortalKombatMoveDef> = {
 	},
 
 
-	// ── ICEBOX (Data protection tank — immutable cold storage) ─────────
+	// -- ICEBOX (Data protection tank - immutable cold storage) ---------
 	// Maximum ransomware defense. On-Demand RO locks the enemy down,
 	// Interface Disconnect air-gaps for healing, Limited R/W chips away.
 

@@ -26,7 +26,7 @@ export const GYM2_MAP: OverworldMapDef = {
 	backgroundColor: "#33230c",
 	defaultSpawn: { x: 6, y: 38 },
 	defaultFacing: "down",
-	statusText: "Sand Gym · stay on the path",
+	statusText: "Sand Gym - stay on the path",
 	tilesets: GYM2_TILESETS.map(tileset => ({
 		...tileset,
 		imagePath: tileset.imagePath === "/indoortileset.png"
@@ -38,7 +38,6 @@ export const GYM2_MAP: OverworldMapDef = {
 					: portalTilesetImagePath,
 	})),
 	tileLayers: GYM2_TILE_LAYERS,
-	objects: [],
 	collisionRects: GYM2_COLLISION_RECTS,
 	collisionPoints: [],
 	encounterZones: GYM2_WILD_ZONES,

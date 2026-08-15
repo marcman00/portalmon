@@ -1,4 +1,4 @@
-﻿import { SpeciesId } from "./data/CreatureList";
+import { SpeciesId } from "./data/CreatureList";
 import { TrainerDefs } from "./data/TrainerList";
 import { CombatManager } from "./_CombatManager";
 import { PortalmonCache } from "./PortalmonController";
@@ -113,7 +113,7 @@ export class GymLeaderVM
 		this.id = def.id;
 		this.name = def.name;
 		this.specialty = def.specialty ?? "";
-		this.portraitEmoji = def.portraitEmoji ?? "❓";
+		this.portraitEmoji = def.portraitEmoji ?? "\u2753";
 		this.creatureEmojis = def.creatureEmojis ?? [];
 		this.party = def.party;
 		this.defeatQuote = def.defeatQuote;
@@ -161,7 +161,7 @@ const SECRET_DEF: BossDef = {
 	id: "secret", name: "???",
 	revealedName: "Rey",
 	subtitle: "Developer signature detected. Location unknown.",
-	portraitEmoji: "🕵️",
+	portraitEmoji: "\uD83D\uDD75\uFE0F",
 	party: TrainerDefs["rey"].party,
 	defeatQuote: TrainerDefs["rey"].victoryMessage,
 	winQuote: TrainerDefs["rey"].winQuote,

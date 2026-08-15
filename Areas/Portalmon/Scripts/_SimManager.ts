@@ -3,7 +3,7 @@ import { SpeciesDef, CreatureDex } from "./data/CreatureList";
 /**
  * Lightweight UI-state manager for the Battle Simulator overlay.
  * Handles creature selection for the sprite viewer and battle sim.
- * No cache or dex dependency — pure UI state.
+ * No cache or dex dependency - pure UI state.
  */
 export class SimManager
 {

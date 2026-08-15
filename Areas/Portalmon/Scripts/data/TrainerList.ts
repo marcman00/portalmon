@@ -131,7 +131,7 @@ export const TrainerDefs: Record<string, TrainerDef> = {
 };
 
 // ============================================================
-// TRAINER DIALOGUE — Full lines per trigger
+// TRAINER DIALOGUE - Full lines per trigger
 // ============================================================
 
 export const TrainerDialogue: Record<string, TrainerDialogueLine[]> = {
@@ -383,7 +383,7 @@ export const TrainerDialogue: Record<string, TrainerDialogueLine[]> = {
 };
 
 // ============================================================
-// HELPER — get random lines for a trigger
+// HELPER - get random lines for a trigger
 // ============================================================
 
 export function getTrainerLines(trainerId: string, trigger: DialogueTrigger): string[]

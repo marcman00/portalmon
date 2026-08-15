@@ -1,13 +1,13 @@
 <div data-bind="with: combatManager, as: 'cm'" class="pk-battle">
 
-	<!-- ===== IDLE STATE — the overworld is shown when no encounter is running ===== -->
+	<!-- ===== IDLE STATE - the overworld is shown when no encounter is running ===== -->
 	<!-- ko ifnot: isEncounterActive() -->
 	@Html.Partial("~/Areas/Portalmon/Views/Home/Overworld.cshtml")
 	<!-- /ko -->
-	<!-- ===== ACTIVE ENCOUNTER — only rendered while a battle is in progress ===== -->
+	<!-- ===== ACTIVE ENCOUNTER - only rendered while a battle is in progress ===== -->
 	<!-- ko if: isEncounterActive() -->
 
-	<!-- SIM LOSS OVERLAY — simpler dismiss for simulation mode -->
+	<!-- SIM LOSS OVERLAY - simpler dismiss for simulation mode -->
 	<!-- ko if: isSimBattle() && isBattleEnded() && playerParty().every(function(p) { return p.isFainted(); }) -->
 	<div class="pk-revive-overlay">
 		<div class="pk-sim-banner d-flex align-items-center justify-content-center gap-2 mb-3">
@@ -173,7 +173,7 @@
 				<!-- ko foreach: playerParty -->
 				<div class="pk-bench-portrait-slot pk-bench-portrait-slot--player"
 					 data-bind="css: { 'pk-bench-fainted': isFainted(), 'pk-bench-active': id === cm.playerActive().id },
-					            attr: { title: name + ' • ' + type + ' • ' + hpCurrent() + '/' + hpMax + ' HP' }">
+					            attr: { title: name + ' - ' + type + ' - ' + hpCurrent() + '/' + hpMax + ' HP' }">
 					<!-- ko if: portraitImage -->
 					<img class="pk-bench-portrait-img" loading="lazy" decoding="async" data-bind="attr: { src: portraitImage, alt: name }" />
 					<!-- /ko -->
@@ -228,7 +228,7 @@
 		<!-- /ko -->
 	</div>
 
-	<!-- CATCH BALL — absolutely positioned inside the battlefield.
+	<!-- CATCH BALL - absolutely positioned inside the battlefield.
 		 Visibility and phase are driven by CatchAnimator on the controller. -->
 	<!-- ko if: $root.catchAnim.isActive() -->
 	<img src="/Areas/Portalmon/Content/Images/Portalmon/ball.png"
@@ -247,7 +247,7 @@
 		 data-bind="css: { 'pk-battle-intro-panel': $root.battleTransition.phase() === 'iris-open' || $root.battleTransition.phase() === 'intro' }">
 		<div class="row g-0">
 
-			<!-- TEXT BOX (left) — always visible so the announcer result stays readable -->
+			<!-- TEXT BOX (left) - always visible so the announcer result stays readable -->
 			<div class="col-7">
 				<div class="pk-text-box">
 					<!-- Trainer dialogue portrait (gym battles) -->
@@ -277,7 +277,7 @@
 			<!-- ACTION BUTTONS (right) -->
 			<div class="col-5">
 
-				<!-- POST-BATTLE RESULT PANEL — replaces action buttons after battle ends -->
+				<!-- POST-BATTLE RESULT PANEL - replaces action buttons after battle ends -->
 				<!-- ko if: isBattleEnded() -->
 				<div class="pk-result-panel">
 					<!-- All party fainted: revival overlay handles it; hide CONTINUE so nothing bleeds through -->

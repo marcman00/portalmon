@@ -28,8 +28,8 @@ export class OverworldDialogue
 	public readonly advanceHint: KnockoutComputed<string> = ko.pureComputed(() =>
 	{
 		if (this.isTyping()) return "";
-		if (this.isChoosing()) return "D-PAD · E CONFIRM";
-		return this.lineIndex >= this.lines.length - 1 ? "E · CLOSE" : "E · NEXT";
+		if (this.isChoosing()) return "D-PAD - E CONFIRM";
+		return this.lineIndex >= this.lines.length - 1 ? "E - CLOSE" : "E - NEXT";
 	});
 
 	private lines: string[] = [];

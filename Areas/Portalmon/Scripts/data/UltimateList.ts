@@ -84,14 +84,14 @@ export interface UltimateDef
 }
 
 // ============================================================
-// ULTIMATE LIBRARY — All 30+ creature ultimates from the Bible
+// ULTIMATE LIBRARY - All 30+ creature ultimates from the Bible
 // ============================================================
 
 export const UltimateLibrary: Record<string, UltimateDef> = {
 
-	// ═══════════════════════════════════════════════════════════
+	// ===========================================================
 	// STARTERS
-	// ═══════════════════════════════════════════════════════════
+	// ===========================================================
 
 	"false_positive": {
 		ultId: "false_positive", name: "False Positive",
@@ -126,9 +126,9 @@ export const UltimateLibrary: Record<string, UltimateDef> = {
 		special: { kind: "guaranteed_if_status", status: "LockOn", bonusEffect: { effectType: "Disrupted", maxTurns: 1, effectPower: 0, effectChance: 100 } },
 	},
 
-	// ═══════════════════════════════════════════════════════════
+	// ===========================================================
 	// EVOLUTIONS
-	// ═══════════════════════════════════════════════════════════
+	// ===========================================================
 
 	"black_swan_event": {
 		ultId: "black_swan_event", name: "Black Swan Event",
@@ -198,9 +198,9 @@ export const UltimateLibrary: Record<string, UltimateDef> = {
 		benchSynergy: { speciesId: "yik", bonus: { kind: "extra_status", effect: { effectType: "Contaminated", maxTurns: 2, effectPower: 8, effectChance: 100 } } },
 	},
 
-	// ═══════════════════════════════════════════════════════════
+	// ===========================================================
 	// WILD CREATURES
-	// ═══════════════════════════════════════════════════════════
+	// ===========================================================
 
 	"all_monitors_red": {
 		ultId: "all_monitors_red", name: "All Monitors Red",
@@ -242,7 +242,7 @@ export const UltimateLibrary: Record<string, UltimateDef> = {
 		ultId: "over_capacity", name: "Over Capacity",
 		type: "Performance", power: 22, hits: 1, hitChance: 100, chargeCost: 4,
 		target: "enemy", animCategory: "single-hit",
-		flavorText: "The capacity assessment came back — you're over capacity.",
+		flavorText: "The capacity assessment came back - you're over capacity.",
 		special: { kind: "double_hits_if_status", status: "Optimized" },
 	},
 
@@ -250,7 +250,7 @@ export const UltimateLibrary: Record<string, UltimateDef> = {
 		ultId: "dr_cutover", name: "DR Cutover",
 		type: "Availability", power: 13, hits: 5, hitChance: 100, chargeCost: 4,
 		target: "enemy", animCategory: "multi-hit",
-		flavorText: "The disaster recovery cutover is live — every standby bee activates.",
+		flavorText: "The disaster recovery cutover is live - every standby bee activates.",
 		special: { kind: "per_hit_status_chance", chance: 35, effect: { effectType: "Throttled", maxTurns: 1, effectPower: -15, effectChance: 100 } },
 	},
 
@@ -275,7 +275,7 @@ export const UltimateLibrary: Record<string, UltimateDef> = {
 		ultId: "true_up", name: "True-Up",
 		type: "Security", power: 32, hits: 1, hitChance: 100, chargeCost: 4,
 		target: "enemy", animCategory: "single-hit",
-		flavorText: "The VMware true-up — everyone discovers they owe more than expected.",
+		flavorText: "The VMware true-up - everyone discovers they owe more than expected.",
 		effect: { effectType: "Contaminated", maxTurns: 2, effectPower: 8, effectChance: 100 },
 		selfDamage: 15,
 	},
@@ -322,9 +322,9 @@ export const UltimateLibrary: Record<string, UltimateDef> = {
 		effect: { effectType: "Contaminated", maxTurns: 2, effectPower: 8, effectChance: 100 },
 	},
 
-	// ═══════════════════════════════════════════════════════════
+	// ===========================================================
 	// JOKE CREATURES
-	// ═══════════════════════════════════════════════════════════
+	// ===========================================================
 
 	"audit_season": {
 		ultId: "audit_season", name: "Audit Season",
@@ -350,9 +350,9 @@ export const UltimateLibrary: Record<string, UltimateDef> = {
 		special: { kind: "reduce_enemy_charge", amount: 2 },
 	},
 
-	// ═══════════════════════════════════════════════════════════
-	// LEGENDARIES — Cloud Duo
-	// ═══════════════════════════════════════════════════════════
+	// ===========================================================
+	// LEGENDARIES - Cloud Duo
+	// ===========================================================
 
 	"subscription_tier_enterprise": {
 		ultId: "subscription_tier_enterprise", name: "Subscription Tier: Enterprise",
@@ -375,7 +375,7 @@ export const UltimateLibrary: Record<string, UltimateDef> = {
 		ultId: "us_east_1_is_down", name: "us-east-1 Is Down",
 		type: "Performance", power: 30, hits: 1, hitChance: 100, chargeCost: 4,
 		target: "enemy", animCategory: "bench-spread",
-		flavorText: "When us-east-1 goes down, EVERYTHING goes down — half the internet breaks.",
+		flavorText: "When us-east-1 goes down, EVERYTHING goes down - half the internet breaks.",
 		effect: { effectType: "Disrupted", maxTurns: 1, effectPower: 0, effectChance: 100 },
 		benchDamage: { power: 15 },
 		special: { kind: "double_hits_if_status", status: "Optimized" },
@@ -390,9 +390,9 @@ export const UltimateLibrary: Record<string, UltimateDef> = {
 		benchSynergy: { speciesId: "amazonite", bonus: { kind: "extra_status", effect: { effectType: "Contaminated", maxTurns: 3, effectPower: 8, effectChance: 100 } } },
 	},
 
-	// ═══════════════════════════════════════════════════════════
-	// LEGENDARIES — Other
-	// ═══════════════════════════════════════════════════════════
+	// ===========================================================
+	// LEGENDARIES - Other
+	// ===========================================================
 
 	"architecture_review": {
 		ultId: "architecture_review", name: "Architecture Review",
@@ -410,9 +410,9 @@ export const UltimateLibrary: Record<string, UltimateDef> = {
 		special: { kind: "miss_stack_accuracy", increment: 25 },
 	},
 
-	// ═══════════════════════════════════════════════════════════
+	// ===========================================================
 	// GEN 1 POKEMON ULTIMATES (GLaDOS imports)
-	// ═══════════════════════════════════════════════════════════
+	// ===========================================================
 
 	"solar_beam": {
 		ultId: "solar_beam", name: "Solar Beam",
@@ -445,9 +445,9 @@ export const UltimateLibrary: Record<string, UltimateDef> = {
 	},
 
 
-	// ═══════════════════════════════════════════════════════════
-	// WAVE 2 — New creatures
-	// ═══════════════════════════════════════════════════════════
+	// ===========================================================
+	// WAVE 2 - New creatures
+	// ===========================================================
 
 	"subscription_model": {
 		ultId: "subscription_model", name: "Subscription Model",

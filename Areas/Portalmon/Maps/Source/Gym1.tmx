@@ -320,11 +320,11 @@
   <properties>
    <property name="wild" type="bool" value="true"/>
   </properties>
-  <object id="1" x="176" y="432" width="192" height="64">
+  <object id="1" x="176" y="448" width="192" height="32">
    <properties>
     <property name="wild" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="16" x="144" y="192" width="240" height="96"/>
+  <object id="16" x="144" y="192" width="240" height="80"/>
  </objectgroup>
 </map>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="38" height="36" tilewidth="16" tileheight="16" infinite="0" nextlayerid="8" nextobjectid="124">
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="38" height="36" tilewidth="16" tileheight="16" infinite="0" nextlayerid="8" nextobjectid="127">
  <tileset firstgid="1" source="pokemon.tsx"/>
  <tileset firstgid="1317" source="PortalTileset.tsx"/>
  <tileset firstgid="1321" source="indoortileset.tsx"/>
@@ -54,28 +54,28 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,1317,0,1319,0,1318,0,1317,0,0,0,0,1319,0,1318,0,1317,0,1317,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,1317,0,1317,0,1317,0,1317,0,0,0,0,1319,0,1318,0,1317,0,1317,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,1319,0,0,0,0,0,0,0,1317,0,0,1317,0,0,0,0,0,0,0,1319,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,1317,0,0,0,0,0,0,0,1317,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1317,0,0,0,0,0,0,0,1319,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,1317,0,0,0,0,0,0,0,1317,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1317,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,1319,0,1317,0,1319,0,1318,0,0,0,0,1317,0,1317,0,1318,0,1317,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,1317,0,1317,0,1317,0,1317,0,0,0,0,1317,0,1317,0,1318,0,1317,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,1317,0,0,0,0,0,0,0,0,0,0,1318,0,0,0,0,0,0,0,1317,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1318,0,0,0,0,0,0,0,1317,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1317,0,0,0,0,0,0,0,1317,0,0,0,0,1317,0,1318,0,1319,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,1317,0,1317,0,1317,0,1317,0,0,0,1317,0,1318,0,1317,0,1318,0,1317,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,1317,0,1317,0,1319,0,1317,0,0,0,1317,0,1318,0,1319,0,1318,0,1317,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6940,0,7324,0,6940,0,7132,0,6748,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1318,7131,0,0,0,0,0,7321,1318,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1318,0,0,0,0,0,0,0,1318,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1317,0,0,0,0,0,0,0,1317,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1317,6555,0,0,0,0,0,6937,1317,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -95,12 +95,12 @@
 347,348,348,348,349,348,348,348,348,349,349,349,348,348,348,348,348,348,348,349,349,348,348,348,349,349,348,348,348,349,349,348,348,349,349,348,349,349,
 347,348,348,348,348,348,348,349,349,349,349,349,348,348,348,348,348,348,348,348,349,348,348,348,349,349,349,348,348,348,348,349,349,349,349,348,349,349,
 347,348,348,348,348,348,348,348,349,349,348,348,348,348,348,349,348,348,348,348,348,348,348,348,349,348,349,348,348,348,348,348,348,349,349,348,349,349,
-347,348,348,348,349,348,348,348,348,348,403,404,348,349,348,348,348,348,403,404,348,348,348,348,348,348,349,348,348,348,348,348,348,349,349,348,349,349,
-347,348,348,348,349,376,376,376,376,376,431,432,376,376,348,348,376,376,431,432,376,376,376,376,376,347,348,348,348,349,348,348,349,349,349,348,349,349,
-347,348,348,403,404,0,0,0,0,0,0,0,0,0,347,349,0,0,0,0,0,0,0,0,0,347,348,348,348,348,348,348,348,349,349,348,349,349,
-347,348,348,431,432,0,108,0,108,0,108,0,108,0,347,349,0,108,0,108,0,108,0,108,0,347,348,348,348,348,348,348,348,349,349,348,349,349,
-347,348,348,348,349,0,0,0,0,0,0,0,0,0,347,349,0,0,0,0,0,0,0,0,0,347,348,348,348,348,349,348,349,349,349,348,349,349,
-347,348,348,348,349,0,108,0,0,0,0,0,108,0,347,349,0,108,0,0,0,0,0,108,0,347,348,348,348,348,349,348,348,349,349,348,349,349,
+347,348,348,348,349,403,404,403,404,349,403,404,403,404,348,348,348,348,403,404,348,348,348,348,348,348,349,348,348,348,348,348,348,349,349,348,349,349,
+347,348,348,348,349,431,432,431,432,349,431,432,431,432,348,348,376,376,431,432,376,376,376,376,376,347,348,348,348,349,348,348,349,349,349,348,349,349,
+347,348,348,348,349,0,0,0,0,0,0,0,0,0,347,349,0,0,0,0,0,0,0,0,0,347,348,348,348,348,348,348,348,349,349,348,349,349,
+347,348,348,403,404,0,0,0,0,0,0,0,0,0,403,404,0,108,0,108,0,108,0,108,0,347,348,348,348,348,348,348,348,349,349,348,349,349,
+347,348,348,431,432,0,0,0,0,0,0,0,0,0,431,432,0,0,0,0,0,0,0,0,0,347,348,348,348,348,349,348,349,349,349,348,349,349,
+347,348,348,348,349,0,0,0,0,0,0,0,0,0,347,349,0,108,0,0,0,0,0,108,0,347,348,348,348,348,349,348,348,349,349,348,349,349,
 347,348,348,348,349,0,0,0,0,108,0,0,0,0,403,404,0,0,0,0,108,0,0,0,0,347,348,348,348,349,349,348,348,349,349,348,349,349,
 347,348,348,348,349,0,0,0,0,0,0,0,0,0,431,432,0,108,0,0,0,0,0,0,0,347,348,0,0,0,0,0,0,0,0,348,349,349,
 347,348,348,348,349,320,320,320,320,320,320,320,320,320,347,349,320,320,320,320,320,320,320,320,320,347,348,0,0,0,0,0,0,13610,0,0,349,349,
@@ -108,17 +108,17 @@
 347,348,431,432,349,0,0,0,0,0,0,0,0,0,347,349,0,0,0,0,0,0,0,0,0,347,348,0,0,0,0,0,0,0,0,348,349,349,
 347,348,348,348,349,0,108,0,108,0,108,0,108,0,347,349,0,108,0,108,0,108,0,108,0,347,348,0,0,0,0,0,0,0,0,348,349,349,
 347,348,348,348,349,0,0,0,0,0,0,0,0,0,347,349,0,0,0,0,0,0,0,0,0,347,348,348,348,349,349,348,348,348,348,348,349,349,
-347,348,348,348,349,0,108,0,0,0,0,0,0,0,403,404,0,108,0,0,0,0,0,108,0,347,348,348,348,349,349,348,348,348,348,348,349,349,
+347,348,348,348,349,0,0,0,0,0,0,0,0,0,403,404,0,108,0,0,0,0,0,108,0,347,348,348,348,349,349,348,348,348,348,348,349,349,
 347,348,348,348,349,0,0,0,0,108,0,0,0,0,431,432,0,0,0,0,108,0,0,0,0,347,348,348,0,0,0,0,0,0,0,348,349,349,
 347,348,348,348,349,0,0,0,0,0,0,0,0,0,347,349,0,108,0,0,0,0,0,108,0,347,348,348,0,0,0,0,0,0,0,348,349,349,
 347,348,348,348,349,320,320,320,320,320,320,320,320,320,347,349,320,320,320,320,320,320,320,320,320,347,348,348,0,108,0,108,0,108,0,348,349,349,
 347,348,348,348,349,376,376,376,376,376,376,376,376,376,347,349,376,376,376,376,376,376,376,376,376,347,348,348,0,0,0,0,0,0,0,348,349,349,
 347,348,348,348,349,0,0,0,0,0,0,0,0,0,403,404,0,0,0,0,0,0,0,0,0,347,348,348,0,0,0,108,0,0,0,348,349,349,
-347,348,348,348,349,0,108,0,108,0,108,0,108,0,431,432,108,0,108,0,108,0,108,0,108,347,348,348,0,0,0,0,0,0,0,348,349,349,
+347,348,348,348,349,0,0,0,0,0,0,0,0,0,431,432,0,0,0,0,0,0,0,0,0,347,348,348,0,0,0,0,0,0,0,348,349,349,
 347,348,348,348,349,0,0,0,0,0,0,0,0,0,347,349,0,0,0,0,0,0,0,0,0,347,348,348,348,349,349,348,349,349,349,349,349,349,
-347,348,348,348,349,0,0,0,0,0,0,0,0,0,347,349,0,108,0,0,0,0,0,108,0,347,348,348,348,349,349,348,349,349,349,348,349,349,
+347,348,348,348,349,0,0,0,0,0,0,0,0,0,347,349,0,0,0,0,0,0,0,0,0,347,348,348,348,349,349,348,349,349,349,348,349,349,
 347,348,348,348,349,0,0,0,0,108,0,0,0,0,347,349,0,0,0,0,108,0,0,0,0,347,348,348,348,349,348,349,349,349,348,348,349,349,
-347,348,348,348,349,0,0,0,0,0,0,0,0,0,347,349,0,108,0,0,0,0,0,108,0,347,348,348,348,349,348,349,349,349,348,348,349,349,
+347,348,348,348,349,0,0,0,0,0,0,0,0,0,347,349,0,0,0,0,0,0,0,0,0,347,348,348,348,349,348,349,349,349,348,348,349,349,
 347,348,348,348,348,319,320,321,0,0,108,319,319,319,347,349,319,319,319,319,319,319,319,320,321,348,348,348,348,349,348,348,349,349,348,348,349,349,
 347,348,348,348,348,348,320,321,0,0,0,347,348,348,348,348,347,347,347,347,348,348,348,348,321,348,348,348,348,349,348,348,348,348,348,348,348,349,
 348,348,348,348,348,348,320,321,106,0,106,347,348,348,348,348,348,348,348,348,348,348,348,348,348,348,348,348,348,349,349,348,348,348,348,348,348,348,
@@ -130,7 +130,7 @@
  <objectgroup color="#ff0000" id="4" name="Actables">
   <object id="1" x="160" y="480" width="16" height="16">
    <properties>
-    <property name="message" value="Cryptic islands ahead. Choose carefully!"/>
+    <property name="message" value="Cryptic islands ahead. Choose wisely!"/>
     <property name="name" value="Sign"/>
    </properties>
   </object>
@@ -140,207 +140,135 @@
     <property name="name" value="Sign"/>
    </properties>
   </object>
-  <object id="5" x="96" y="400" width="16" height="16">
-   <properties>
-    <property name="message" value="Pick me!"/>
-    <property name="name" value="Sign"/>
-   </properties>
-  </object>
-  <object id="6" x="128" y="400" width="16" height="16">
-   <properties>
-    <property name="message" value="Pick me!"/>
-    <property name="name" value="Sign"/>
-   </properties>
-  </object>
-  <object id="7" x="160" y="400" width="16" height="16">
-   <properties>
-    <property name="message" value="Pick me."/>
-    <property name="name" value="Sign"/>
-   </properties>
-  </object>
-  <object id="8" x="192" y="400" width="16" height="16">
-   <properties>
-    <property name="message" value="Pick me!"/>
-    <property name="name" value="Sign"/>
-   </properties>
-  </object>
   <object id="9" x="320" y="192" width="16" height="16">
    <properties>
-    <property name="message" value="Hope you kept track of purple so far!"/>
+    <property name="message" value="Sound it out."/>
     <property name="name" value="Sign"/>
    </properties>
   </object>
   <object id="10" x="272" y="208" width="16" height="16">
    <properties>
-    <property name="message" value="2"/>
+    <property name="message" value="1"/>
     <property name="name" value="Sign"/>
    </properties>
   </object>
   <object id="11" x="272" y="176" width="16" height="16">
    <properties>
-    <property name="message" value="3"/>
+    <property name="message" value="2"/>
     <property name="name" value="Sign"/>
    </properties>
   </object>
   <object id="12" x="272" y="144" width="16" height="16">
    <properties>
-    <property name="message" value="4"/>
+    <property name="message" value="3"/>
     <property name="name" value="Sign"/>
    </properties>
   </object>
   <object id="13" x="304" y="144" width="16" height="16">
    <properties>
-    <property name="message" value="5"/>
+    <property name="message" value="4"/>
     <property name="name" value="Sign"/>
    </properties>
   </object>
   <object id="14" x="336" y="144" width="16" height="16">
    <properties>
-    <property name="message" value="6"/>
+    <property name="message" value="5"/>
     <property name="name" value="Sign"/>
    </properties>
   </object>
   <object id="15" x="368" y="144" width="16" height="16">
    <properties>
-    <property name="message" value="7"/>
+    <property name="message" value="6"/>
     <property name="name" value="Sign"/>
    </properties>
   </object>
   <object id="16" x="368" y="176" width="16" height="16">
    <properties>
-    <property name="message" value="8"/>
-    <property name="name" value="Sign"/>
-   </properties>
-  </object>
-  <object id="17" x="144" y="192" width="16" height="16">
-   <properties>
-    <property name="message" value="How many purple portals are there?"/>
-    <property name="name" value="Sign"/>
-   </properties>
-  </object>
-  <object id="19" x="96" y="176" width="16" height="16">
-   <properties>
-    <property name="message" value="3"/>
-    <property name="name" value="Sign"/>
-   </properties>
-  </object>
-  <object id="20" x="96" y="144" width="16" height="16">
-   <properties>
-    <property name="message" value="4"/>
-    <property name="name" value="Sign"/>
-   </properties>
-  </object>
-  <object id="21" x="128" y="144" width="16" height="16">
-   <properties>
-    <property name="message" value="5"/>
-    <property name="name" value="Sign"/>
-   </properties>
-  </object>
-  <object id="22" x="160" y="144" width="16" height="16">
-   <properties>
-    <property name="message" value="6"/>
-    <property name="name" value="Sign"/>
-   </properties>
-  </object>
-  <object id="23" x="192" y="144" width="16" height="16">
-   <properties>
     <property name="message" value="7"/>
-    <property name="name" value="Sign"/>
-   </properties>
-  </object>
-  <object id="24" x="192" y="176" width="16" height="16">
-   <properties>
-    <property name="message" value="8"/>
     <property name="name" value="Sign"/>
    </properties>
   </object>
   <object id="25" x="144" y="320" width="16" height="16">
    <properties>
-    <property name="message" value="How many purple portals are there?"/>
-    <property name="name" value="Sign"/>
-   </properties>
-  </object>
-  <object id="27" x="96" y="304" width="16" height="16">
-   <properties>
-    <property name="message" value="3"/>
+    <property name="message" value="Is something different?"/>
     <property name="name" value="Sign"/>
    </properties>
   </object>
   <object id="28" x="96" y="272" width="16" height="16">
    <properties>
-    <property name="message" value="4"/>
+    <property name="message" value="Pick me!"/>
     <property name="name" value="Sign"/>
    </properties>
   </object>
   <object id="29" x="128" y="272" width="16" height="16">
    <properties>
-    <property name="message" value="5"/>
+    <property name="message" value="Pick me."/>
     <property name="name" value="Sign"/>
    </properties>
   </object>
   <object id="30" x="160" y="272" width="16" height="16">
    <properties>
-    <property name="message" value="6"/>
+    <property name="message" value="Pick me!"/>
     <property name="name" value="Sign"/>
    </properties>
   </object>
   <object id="31" x="192" y="272" width="16" height="16">
    <properties>
-    <property name="message" value="7"/>
+    <property name="message" value="Pick me!"/>
     <property name="name" value="Sign"/>
    </properties>
   </object>
   <object id="33" x="320" y="320" width="16" height="16">
    <properties>
-    <property name="message" value="How many purple portals are there?"/>
+    <property name="message" value="Hope you've been keeping track of portals."/>
     <property name="name" value="Sign"/>
    </properties>
   </object>
   <object id="34" x="272" y="336" width="16" height="16">
    <properties>
-    <property name="message" value="2"/>
+    <property name="message" value="16"/>
     <property name="name" value="Sign"/>
    </properties>
   </object>
   <object id="35" x="272" y="304" width="16" height="16">
    <properties>
-    <property name="message" value="3"/>
+    <property name="message" value="17"/>
     <property name="name" value="Sign"/>
    </properties>
   </object>
   <object id="36" x="272" y="272" width="16" height="16">
    <properties>
-    <property name="message" value="4"/>
+    <property name="message" value="18"/>
     <property name="name" value="Sign"/>
    </properties>
   </object>
   <object id="37" x="304" y="272" width="16" height="16">
    <properties>
-    <property name="message" value="5"/>
+    <property name="message" value="19"/>
     <property name="name" value="Sign"/>
    </properties>
   </object>
   <object id="38" x="336" y="272" width="16" height="16">
    <properties>
-    <property name="message" value="6"/>
+    <property name="message" value="20"/>
     <property name="name" value="Sign"/>
    </properties>
   </object>
   <object id="39" x="368" y="272" width="16" height="16">
    <properties>
-    <property name="message" value="7"/>
+    <property name="message" value="21"/>
     <property name="name" value="Sign"/>
    </properties>
   </object>
   <object id="40" x="368" y="304" width="16" height="16">
    <properties>
-    <property name="message" value="8"/>
+    <property name="message" value="22"/>
     <property name="name" value="Sign"/>
    </properties>
   </object>
   <object id="41" x="320" y="448" width="16" height="16">
    <properties>
-    <property name="message" value="How many purple portals are there?"/>
+    <property name="message" value="_____ point."/>
     <property name="name" value="Sign"/>
    </properties>
   </object>
@@ -400,7 +328,7 @@
   </object>
   <object id="51" x="368" y="336" width="16" height="16">
    <properties>
-    <property name="message" value="4"/>
+    <property name="message" value="23"/>
     <property name="name" value="Sign"/>
    </properties>
   </object>
@@ -431,6 +359,12 @@
   <object id="117" x="528" y="224" width="16" height="16">
    <properties>
     <property name="trainerId" value="coach"/>
+   </properties>
+  </object>
+  <object id="124" x="144" y="192" width="16" height="16">
+   <properties>
+    <property name="message" value="Paper and scissors."/>
+    <property name="name" value="Sign"/>
    </properties>
   </object>
  </objectgroup>
@@ -483,12 +417,6 @@
     <property name="spawn" value="gym3-start-over"/>
    </properties>
   </object>
-  <object id="74" x="80" y="304" width="16" height="16">
-   <properties>
-    <property name="map" value="gym3"/>
-    <property name="spawn" value="gym3-start-over"/>
-   </properties>
-  </object>
   <object id="75" x="96" y="128" width="16" height="16">
    <properties>
     <property name="map" value="gym3"/>
@@ -513,13 +441,13 @@
     <property name="spawn" value="gym3-start-over"/>
    </properties>
   </object>
-  <object id="79" x="80" y="176" width="16" height="16">
+  <object id="79" x="80" y="192" width="16" height="16">
    <properties>
     <property name="map" value="gym3"/>
-    <property name="spawn" value="gym3-start-over"/>
+    <property name="spawn" value="gym3-trial4"/>
    </properties>
   </object>
-  <object id="80" x="208" y="176" width="16" height="16">
+  <object id="80" x="208" y="160" width="16" height="16">
    <properties>
     <property name="map" value="gym3"/>
     <property name="spawn" value="gym3-start-over"/>
@@ -558,7 +486,7 @@
   <object id="86" x="384" y="176" width="16" height="16">
    <properties>
     <property name="map" value="gym3"/>
-    <property name="spawn" value="gym3-start-over"/>
+    <property name="spawn" value="gym3-trial5"/>
    </properties>
   </object>
   <object id="87" x="272" y="256" width="16" height="16">
@@ -618,7 +546,7 @@
   <object id="96" x="384" y="384" width="16" height="16">
    <properties>
     <property name="map" value="gym3"/>
-    <property name="spawn" value="gym3-start-over"/>
+    <property name="spawn" value="gym3-trial7"/>
    </properties>
   </object>
   <object id="97" x="256" y="432" width="16" height="16">
@@ -642,7 +570,7 @@
   <object id="100" x="384" y="336" width="16" height="16">
    <properties>
     <property name="map" value="gym3"/>
-    <property name="spawn" value="gym3-start-over"/>
+    <property name="spawn" value="gym3-trial6"/>
    </properties>
   </object>
   <object id="101" x="256" y="384" width="16" height="16">
@@ -699,6 +627,18 @@
     <property name="spawn" value="gym3-start-over"/>
    </properties>
   </object>
+  <object id="125" x="208" y="192" width="16" height="16">
+   <properties>
+    <property name="map" value="gym3"/>
+    <property name="spawn" value="gym3-start-over"/>
+   </properties>
+  </object>
+  <object id="126" x="80" y="160" width="16" height="16">
+   <properties>
+    <property name="map" value="gym3"/>
+    <property name="spawn" value="gym3-start-over"/>
+   </properties>
+  </object>
  </objectgroup>
  <objectgroup color="#ff00ff" id="6" name="Spawns">
   <object id="65" x="144" y="512" width="16" height="16">
@@ -747,7 +687,7 @@
    </properties>
   </object>
  </objectgroup>
- <objectgroup color="#aa00ff" id="7" name="Wild" visible="0">
+ <objectgroup color="#aa00ff" id="7" name="Wild">
   <object id="54" x="128" y="432" width="48" height="48"/>
   <object id="55" x="128" y="304" width="48" height="48"/>
   <object id="60" x="128" y="176" width="48" height="48"/>

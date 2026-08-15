@@ -1,4 +1,4 @@
-﻿/**
+/**
  * SoundHandler - Manages background music and sound effects
  * 
  * Features:

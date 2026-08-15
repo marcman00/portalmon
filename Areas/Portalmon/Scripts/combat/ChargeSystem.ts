@@ -9,7 +9,7 @@ type ChargeLogMode = "always" | "ready-only";
 /**
  * All ULT-charge-meter bookkeeping for one battle: passive ticks, archetype
  * bonuses, bench charging (half rate), swap penalties, and ult spend.
- * Pulled out of CombatManager as its own unit — the only thing it needs from
+ * Pulled out of CombatManager as its own unit - the only thing it needs from
  * the battle it's charging for is somewhere to write log lines.
  */
 export class ChargeSystem

@@ -1,4 +1,4 @@
-﻿import { MoveId, StatusEffectDef } from "./MoveList";
+import { MoveId, StatusEffectDef } from "./MoveList";
 import { PortalKombatType } from "./TypeList";
 import { ChargeArchetype } from "./UltimateList";
 
@@ -37,27 +37,27 @@ export interface CreatureInstance
 //
 // Base creatures have modest stats that define a clear role.
 // Evolutions are meaningfully better but not overwhelming (~+15-20% key stats).
-// Legendaries sit at roughly evolution tier — special, not broken.
+// Legendaries sit at roughly evolution tier - special, not broken.
 // Orakle is intentionally below curve (joke creature).
 //
 // Roles and what to prioritize:
-//   Glass cannon   — high atk, low def, mid spd         (normling)
-//   Speed sweeper  — max spd, good atk, low bulk        (redping)
-//   Setup attacker — balanced stats, rewards buff turns  (pclaw, memlet)
-//   Aggressive     — high hp + atk, sacrifices def/spd  (owtage)
-//   Heal tank      — extreme hp + def, low atk/spd      (ressie, beecyerview)
-//   Control        — balanced, value is in status moves  (querion, prodle)
-//   Disrupt tank   — high def, average atk, low spd     (cpfnib)
-//   Joke           — below curve across the board       (orakle)
+//   Glass cannon   - high atk, low def, mid spd         (normling)
+//   Speed sweeper  - max spd, good atk, low bulk        (redping)
+//   Setup attacker - balanced stats, rewards buff turns  (pclaw, memlet)
+//   Aggressive     - high hp + atk, sacrifices def/spd  (owtage)
+//   Heal tank      - extreme hp + def, low atk/spd      (ressie, beecyerview)
+//   Control        - balanced, value is in status moves  (querion, prodle)
+//   Disrupt tank   - high def, average atk, low spd     (cpfnib)
+//   Joke           - below curve across the board       (orakle)
 // ============================================================
 export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 
-	// ═══════════════════════════════════════════════════════════
+	// ===========================================================
 	// STARTERS
-	// ═══════════════════════════════════════════════════════════
+	// ===========================================================
 
 	"normling": {
-		// Glass cannon — fast, hits hard, not built to take hits.
+		// Glass cannon - fast, hits hard, not built to take hits.
 		// Spike Warning is the win condition; Normalize buys a second chance.
 		id: "normling",
 		name: "Normling",
@@ -73,7 +73,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 	},
 
 	"cpfnib": {
-		// Disrupt tank — slow but hard to shift. Wins by locking down the enemy
+		// Disrupt tank - slow but hard to shift. Wins by locking down the enemy
 		// and landing a clean Mercator Draft while they're Throttled or Disrupted.
 		id: "cpfnib",
 		name: "CPFNib",
@@ -88,7 +88,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 	},
 
 	"ressie": {
-		// Heal tank — the slowest starter by far, but nearly unkillable.
+		// Heal tank - the slowest starter by far, but nearly unkillable.
 		// Self Assess offers a brief self-repair window without letting battles stall out.
 		id: "ressie",
 		name: "Ressie",
@@ -104,12 +104,12 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 	},
 
 
-	// ═══════════════════════════════════════════════════════════
+	// ===========================================================
 	// WILD CREATURES
-	// ═══════════════════════════════════════════════════════════
+	// ===========================================================
 
 	"redping": {
-		// Speed sweeper — the fastest creature in the dex. Low bulk means it
+		// Speed sweeper - the fastest creature in the dex. Low bulk means it
 		// needs to win quickly. Red Alert into back-to-back Ping Waves ends fights fast.
 		id: "redping",
 		name: "Redping",
@@ -124,7 +124,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 	},
 
 	"querion": {
-		// Control — stats are intentionally average because its value is in
+		// Control - stats are intentionally average because its value is in
 		// guaranteed Throttle + LockOn setup. The stats do enough to support the kit.
 		id: "querion",
 		name: "Querion",
@@ -139,7 +139,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 	},
 
 	"owtage": {
-		// Aggressive — high HP lets it absorb punishment while it spreads Contamination.
+		// Aggressive - high HP lets it absorb punishment while it spreads Contamination.
 		// Emergency Patch sustains the attrition game; Cascade Failure is the opener.
 		id: "owtage",
 		name: "Owtage",
@@ -154,7 +154,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 	},
 
 	"pclaw": {
-		// Setup attacker — needs one Parallel Review turn to really threaten.
+		// Setup attacker - needs one Parallel Review turn to really threaten.
 		// Balanced enough to take a hit while setting up; Hardware Request is the payoff.
 		id: "pclaw",
 		name: "Pclaw",
@@ -169,7 +169,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 	},
 
 	"beecyerview": {
-		// Heal tank (extreme) — highest HP in the dex, highest def, barely attacks.
+		// Heal tank (extreme) - highest HP in the dex, highest def, barely attacks.
 		// HA Failover gives it a short sustain spike, but no longer lets it hard-stall fights.
 		id: "beecyerview",
 		name: "Beecyerview",
@@ -184,7 +184,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 	},
 
 	"memlet": {
-		// Setup attacker (risky) — similar role to Pclaw but leans riskier.
+		// Setup attacker (risky) - similar role to Pclaw but leans riskier.
 		// Overcommit is its nuke; Size Estimate sets up for it. Folds fast if it misses.
 		id: "memlet",
 		name: "Memlet",
@@ -199,7 +199,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 	},
 
 	"orakle": {
-		// Joke creature — intentionally weak across the board.
+		// Joke creature - intentionally weak across the board.
 		// Misfire has the highest power in its kit and still has 50% hit chance.
 		id: "orakle",
 		name: "Orakle",
@@ -216,7 +216,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 
 
 	"broadmawl": {
-		// Joke — self-sabotaging attacker. Broadcom wolf. Hits hard but the licensing hurts.
+		// Joke - self-sabotaging attacker. Broadcom wolf. Hits hard but the licensing hurts.
 		// vMotion is reliable; License Squeeze is brutal but guarantees self-Contamination.
 		id: "broadmawl",
 		name: "Broadmawl",
@@ -232,7 +232,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 	},
 
 	"fosslaix": {
-		// Joke — unkillable legacy fossil. Nobody remembers who deployed it.
+		// Joke - unkillable legacy fossil. Nobody remembers who deployed it.
 		// Legacy Hold slows enemies briefly; Power Cycle buys time without dragging fights out.
 		id: "fosslaix",
 		name: "Fosslaix",
@@ -247,7 +247,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 	},
 
 	"fyrd": {
-		// Defensive reader — blue oni in tai chi stance. Reads and absorbs.
+		// Defensive reader - blue oni in tai chi stance. Reads and absorbs.
 		// Buffer Absorb sustains; Seek Strike disrupts. The calm counterpart to Fywr.
 		id: "fyrd",
 		name: "Fyrd",
@@ -262,7 +262,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 	},
 
 	"fywr": {
-		// Aggressive writer — red oni in karate stance. Writes with fury.
+		// Aggressive writer - red oni in karate stance. Writes with fury.
 		// Write Burst primes Cascading; Flush Strike delivers. The fierce counterpart to Fyrd.
 		id: "fywr",
 		name: "Fywr",
@@ -277,7 +277,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 	},
 
 	"gockensmith": {
-		// Scientific benchmarker — wiry gecko in goggles and singed apron.
+		// Scientific benchmarker - wiry gecko in goggles and singed apron.
 		// Ramp Run primes Cascading; Even Stripe delivers max throughput.
 		id: "gockensmith",
 		name: "Gockensmith",
@@ -292,7 +292,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 	},
 
 	"pixelwraith": {
-		// Joke — unreliable Citrix speedster. Fast but everything misses.
+		// Joke - unreliable Citrix speedster. Fast but everything misses.
 		// Session Drop has power but 60% hit. Reconnect is the only reliable move.
 		id: "pixelwraith",
 		name: "Pixelwraith",
@@ -307,7 +307,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 	},
 
 	"wridaemon": {
-		// Relentless writer — fiery red imp. 8K blocks all day every day.
+		// Relentless writer - fiery red imp. 8K blocks all day every day.
 		// Cycle Burst primes Cascading; Thermal Spike delivers the burn.
 		id: "wridaemon",
 		name: "Wridaemon",
@@ -324,7 +324,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 
 
 	"icebox": {
-		// Data protection tank — maximum ransomware defense. Immutable cold storage.
+		// Data protection tank - maximum ransomware defense. Immutable cold storage.
 		// On-Demand RO locks enemies down; Interface Disconnect air-gaps for healing;
 		// Limited R/W chips away. Nearly unkillable.
 		id: "icebox",
@@ -340,7 +340,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 	},
 
 	"gaier": {
-		// Defensive setup — fluffy duckling with one weird mechanical eye.
+		// Defensive setup - fluffy duckling with one weird mechanical eye.
 		// Assimilate Throttles; Adapt Protocol buffs up. The assimilation is working.
 		id: "gaier",
 		name: "Gaier",
@@ -353,7 +353,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 	},
 
 	"yik": {
-		// Anonymous gossip — hunched yak doomscrolling on phone.
+		// Anonymous gossip - hunched yak doomscrolling on phone.
 		// Incognito Mode buffs up; Downvote guarantees a short Throttle.
 		id: "yik",
 		name: "Yik",
@@ -368,12 +368,12 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 	},
 
 
-	// ═══════════════════════════════════════════════════════════
+	// ===========================================================
 	// EVOLUTION CREATURES
-	// ═══════════════════════════════════════════════════════════
+	// ===========================================================
 
 	"mercatador": {
-		// Evolved CPFNib — Mercator's drafting process fully realized.
+		// Evolved CPFNib - Mercator's drafting process fully realized.
 		// Still the slowest Security creature, but now its locked-down enemies get obliterated.
 		// config_purge primes Cascading; force_apply delivers the payload.
 		// Key changes from CPFNib: hp +7, atk +6 (the meaningful upgrade), def +3, spd +3
@@ -392,7 +392,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 	},
 
 	"redalert": {
-		// Redalert — evolved Redping — incident severity escalation incarnate.
+		// Redalert - evolved Redping - incident severity escalation incarnate.
 		// Yellow Alert establishes a long LockOn window; Orange and Red become
 		// increasingly dangerous as soon as the target is acquired; Plaid is the finisher.
 		id: "redalert",
@@ -409,7 +409,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 	},
 
 	"fortress": {
-		// Fortress — evolved Ressie — colossal castle-bearing world turtle.
+		// Fortress - evolved Ressie - colossal castle-bearing world turtle.
 		// Lockdown shuts enemies down (guaranteed Throttle), Kernel Crush hits hard,
 		// Bastion Wall sustains with 3-turn healing. A true tank + offense hybrid.
 		id: "fortress",
@@ -426,7 +426,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 	},
 
 	"hootopsy": {
-		// Hootopsy — evolved Owtage — smarter and faster. Swaps brute aggression for
+		// Hootopsy - evolved Owtage - smarter and faster. Swaps brute aggression for
 		// precision: LockOn into boosted Full Report. Better spd means it acts sooner.
 		// Key changes from Owtage: hp +4, atk +2, def +3, spd +4
 		id: "hootopsy",
@@ -443,7 +443,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 	},
 
 	"normking": {
-		// Evolved Normling — glass cannon perfected. Hits harder and faster.
+		// Evolved Normling - glass cannon perfected. Hits harder and faster.
 		// Critical Threshold + LockOn Report is a devastating 2-turn combo.
 		// Key changes from Normling: hp +8, atk +4, def +3, spd +2
 		id: "normking",
@@ -460,7 +460,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 	},
 
 	"purrallel": {
-		// Purrallel — evolved Pclaw — the planning paid off, the hardware arrived.
+		// Purrallel - evolved Pclaw - the planning paid off, the hardware arrived.
 		// Full Capacity gives 3-turn Optimized; then Hardware Upgrade closes it.
 		// Key changes from Pclaw: hp +6, atk +5, def +1, spd +3
 		id: "purrallel",
@@ -479,7 +479,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 
 
 	"yodel": {
-		// Evolution of Yik — anonymous broadcaster. Standing bipedal yak in alpine costume.
+		// Evolution of Yik - anonymous broadcaster. Standing bipedal yak in alpine costume.
 		// Masquerade sets up LockOn; Yodel Blast delivers burst + Disruption.
 		id: "yodel",
 		name: "Yodel",
@@ -496,7 +496,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 	},
 
 	"swanborg": {
-		// Evolution of Gaier — majestic swan being elegantly assimilated by Borg tech.
+		// Evolution of Gaier - majestic swan being elegantly assimilated by Borg tech.
 		// Collective Strike hits hard with Throttle; Optical Scan locks on; Elegant Override disrupts.
 		id: "swanborg",
 		name: "Swanborg",
@@ -510,13 +510,13 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 	},
 
 
-	// ═══════════════════════════════════════════════════════════
+	// ===========================================================
 	// LEGENDARY CREATURES
-	// (Stats at roughly evolution tier — special, not broken)
-	// ═══════════════════════════════════════════════════════════
+	// (Stats at roughly evolution tier - special, not broken)
+	// ===========================================================
 
 	"dougtrio": {
-		// Legendary Performance — not the tankiest or fastest, but the most consistent.
+		// Legendary Performance - not the tankiest or fastest, but the most consistent.
 		// 3-turn Optimized into Tech Consult is a near-guaranteed win condition.
 		id: "dougtrio",
 		name: "Dougtrio",
@@ -529,7 +529,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 	},
 
 	"prodle": {
-		// Legendary Manageable — perfectly balanced, which is appropriate for a puzzle game.
+		// Legendary Manageable - perfectly balanced, which is appropriate for a puzzle game.
 		// Process of Elimination + Yellow Tile + Green Tile is a methodical shutdown.
 		id: "prodle",
 		name: "Prodle",
@@ -545,7 +545,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 
 
 	"amazonite": {
-		// Legendary Performance — AWS stone lion. IaaS attacker.
+		// Legendary Performance - AWS stone lion. IaaS attacker.
 		// EC2 Burst chips reliably; S3 Dump hits hard; VPC Lockdown buffs up.
 		id: "amazonite",
 		name: "Amazonite",
@@ -560,7 +560,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 	},
 
 	"azurite": {
-		// Legendary Security — Azure IaaS tank. Slow but extremely resilient.
+		// Legendary Security - Azure IaaS tank. Slow but extremely resilient.
 		// VNet Fence locks enemies down; Ultra Disk Hurl chips reliably; IOPS Burst closes.
 		id: "azurite",
 		name: "Azurite",
@@ -575,7 +575,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 	},
 
 	"cobaltite": {
-		// Legendary Evolution of Azurite — three-headed crystal cerberus.
+		// Legendary Evolution of Azurite - three-headed crystal cerberus.
 		// Ampere Override primes Cascading; Egress Toll chips + Contaminates; VM Limit Crush nukes.
 		id: "cobaltite",
 		name: "Cobaltite",
@@ -591,7 +591,7 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 	},
 
 	"gravitonite": {
-		// Legendary Evolution of Amazonite — three-headed orange stone hydra.
+		// Legendary Evolution of Amazonite - three-headed orange stone hydra.
 		// Graviton Crunch primes Cascading; Egress Drain chips + Contaminates; Provisioned IOPS nukes.
 		id: "gravitonite",
 		name: "Gravitonite",
@@ -606,10 +606,10 @@ export const CreatureDex: Record<SpeciesId, SpeciesDef> = {
 		chargeArchetype: "Brawler",
 	},
 
-	// ═══════════════════════════════════════════════════════════
+	// ===========================================================
 	// GEN 1 POKEMON (GLaDOS cross-dimensional imports)
 	// Imported from POKEMON_GEN_1.DB. Unlocked for random encounters after GLaDOS is defeated.
-	// ═══════════════════════════════════════════════════════════
+	// ===========================================================
 
 	"venusaur": {
 		id: "venusaur",

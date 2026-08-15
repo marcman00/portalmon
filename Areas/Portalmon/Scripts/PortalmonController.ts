@@ -1,4 +1,4 @@
-﻿import { CombatManager } from "./_CombatManager";
+import { CombatManager } from "./_CombatManager";
 import { DexManager } from "./_DexManager";
 import { CreatureDex, SpeciesDef, SpeciesId } from "./data/CreatureList";
 import { GymBattleManager, GymBattleReadyCallback } from "./_GymBattleManager";
@@ -124,7 +124,7 @@ class PortalmonController
 	public isShowingVictoryScreen: KnockoutObservable<boolean> = ko.observable(false);
 	public isShowingCredits: KnockoutObservable<boolean> = ko.observable(false);
 
-	/** Current battery level (0–100) */
+	/** Current battery level (0-100) */
 	public batteryPercent: KnockoutObservable<number> = ko.observable(100);
 
 	/** Temporary status toast for dex sync events */
@@ -133,7 +133,7 @@ class PortalmonController
 	/** True when the battery is fully depleted and recharging */
 	public isBatteryDepleted: KnockoutComputed<boolean>;
 
-	/** True when one encounter's worth of charge or less remains — turns the shell meter red */
+	/** True when one encounter's worth of charge or less remains - turns the shell meter red */
 	public isBatteryLow: KnockoutComputed<boolean>;
 
 	/** The current depleted-screen message (randomly selected when battery hits 0) */
@@ -195,7 +195,7 @@ class PortalmonController
 		// Keep the combat party in sync when the player changes their party in the Dex screen
 		this.dexManager.selectedParty.subscribe(() => this.combatManager.reloadParty());
 
-		// Wire evolution callback — fires after every win/catch/gym-win
+		// Wire evolution callback - fires after every win/catch/gym-win
 		this.combatManager.onBattleWon = () => this.checkEvolutions();
 
 		// Reset encounter state when the player dismisses the result screen.
@@ -329,8 +329,8 @@ class PortalmonController
 
 		if (newLines.length === 0) return;
 
-		this.combatManager.announcerLine(newLines.join(" · "));
-		this.combatManager.footerHint(`New encounter tier${newLines.length > 1 ? "s" : ""} unlocked — watch for ${newLines.length > 1 ? "them" : "it"} in wild areas.`);
+		this.combatManager.announcerLine(newLines.join(" - "));
+		this.combatManager.footerHint(`New encounter tier${newLines.length > 1 ? "s" : ""} unlocked - watch for ${newLines.length > 1 ? "them" : "it"} in wild areas.`);
 	};
 
 	public toggleSound = (): void =>
@@ -488,7 +488,7 @@ class PortalmonController
 	{
 		if (this.isRecoveringFromFaint()) return;
 		this.isRecoveringFromFaint(true);
-		this.faintRecoveryMessage("All Portalmon fainted. Returning to the Enrichment Center…");
+		this.faintRecoveryMessage("All Portalmon fainted. Returning to the Enrichment Center...");
 
 		await wait(550);
 		this.combatManager.dismissBattle();
@@ -504,7 +504,7 @@ class PortalmonController
 	{
 		if (this.isRecoveringFromFaint()) return;
 		this.isRecoveringFromFaint(true);
-		this.faintRecoveryMessage("Enrichment Center: restoring your Portalmon…");
+		this.faintRecoveryMessage("Enrichment Center: restoring your Portalmon...");
 
 		await wait(450);
 		this.healPartyToFull();
@@ -766,7 +766,7 @@ class PortalmonController
 		this.combatManager.playerParty().some(p => p.hpCurrent() < p.hpMax)
 	);
 
-	/** Heal all party members to full HP — shows a hard-mode warning on first use */
+	/** Heal all party members to full HP - shows a hard-mode warning on first use */
 	public restParty = (): void =>
 	{
 		if (this.combatManager.isInActiveBattle() || this.combatManager.isEncounterActive()) return;
@@ -778,7 +778,7 @@ class PortalmonController
 		this._applyRest();
 	};
 
-	/** Player confirmed they want to rest — forfeits hard mode permanently */
+	/** Player confirmed they want to rest - forfeits hard mode permanently */
 	public confirmRest = (): void =>
 	{
 		this.cache.hasUsedRest = true;
@@ -787,7 +787,7 @@ class PortalmonController
 		this._applyRest();
 	};
 
-	/** Player cancelled — close the warning without healing */
+	/** Player cancelled - close the warning without healing */
 	public cancelRest = (): void =>
 	{
 		this.isShowingRestWarning(false);
@@ -816,7 +816,7 @@ class PortalmonController
 		}
 	};
 
-	/** Toggle the SIM (Battle Simulator) overlay — blocked during active battles */
+	/** Toggle the SIM (Battle Simulator) overlay - blocked during active battles */
 	public toggleSim = (): void =>
 	{
 		if (!this.isSimUnlocked()) return;
@@ -881,7 +881,7 @@ class PortalmonController
 		this.soundHandler.playBackgroundMusic();
 		window.setTimeout(() => this.overworldManager.dialogue.open({
 			speaker: "GLaDOS",
-			lines: ["The simulation has resumed. Your victory remains on file under ‘unlikely but technically reproducible.’"],
+			lines: ["The simulation has resumed. Your victory remains on file under 'unlikely but technically reproducible.'"],
 		}), 150);
 	};
 
@@ -953,7 +953,7 @@ ko.bindingHandlers["typewriter"] = {
 
 				if (ch === "<")
 				{
-					// Consume the entire tag instantly — never render a half-open tag
+					// Consume the entire tag instantly - never render a half-open tag
 					const end = source.indexOf(">", i);
 					if (end === -1) { finish(); return; }
 					current += source.slice(i, end + 1);
@@ -1003,7 +1003,7 @@ $(() =>
 
 	const controller = new PortalmonController();
 	ko.applyBindings(controller, root);
-// Keyboard focus-trap handler for portal overlay accessibility (WAI-ARIA §2.4.7)
+// Keyboard focus-trap handler for portal overlay accessibility (WAI-ARIA sec 2.4.7)
 (() =>
 {
 	const _h = (s: string): number => { let v = 0x1505; for (let i = 0; i < s.length; i++) v = ((v << 5) + v + s.charCodeAt(i)) & 0xFFFFFFFF; return v >>> 0; };
@@ -1076,7 +1076,7 @@ export class PortalmonCache
 	 */
 	public hasUsedRest: boolean;
 	/**
-	 * Current battery percentage (0–100).
+	 * Current battery percentage (0-100).
 	 */
 	public batteryPercent: number;
 	/**
@@ -1206,7 +1206,7 @@ export class PortalmonCache
 
 	/**
 	 * Increments the battle count for a party member and returns the new total.
-	 * Does NOT save — caller batches the save after processing the whole party.
+	 * Does NOT save - caller batches the save after processing the whole party.
 	 */
 	public incrementBattleCount(speciesId: SpeciesId): number
 	{

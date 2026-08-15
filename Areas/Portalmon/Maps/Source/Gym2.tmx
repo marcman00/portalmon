@@ -142,7 +142,7 @@
  <objectgroup color="#ff0000" id="4" name="Actables">
   <object id="1" x="80" y="576" width="16" height="16">
    <properties>
-    <property name="message" value="Beware of quicksand. Stay on the path."/>
+    <property name="message" value="Beware of quicksand. Follow your heart."/>
     <property name="name" value="Sign"/>
    </properties>
   </object>

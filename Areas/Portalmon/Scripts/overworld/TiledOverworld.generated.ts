@@ -58,13 +58,14 @@ export const TILED_COLLISION_RECTS: MapCollisionRect[] = [
 	{ x: 4, y: 11, width: 5, height: 1, label: "obstacle" },
 	{ x: 11, y: 11, width: 5, height: 1, label: "obstacle" },
 	{ x: 20, y: 11, width: 1, height: 1, label: "obstacle" },
+	{ x: 30, y: 11, width: 1, height: 1, label: "obstacle" },
 	{ x: 43, y: 11, width: 1, height: 1, label: "obstacle" },
 	{ x: 53, y: 11, width: 3, height: 1, label: "obstacle" },
 	{ x: 0, y: 12, width: 2, height: 1, label: "obstacle" },
 	{ x: 4, y: 12, width: 5, height: 1, label: "obstacle" },
 	{ x: 11, y: 12, width: 5, height: 1, label: "obstacle" },
 	{ x: 21, y: 12, width: 5, height: 1, label: "obstacle" },
-	{ x: 43, y: 12, width: 1, height: 1, label: "obstacle" },
+	{ x: 42, y: 12, width: 2, height: 1, label: "obstacle" },
 	{ x: 53, y: 12, width: 3, height: 1, label: "obstacle" },
 	{ x: 0, y: 13, width: 2, height: 1, label: "obstacle" },
 	{ x: 4, y: 13, width: 5, height: 1, label: "obstacle" },
@@ -74,10 +75,8 @@ export const TILED_COLLISION_RECTS: MapCollisionRect[] = [
 	{ x: 50, y: 13, width: 1, height: 1, label: "obstacle" },
 	{ x: 53, y: 13, width: 3, height: 1, label: "obstacle" },
 	{ x: 0, y: 14, width: 2, height: 1, label: "obstacle" },
-	{ x: 4, y: 14, width: 1, height: 1, label: "obstacle" },
-	{ x: 6, y: 14, width: 3, height: 1, label: "obstacle" },
-	{ x: 11, y: 14, width: 1, height: 1, label: "obstacle" },
-	{ x: 13, y: 14, width: 3, height: 1, label: "obstacle" },
+	{ x: 4, y: 14, width: 5, height: 1, label: "obstacle" },
+	{ x: 11, y: 14, width: 5, height: 1, label: "obstacle" },
 	{ x: 21, y: 14, width: 5, height: 1, label: "obstacle" },
 	{ x: 50, y: 14, width: 1, height: 1, label: "obstacle" },
 	{ x: 53, y: 14, width: 3, height: 1, label: "obstacle" },
@@ -130,6 +129,7 @@ export const TILED_COLLISION_RECTS: MapCollisionRect[] = [
 	{ x: 49, y: 24, width: 7, height: 1, label: "obstacle" },
 	{ x: 0, y: 25, width: 2, height: 1, label: "obstacle" },
 	{ x: 4, y: 25, width: 15, height: 1, label: "obstacle" },
+	{ x: 31, y: 25, width: 1, height: 1, label: "obstacle" },
 	{ x: 38, y: 25, width: 3, height: 1, label: "obstacle" },
 	{ x: 49, y: 25, width: 7, height: 1, label: "obstacle" },
 	{ x: 0, y: 26, width: 2, height: 1, label: "obstacle" },
@@ -144,8 +144,7 @@ export const TILED_COLLISION_RECTS: MapCollisionRect[] = [
 	{ x: 4, y: 27, width: 1, height: 1, label: "obstacle" },
 	{ x: 32, y: 27, width: 5, height: 1, label: "obstacle" },
 	{ x: 40, y: 27, width: 5, height: 1, label: "obstacle" },
-	{ x: 49, y: 27, width: 1, height: 1, label: "obstacle" },
-	{ x: 51, y: 27, width: 5, height: 1, label: "obstacle" },
+	{ x: 49, y: 27, width: 7, height: 1, label: "obstacle" },
 	{ x: 0, y: 28, width: 2, height: 1, label: "obstacle" },
 	{ x: 4, y: 28, width: 1, height: 1, label: "obstacle" },
 	{ x: 32, y: 28, width: 5, height: 1, label: "obstacle" },
@@ -209,9 +208,6 @@ export const TILED_COLLISION_RECTS: MapCollisionRect[] = [
 ];
 
 export const TILED_DOORS: Record<number, MapPoint> = {
-	1: { x: 50, y: 27 },
-	2: { x: 5, y: 14 },
-	4: { x: 12, y: 14 },
 	5: { x: 23, y: 16 },
 };
 
@@ -236,4 +232,4 @@ export const TILED_WILD_ZONES: MapEncounterZone[] = [
 
 export const TILED_PORTALS: MapPortalDef[] = [];
 
-export const TILED_ACTABLES: MapActableDef[] = [{"id": 12, "position": {"x": 3, "y": 16}, "facing": "down", "name": "Eric", "message": "I got this house on a crazy good deal."}, {"id": 13, "position": {"x": 14, "y": 15}, "facing": "down", "name": "Hailey", "message": "Mm mm that bread at the market is so tasy."}, {"id": 14, "position": {"x": 21, "y": 31}, "facing": "down", "name": "Ben", "message": "Some people say the mayor is a robot. Maybe that's why she never seems to age."}, {"id": 15, "position": {"x": 41, "y": 18}, "facing": "down", "name": "Billy", "message": "Be careful! The garden is full of Portalmon."}, {"id": 16, "position": {"x": 20, "y": 16}, "facing": "down", "name": "Nurse Karen", "message": "Your Portalmon will be well taken care of in our enrichment center"}, {"id": 17, "position": {"x": 6, "y": 25}, "facing": "down", "name": "bob1", "message": "Fresh cache, picked this morning. Only slightly stale."}, {"id": 18, "position": {"x": 9, "y": 25}, "facing": "down", "name": "bob2", "message": "Two for one on legacy dependencies. No refunds, no support."}, {"id": 20, "position": {"x": 15, "y": 25}, "facing": "down", "name": "bob4", "message": "Everything at this stall is organic, artisanal, and completely untested."}, {"id": 21, "position": {"x": 51, "y": 37}, "facing": "down", "name": "Joe", "message": "Been phishing for days now and no bytes."}, {"id": 22, "position": {"x": 12, "y": 25}, "facing": "down", "name": "bob3", "message": "These tomatoes are heirloom. So is my codebase. Neither is documented."}, {"id": 28, "position": {"x": 48, "y": 20}, "facing": "down", "name": "Sign", "message": "Wild Portalmon ahead. Enter at your own risk!"}, {"id": 30, "position": {"x": 18, "y": 25}, "facing": "down", "name": "Sign", "message": "Farmer's Market"}, {"id": 40, "position": {"x": 17, "y": 3}, "facing": "down", "trainerId": "rey"}];
+export const TILED_ACTABLES: MapActableDef[] = [{"id": 12, "position": {"x": 3, "y": 16}, "facing": "down", "name": "Eric", "message": "I got this house on a crazy good deal."}, {"id": 13, "position": {"x": 14, "y": 15}, "facing": "down", "name": "Hailey", "message": "Mm mm that bread at the market is so tasy."}, {"id": 14, "position": {"x": 21, "y": 31}, "facing": "down", "name": "Ben", "message": "Some people say the mayor is a robot. Maybe that's why she never seems to age."}, {"id": 15, "position": {"x": 41, "y": 18}, "facing": "down", "name": "Billy", "message": "Be careful! The garden is full of Portalmon."}, {"id": 16, "position": {"x": 20, "y": 16}, "facing": "down", "name": "Nurse Karen", "message": "Your Portalmon will be well taken care of in our enrichment center"}, {"id": 17, "position": {"x": 6, "y": 25}, "facing": "down", "name": "bob1", "message": "Fresh cache, picked this morning. Only slightly stale."}, {"id": 18, "position": {"x": 9, "y": 25}, "facing": "down", "name": "bob2", "message": "Two for one on legacy dependencies. No refunds, no support."}, {"id": 20, "position": {"x": 15, "y": 25}, "facing": "down", "name": "bob4", "message": "Everything at this stall is organic, artisanal, and completely untested."}, {"id": 21, "position": {"x": 51, "y": 37}, "facing": "down", "name": "Joe", "message": "Been phishing for days now and no bytes."}, {"id": 22, "position": {"x": 12, "y": 25}, "facing": "down", "name": "bob3", "message": "These tomatoes are heirloom. So is my codebase. Neither is documented."}, {"id": 28, "position": {"x": 48, "y": 20}, "facing": "down", "name": "Sign", "message": "Wild Portalmon ahead. Enter at your own risk!"}, {"id": 30, "position": {"x": 18, "y": 25}, "facing": "down", "name": "Sign", "message": "Farmer's Market"}, {"id": 40, "position": {"x": 17, "y": 3}, "facing": "down", "trainerId": "rey"}, {"id": 41, "position": {"x": 31, "y": 25}, "facing": "down", "name": "Sign", "message": "Welcome to Portal town! East: Beach. Northeast: Wild Portalmon safari. North: Gym battles. Center: Enrichment Center. Northwest: Lab. West: Farmer's Market."}, {"id": 42, "position": {"x": 30, "y": 11}, "facing": "down", "name": "Sign", "message": "Dangerous and tricky gym battles ahead! Make sure you've trained in the safari (east) before entering."}, {"id": 43, "position": {"x": 50, "y": 27}, "facing": "down", "name": "Door", "message": "Locked!"}, {"id": 44, "position": {"x": 5, "y": 14}, "facing": "down", "name": "Door", "message": "Locked!"}, {"id": 45, "position": {"x": 12, "y": 14}, "facing": "down", "name": "Door", "message": "Locked!"}, {"id": 46, "position": {"x": 42, "y": 12}, "facing": "down", "name": "Sign", "message": "Wild Portalmon ahead. Enter at your own risk!"}];

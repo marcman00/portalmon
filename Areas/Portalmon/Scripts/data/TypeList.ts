@@ -1,14 +1,14 @@
-﻿// ============================================================
+// ============================================================
 // TYPES
 // Four types form a cycle for type effectiveness:
-//   Availability → Performance → Manageable → Security → Availability
+//   Availability -> Performance -> Manageable -> Security -> Availability
 // ============================================================
 export type PortalKombatType = "Availability" | "Performance" | "Security" | "Manageable";
 
 // ============================================================
 // TYPE CHART
-// Maps attacker type → { defenderType → multiplier }.
-// Omitted matchups are neutral (1×).
+// Maps attacker type -> { defenderType -> multiplier }.
+// Omitted matchups are neutral (1x).
 // Usage: TypeChart[moveType][targetType] ?? 1
 // ============================================================
 export const TypeChart: Record<PortalKombatType, Partial<Record<PortalKombatType, number>>> = {
@@ -41,14 +41,14 @@ export type StatusEffect =
 export const StatusEffectDescriptions: Record<StatusEffect, string> = {
 	// Negative
 	Contaminated: "System compromised (dmg/turn)",
-	Throttled: "All systems rate-limited (↓ atk, def, spd)",
-	Disrupted: "System disrupted (↓↓ next move accuracy)",   // NEW: next attack is much more likely to miss
+	Throttled: "All systems rate-limited (- atk, def, spd)",
+	Disrupted: "System disrupted (-- next move accuracy)",   // NEW: next attack is much more likely to miss
 
 	// Positive
 	SelfHealing: "Auto-repair enabled (heal/turn)",
-	Optimized: "Operating at peak efficiency (↑ atk, def, spd)",
-	LockOn: "Target acquired (↑↑ accuracy, ↑ damage)",
-	Cascading: "Cascading effect active (↑↑ next move power)", // NEW: next move hits significantly harder
+	Optimized: "Operating at peak efficiency (+ atk, def, spd)",
+	LockOn: "Target acquired (++ accuracy, + damage)",
+	Cascading: "Cascading effect active (++ next move power)", // NEW: next move hits significantly harder
 };
 
 // ============================================================

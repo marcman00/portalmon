@@ -23,7 +23,7 @@ export interface UltimateExecutorDeps
  * Resolves a single ultimate-move activation: synergy/special-effect
  * modifiers, the hit loop (damage, misses, status procs), and all the
  * per-ult special-case branches. Pulled out of CombatManager because it's
- * the single largest self-contained block in the file — its only ties back
+ * the single largest self-contained block in the file - its only ties back
  * into the battle are the small set of callbacks in UltimateExecutorDeps.
  */
 export async function executeUltimate(
@@ -118,7 +118,7 @@ export async function executeUltimate(
 			totalDmg += dmg;
 			if (hits <= 6) addLog(`Hit ${i + 1}: ${dmg} damage.`);
 
-			// Damage reflect (Castle Doctrine) — applies to ult hits too
+			// Damage reflect (Castle Doctrine) - applies to ult hits too
 			if (hitTarget.reflectTurns() > 0)
 			{
 				const pct = (hitTarget as any)._reflectPercent ?? 0.5;

@@ -8,10 +8,10 @@
 		<div class="pk-overworld-hud" aria-live="polite">
 			<span class="pk-overworld-status" data-bind="text: statusText"></span>
 			<span class="pk-overworld-position"
-				  data-bind="text: currentMapName() + ' · ' + positionLabel()"></span>
+				  data-bind="text: currentMapName() + ' - ' + positionLabel()"></span>
 		</div>
 		<div class="pk-overworld-help" data-bind="visible: !dialogue.visible()">
-			MOVE: D-PAD / ARROWS / WASD · TALK: A / ENTER / E
+			MOVE: D-PAD / ARROWS / WASD - TALK: A / ENTER / E
 		</div>
 
 		<div class="pk-dialogue-box"
@@ -34,7 +34,7 @@
 		<div class="pk-lab-wake" data-bind="css: { 'is-active': $root.isLabWakeActive }, click: $root.skipLabWake">
 			<div class="pk-lab-wake__lid pk-lab-wake__lid--top"></div>
 			<div class="pk-lab-wake__lid pk-lab-wake__lid--bottom"></div>
-			<div class="pk-lab-wake__hint">E · WAKE UP</div>
+			<div class="pk-lab-wake__hint">E - WAKE UP</div>
 		</div>
 	</div>
 </div>

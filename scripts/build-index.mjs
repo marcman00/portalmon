@@ -10,7 +10,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
 const viewsHome = path.join(root, "Areas/Portalmon/Views/Home");
 
-const read = name => readFileSync(path.join(viewsHome, name), "utf8").replace(/^﻿/, "");
+const read = name => readFileSync(path.join(viewsHome, name), "utf8").replace(/^\uFEFF/, "");
 
 const PARTIAL_RE = /@Html\.Partial\("~\/Areas\/Portalmon\/Views\/Home\/([A-Za-z]+\.cshtml)"\)/g;
 
@@ -25,12 +25,12 @@ function inlinePartials(html)
 		if (!PARTIAL_RE.test(html)) return html;
 		html = html.replace(PARTIAL_RE, (_match, file) => read(file));
 	}
-	throw new Error(`inlinePartials: still resolving @Html.Partial includes after ${MAX_PASSES} passes — possible circular partial reference.`);
+	throw new Error(`inlinePartials: still resolving @Html.Partial includes after ${MAX_PASSES} passes - possible circular partial reference.`);
 }
 
 let indexBody = read("Index.cshtml");
 indexBody = inlinePartials(indexBody);
-// Drop the compiled-bundle include from the real site — we supply our own
+// Drop the compiled-bundle include from the real site - we supply our own
 // script tag via /src/main.ts below.
 indexBody = indexBody.replace(/@Html\.Partial\("~\/dist\/Portalmon\.cshtml"\)\s*/, "");
 

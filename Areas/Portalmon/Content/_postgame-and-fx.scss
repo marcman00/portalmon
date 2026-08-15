@@ -75,7 +75,7 @@ $gold-glow: rgba(240, 192, 64, 0.18);
     background: repeating-linear-gradient( 0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px );
 }
 
-// ── Header ──
+// -- Header --
 .pk-victory-header {
     position: relative;
     z-index: 2;
@@ -115,7 +115,7 @@ $gold-glow: rgba(240, 192, 64, 0.18);
     margin-top: 0.2rem;
 }
 
-// ── Party roster ──
+// -- Party roster --
 .pk-victory-party {
     position: relative;
     z-index: 2;
@@ -217,7 +217,7 @@ $gold-glow: rgba(240, 192, 64, 0.18);
     text-transform: uppercase;
 }
 
-// ── Footer ──
+// -- Footer --
 .pk-victory-footer {
     position: relative;
     z-index: 2;
@@ -329,9 +329,9 @@ $gold-glow: rgba(240, 192, 64, 0.18);
 
 
 
-// ═══════════════════════════════════════════════════════════════
+// ===============================================================
 // BATTLE INTRO CHOREOGRAPHY
-// ═══════════════════════════════════════════════════════════════
+// ===============================================================
 
 // Enemy: slides in from right as silhouette, holds dark, then reveals
 @keyframes pk-intro-enemy {
@@ -396,9 +396,9 @@ $gold-glow: rgba(240, 192, 64, 0.18);
 }
 
 
-// ═══════════════════════════════════════════════════════════════
+// ===============================================================
 // ULTIMATE ANIMATION FX
-// ═══════════════════════════════════════════════════════════════
+// ===============================================================
 
 // --- Screen shake ---
 @keyframes pk-ult-shake-anim {
@@ -503,9 +503,9 @@ $gold-glow: rgba(240, 192, 64, 0.18);
 
 
 
-// ═══════════════════════════════════════════════════════════════
+// ===============================================================
 // GYM BADGE SYSTEM (inline on trainer cards)
-// ═══════════════════════════════════════════════════════════════
+// ===============================================================
 
 .pk-portrait-badge-wrap {
     position: relative;
@@ -647,7 +647,7 @@ $gold-glow: rgba(240, 192, 64, 0.18);
 
 
 // CREDITS SEQUENCE
-// ═══════════════════════════════════════════════════════════════
+// ===============================================================
 
 .pk-credits-screen {
     position: absolute;

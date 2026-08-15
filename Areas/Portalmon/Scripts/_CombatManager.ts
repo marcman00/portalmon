@@ -41,7 +41,7 @@ export class CombatManager
 	/**
 	 * Explicit flag: true only while a battle is actively running.
 	 * Set to true in beginEncounter/beginGymBattle, false in endBattle.
-	 * This is the single source of truth for whether combat is in progress —
+	 * This is the single source of truth for whether combat is in progress -
 	 * avoids the old bug where a freshly-initialised (but unstarted) enemy
 	 * creature would make isInActiveBattle read true on page load.
 	 */
@@ -178,7 +178,7 @@ export class CombatManager
 		this.playerParty(party);
 		this.playerActive = ko.observable(party[0]);
 
-		// Placeholder enemy — never shown until an encounter begins.
+		// Placeholder enemy - never shown until an encounter begins.
 		// isEncounterActive being false ensures no UI treats this as a live battle.
 		// Uses the first dex entry rather than a specific hardcoded species so this
 		// doesn't break if that species is ever renamed or removed.
@@ -193,7 +193,7 @@ export class CombatManager
 			&& !this.isBattleOver()
 		);
 
-		// Gates external UI — only true while a real battle is running
+		// Gates external UI - only true while a real battle is running
 		this.isInActiveBattle = ko.pureComputed(() =>
 			this.isEncounterActive()
 			&& !this.enemyActive().isFainted()
@@ -585,7 +585,7 @@ export class CombatManager
 		return true;
 	};
 
-	/** Swap active creature — costs the player their turn (enemy acts after) */
+	/** Swap active creature - costs the player their turn (enemy acts after) */
 	public swapTo = async (candidate: PortalKombatCreature): Promise<void> =>
 	{
 		if (!this.canSwap(candidate)) return;
@@ -643,7 +643,7 @@ export class CombatManager
 			return;
 		}
 
-		// Speed check — slower attacker means enemy goes first
+		// Speed check - slower attacker means enemy goes first
 		const defenderFirst = this.getEffectiveStats(attacker).spd < this.getEffectiveStats(this.enemyActive()).spd;
 		if (defenderFirst)
 		{
@@ -651,14 +651,14 @@ export class CombatManager
 
 			// The enemy turn may have ended the battle (e.g. all party fainted,
 			// or the enemy fainted from its own status tick and triggered victory).
-			// If so, stop here — do not execute the player's attack.
+			// If so, stop here - do not execute the player's attack.
 			if (!this.isEncounterActive())
 			{
 				this.isBusy(false);
 				return;
 			}
 			// If the player's creature was killed by the enemy's faster move,
-			// just abort — enemyTurn() already handled the death (auto-deploy or endBattle).
+			// just abort - enemyTurn() already handled the death (auto-deploy or endBattle).
 			if (attacker.isFainted())
 			{
 				this.isBusy(false);
@@ -666,7 +666,7 @@ export class CombatManager
 			}
 		}
 
-		// Re-read the active enemy after any async enemy turn — in a gym battle
+		// Re-read the active enemy after any async enemy turn - in a gym battle
 		// the previous enemy may have been replaced by the next queued creature.
 		const defender = this.enemyActive();
 
@@ -705,8 +705,8 @@ export class CombatManager
 
 			const advanced = await this.handleEnemyFainted();
 			this.isBusy(false);
-			if (!advanced) return; // battle over — no enemy turn
-			// Gym: next enemy sent out — continue
+			if (!advanced) return; // battle over - no enemy turn
+			// Gym: next enemy sent out - continue
 			if (!defenderFirst) await this.enemyTurn();
 			return;
 		}
@@ -716,7 +716,7 @@ export class CombatManager
 	};
 
 	/**
-	* Pure catch roll — no side effects. Call this BEFORE the animation.
+	* Pure catch roll - no side effects. Call this BEFORE the animation.
 	*/
 	public computeCatchResult(): boolean
 	{
@@ -788,7 +788,7 @@ export class CombatManager
 		{
 			await this.enemyTurn();
 			if (!this.isEncounterActive()) { this.isBusy(false); return; }
-			// enemyTurn() already handled the death — just abort.
+			// enemyTurn() already handled the death - just abort.
 			if (attacker.isFainted()) { this.isBusy(false); return; }
 		}
 
@@ -855,7 +855,7 @@ export class CombatManager
 		else { this.endBattle("lose"); }
 	}
 
-	/** Run from the current wild encounter — enemy gets a parting shot */
+	/** Run from the current wild encounter - enemy gets a parting shot */
 	public disengage = async (): Promise<void> =>
 	{
 		if (!this.canAct()) return;
@@ -872,7 +872,7 @@ export class CombatManager
 
 	/**
 	 * Computes effective atk/def/spd by applying all active stat-modifier effects.
-	 * Base stats are never mutated — called fresh at the point of use.
+	 * Base stats are never mutated - called fresh at the point of use.
 	 *
 	 * Throttled / Optimized: effectPower is the % delta applied to all three stats.
 	 * LockOn: effectPower added to atk only; accuracy handled separately via hasLockOn().
@@ -897,7 +897,7 @@ export class CombatManager
 					atkDelta += power;
 					break;
 				// Contaminated / SelfHealing: no stat modifier
-				// Disrupted / Cascading: consumed on attack in hitEnemy — not persistent stat modifiers
+				// Disrupted / Cascading: consumed on attack in hitEnemy - not persistent stat modifiers
 			}
 		}
 
@@ -959,7 +959,7 @@ export class CombatManager
 		if (creature.reflectTurns() > 0)
 			creature.reflectTurns(creature.reflectTurns() - 1);
 
-		const effects = creature.statusEffects().slice(); // snapshot — avoid mutating during iteration
+		const effects = creature.statusEffects().slice(); // snapshot - avoid mutating during iteration
 		for (const se of effects)
 		{
 			const { effectType, effectPower } = se.effect;
@@ -975,8 +975,8 @@ export class CombatManager
 					this.addLog(`${creature.name} self-repaired for ${effectPower} HP.`);
 					break;
 				// Throttled, Optimized, LockOn: handled by getEffectiveStats / hasLockOn
-				// Disrupted: accuracy penalty applied in hitEnemy — no HP tick
-				// Cascading: power multiplier applied in hitEnemy — no HP tick
+				// Disrupted: accuracy penalty applied in hitEnemy - no HP tick
+				// Cascading: power multiplier applied in hitEnemy - no HP tick
 			}
 
 			const remaining = se.turnsLeft() - 1;
@@ -1227,7 +1227,7 @@ export class CombatManager
 
 	private endBattle(result: "win" | "gym-win" | "lose" | "contain" | "run"): void
 	{
-		// Mark battle as ended — keeps the battlefield visible until the player
+		// Mark battle as ended - keeps the battlefield visible until the player
 		// dismisses the result screen. isEncounterActive stays true so KO keeps
 		// rendering the battlefield. External gates (isInActiveBattle) rely on
 		//isBattleOver() which is already true at this point.
@@ -1247,7 +1247,7 @@ export class CombatManager
 					this.trainerDialogue(this.gymDefeatQuote);
 				}
 				this.announcerLine(`${this.gymTrainerName}: "${this.gymDefeatQuote}"`);
-				this.footerHint(`${this.gymBattleLabel()} — cleared! Party fully restored.`);
+				this.footerHint(`${this.gymBattleLabel()} - cleared! Party fully restored.`);
 				break;
 			case "contain":
 				this.announcerLine("CONTAINMENT CONFIRMED.");
@@ -1345,7 +1345,7 @@ export class CombatManager
 			else if (move.target === "self") this.hitSelf(attacker, move);
 			this.chargeSystem.tickCharge(attacker, this.chargeSystem.getMoveChargeReason(move, dealtDamage));
 			// Sprite hit recoil on defender (only if damage was dealt)
-			// (moved inside else — ult hits handle their own recoil in executeUltimate)
+			// (moved inside else - ult hits handle their own recoil in executeUltimate)
 			if (move.target === "enemy" && dealtDamage)
 			{
 				this.playerSpriteState("hit");

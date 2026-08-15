@@ -1,4 +1,4 @@
-﻿<div id="portalmon">
+<div id="portalmon">
 	<div class="gba-shell" data-bind="attr: { 'data-skin': gameboySkin() }">
 
 		<!-- ===== TOP BAR: Power LED + Label + Help + Speaker ===== -->
@@ -22,7 +22,7 @@
 				<div class="gba-speaker-dot"></div>
 			</div>
 
-			<!-- Battery meter — one segment drains per encounter, recharges on a timer -->
+			<!-- Battery meter - one segment drains per encounter, recharges on a timer -->
 			<div class="gba-battery" role="img"
 				 data-bind="visible: isPoweredOn(),
 							attr: {
@@ -73,7 +73,7 @@
 							}"></button>
 				</div>
 				<div style="display:flex;flex-direction:column;gap:5px;align-items:center;">
-					<!-- ENC button removed — portals on the idle screen replace it -->
+					<!-- ENC button removed - portals on the idle screen replace it -->
 					<button type="button" class="gba-pill-btn" data-bind="click: toggleStart">START</button>
 					<!-- ko if: isSimUnlocked() -->
 					<button type="button" class="gba-pill-btn" data-bind="click: toggleSim">SIM</button>
@@ -89,16 +89,16 @@
 							data-bind="visible: battleTransition.phase() === 'vortex' || battleTransition.phase() === 'iris-close'"></canvas>
 
 					<!-- ============================================================ -->
-					<!-- POWER-OFF SCREEN — shown before the player clicks "turn on" -->
+					<!-- POWER-OFF SCREEN - shown before the player clicks "turn on" -->
 					<!-- ============================================================ -->
 					<!-- ko if: !isPoweredOn() && !isShowingLogo() -->
 					<div class="pk-power-off-screen" data-bind="click: powerOn">
-						<div class="pk-power-icon">⏻</div>
+						<div class="pk-power-icon">&#9211;</div>
 						<div class="pk-power-hint">Click to turn on</div>
 					</div>
 					<!-- /ko -->
 					<!-- ============================================================ -->
-					<!-- LOGO SPLASH — shown for ~3 s after clicking "turn on"       -->
+					<!-- LOGO SPLASH - shown for ~3 s after clicking "turn on"       -->
 					<!-- ============================================================ -->
 					<!-- ko if: isShowingLogo() -->
 					<div class="pk-logo-screen">
@@ -109,7 +109,7 @@
 					</div>
 					<!-- /ko -->
 					<!-- ============================================================ -->
-					<!-- ALL GAME CONTENT — hidden until powered on                  -->
+					<!-- ALL GAME CONTENT - hidden until powered on                  -->
 					<!-- ============================================================ -->
 					<!-- ko if: isPoweredOn() -->
 				<!-- ko if: _statusToast() -->
@@ -185,11 +185,11 @@
 						</div>
 					</div>
 					<!-- /ko -->
-					<!-- REST WARNING — GLaDOS hard-mode forfeit confirmation -->
+					<!-- REST WARNING - GLaDOS hard-mode forfeit confirmation -->
 					<!-- ko if: isShowingRestWarning() -->
 					@Html.Partial("~/Areas/Portalmon/Views/Home/RestWarning.cshtml")
 					<!-- /ko -->
-					<!-- CHAMPIONSHIP VICTORY SCREEN — topmost layer, above all overlays -->
+					<!-- CHAMPIONSHIP VICTORY SCREEN - topmost layer, above all overlays -->
 					<!-- ko if: isShowingVictoryScreen() -->
 					@Html.Partial("~/Areas/Portalmon/Views/Home/VictoryScreen.cshtml")
 					<!-- /ko -->

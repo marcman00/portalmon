@@ -9,7 +9,7 @@
  * without type checking. Hosts that run a real type-check pass (webpack with
  * fork-ts-checker) do, so this file lives inside the Area and travels with it.
  *
- * Only *.png is declared — that is the only asset extension Portalmon modules
+ * Only *.png is declared - that is the only asset extension Portalmon modules
  * import. Keep it that way so this cannot collide with declarations the host
  * already provides for its own asset types (e.g. the @mdi/svg pipeline).
  */

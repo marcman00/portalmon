@@ -17,7 +17,7 @@ export function getRandomInt(min: number, max: number): number
 
 /**
  * Returns the type effectiveness multiplier for a move type vs a defender type.
- * Defender type may be dual (e.g. "Performance/Security") — in that case each
+ * Defender type may be dual (e.g. "Performance/Security") - in that case each
  * half is evaluated independently and the results are multiplied together
  * (matching standard Pokemon dual-type behaviour).
  */

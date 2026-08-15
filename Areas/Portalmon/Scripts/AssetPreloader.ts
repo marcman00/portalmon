@@ -21,8 +21,8 @@
  */
 
 /**
- * Resolved-once promise per URL. Repeat requests for the same art — the same
- * gym leader, the same species — reuse the first fetch instead of issuing
+ * Resolved-once promise per URL. Repeat requests for the same art - the same
+ * gym leader, the same species - reuse the first fetch instead of issuing
  * another one.
  */
 const inFlight: Map<string, Promise<void>> = new Map();

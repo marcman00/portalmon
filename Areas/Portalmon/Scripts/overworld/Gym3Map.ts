@@ -26,7 +26,7 @@ export const GYM3_MAP: OverworldMapDef = {
 	backgroundColor: "#241630",
 	defaultSpawn: { x: 17, y: 38 },
 	defaultFacing: "down",
-	statusText: "Trivia Gym Â· choose wisely",
+	statusText: "Trivia Gym - choose wisely",
 	tilesets: GYM3_TILESETS.map(tileset => ({
 		...tileset,
 		imagePath: tileset.imagePath === "/indoortileset.png"
@@ -38,7 +38,6 @@ export const GYM3_MAP: OverworldMapDef = {
 					: portalTilesetImagePath,
 	})),
 	tileLayers: GYM3_TILE_LAYERS,
-	objects: [],
 	collisionRects: GYM3_COLLISION_RECTS,
 	collisionPoints: [],
 	encounterZones: GYM3_WILD_ZONES,

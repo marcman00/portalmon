@@ -40,7 +40,7 @@
     width: 100%;
     max-width: $gba-shell-max-width;
     margin: 0 auto;
-    zoom: 1.5;
+    zoom: 1.25;
     background: linear-gradient(
         165deg,
         var(--gba-shell-top) 0%,
@@ -346,13 +346,13 @@
 }
 
 // =========================================
-// MAIN BODY — 3-column layout
+// MAIN BODY - 3-column layout
 // =========================================
 .gba-body {
     position: relative;
     z-index: 1;
     display: flex;
-    flex-wrap: nowrap; // never stack — panels must stay beside the screen
+    flex-wrap: nowrap; // never stack - panels must stay beside the screen
     align-items: center;
     padding: 4px 12px 8px;
     gap: 10px;
@@ -382,7 +382,7 @@
     background: #0c140c;
     border-radius: 3px;
     overflow: hidden;
-    height: 400px; // fixed landscape height — content scrolls inside
+    height: 400px; // fixed landscape height - content scrolls inside
 }
 
 // Scanline + warm LCD tint overlay
@@ -662,7 +662,7 @@
 }
 
 // =========================================
-// SCREEN CONTENT — overlays and base layer
+// SCREEN CONTENT - overlays and base layer
 // =========================================
 .gba-screen-base {
     position: relative;

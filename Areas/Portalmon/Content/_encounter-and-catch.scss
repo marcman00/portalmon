@@ -1,5 +1,5 @@
 // =========================================
-// ENCOUNTER TAB — IDLE STATE
+// ENCOUNTER TAB - IDLE STATE
 // =========================================
 .pk-idle-state {
     display: flex;
@@ -118,7 +118,7 @@
 }
 
 // =========================================
-// ENCOUNTER TAB — POST-BATTLE RESULT
+// ENCOUNTER TAB - POST-BATTLE RESULT
 // =========================================
 .pk-result-panel {
     display: flex;
@@ -149,7 +149,7 @@
 }
 
 // =========================================
-// BOOTSTRAP OVERRIDES — inside the screen
+// BOOTSTRAP OVERRIDES - inside the screen
 // Bootstrap utility classes and components must render dark
 // regardless of the page theme (light or dark mode).
 // =========================================
@@ -206,7 +206,7 @@
 
 
 // =========================================
-// POWER LED — off state modifier
+// POWER LED - off state modifier
 // =========================================
 .gba-power-led--off {
     background: #4a1a1a !important;
@@ -306,7 +306,7 @@
 }
 
 // =========================================
-// IDLE STATE — portal layout
+// IDLE STATE - portal layout
 // =========================================
 
 .pk-portal-layout {
@@ -412,7 +412,7 @@
 // DUAL PORTAL ENCOUNTER SELECTION
 // =========================================
 
-// Portal container — fills the full column height
+// Portal container - fills the full column height
 .pk-portal {
     flex: 0 0 auto;
     display: flex;
@@ -434,7 +434,7 @@
 }
 
 // The oval: a circle squished horizontally via scaleX.
-// Height drives the size — we want it to fill most of the available height.
+// Height drives the size - we want it to fill most of the available height.
 .pk-portal-interior {
     width: 220px;
     height: 220px;
@@ -448,7 +448,7 @@
     flex-shrink: 0;
 }
 
-// Silhouette — undo the parent scaleX so the image renders at natural ratio
+// Silhouette - undo the parent scaleX so the image renders at natural ratio
 .pk-portal-silhouette {
     transform: scaleX(2.38); // inverse of 0.42
     width: 80%;
@@ -523,9 +523,9 @@ $portal-orange: #ff8030;
 // The ball is absolutely positioned inside .pk-battlefield (position: relative).
 // Its natural/resting position is the enemy sprite center (top-right).
 // Coordinates are derived from the existing sprite placement rules:
-//   Enemy sprite: top: 14px, right: 28px, 100×100px  → center: top:64px, right:78px
-//   Player sprite: bottom: 28px, left: 28px, 100×100px → center: top:~146px, left:78px
-//   Ball size: 32px → offset by 16px from center when positioning top-left corner.
+//   Enemy sprite: top: 14px, right: 28px, 100x100px  -> center: top:64px, right:78px
+//   Player sprite: bottom: 28px, left: 28px, 100x100px -> center: top:~146px, left:78px
+//   Ball size: 32px -> offset by 16px from center when positioning top-left corner.
 
 .pk-catch-ball {
     position: absolute;
@@ -540,8 +540,8 @@ $portal-orange: #ff8030;
     z-index: 10;
 }
 
-// ── Flying ────────────────────────────────────────────────────────────────────
-// Arc from player sprite center → enemy sprite center.
+// -- Flying --------------------------------------------------------------------
+// Arc from player sprite center -> enemy sprite center.
 // Animating left/top gives us full control over the parabolic path.
 // The 35% keyframe is the peak of the arc (ball overshoots vertically).
 @keyframes pk-catch-throw {
@@ -553,7 +553,7 @@ $portal-orange: #ff8030;
 
     35% {
         left: calc(50% - 16px); // mid-arc peak (horizontally centered)
-        top: 10px; // near top of battlefield — the high point
+        top: 10px; // near top of battlefield - the high point
         transform: rotate(210deg) scale(0.92);
     }
 
@@ -568,7 +568,7 @@ $portal-orange: #ff8030;
     animation: pk-catch-throw 700ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
-// ── Absorbing ─────────────────────────────────────────────────────────────────
+// -- Absorbing -----------------------------------------------------------------
 // Quick flash-and-settle to sell the "suck in" moment.
 @keyframes pk-catch-absorb {
     0% {
@@ -591,8 +591,8 @@ $portal-orange: #ff8030;
     animation: pk-catch-absorb 350ms ease-out forwards;
 }
 
-// ── Wiggling ──────────────────────────────────────────────────────────────────
-// A single left-right rock. CatchAnimator toggles 'settling' → 'wiggling'
+// -- Wiggling ------------------------------------------------------------------
+// A single left-right rock. CatchAnimator toggles 'settling' -> 'wiggling'
 // between iterations so the animation restarts for each discrete wiggle.
 @keyframes pk-catch-wiggle {
     0% {
@@ -624,8 +624,8 @@ $portal-orange: #ff8030;
     animation: pk-catch-wiggle 650ms ease-in-out forwards;
 }
 
-// ── Caught ────────────────────────────────────────────────────────────────────
-// Pulse of golden light then a steady glow — "locked in".
+// -- Caught --------------------------------------------------------------------
+// Pulse of golden light then a steady glow - "locked in".
 @keyframes pk-catch-success {
     0% {
         transform: scale(1);
@@ -666,7 +666,7 @@ $portal-orange: #ff8030;
         pk-catch-captured-idle 1800ms ease-in-out 1000ms infinite;
 }
 
-// ── Escaped ───────────────────────────────────────────────────────────────────
+// -- Escaped -------------------------------------------------------------------
 // Ball bursts open (scale up + bright flash + fade to nothing).
 @keyframes pk-catch-escape {
     0% {
