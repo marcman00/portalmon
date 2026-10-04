@@ -37,7 +37,6 @@ Use these checks after changing game code, maps, or assets:
 
     npm run map:gym
     npm run map:tiled
-    npm run map:test
     npm run build
 
 Map commands:
@@ -45,8 +44,10 @@ Map commands:
 - map:gym exports Gym1.tmx, Gym2.tmx, Gym3.tmx, and Lab.tmx to Scripts/overworld/*.generated.ts.
 - map:lab exports only Lab.tmx.
 - map:tiled exports overworld collision, warp, spawn, portal, encounter, and actable metadata.
-- map:test runs the static-town invariant tests.
-- map:build rebuilds the alternative town-layout-generated image/data. The active town currently renders Content/Images/Overworld/Overworld.png, so this command does not replace the active town unless TownMap.ts is changed deliberately.
+- town:experiment:test checks the retained, inactive town-layout experiment; it does not test active Tiled maps.
+- town:experiment:build rebuilds that experiment's image/data. The active town currently renders Content/Images/Overworld/Overworld.png.
+
+Use the `town:experiment:*` commands only when editing the retained `town-layout.json` experiment.
 
 Generated TypeScript is committed. Always regenerate it after changing its TMX source.
 

@@ -253,7 +253,6 @@ This forces a clean game rather than attempting to load stale IDs.
 npm.cmd run map:lab
 npm.cmd run map:gym
 npm.cmd run map:tiled
-npm.cmd run map:test
 npm.cmd run build
 ```
 

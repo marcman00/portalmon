@@ -94,8 +94,8 @@ const PLAYER_FRAME_RECTS: Record<WalkDirection, SpriteFrameRect[]> = {
 };
 
 /**
- * Small canvas-based overworld proof of concept. Movement state stays on a
- * logical 16px grid while rendering interpolates between tiles.
+ * Canvas runtime for the registered world maps. Movement stays on a logical
+ * 16px grid while rendering interpolates between tiles.
  */
 export class OverworldManager
 {
@@ -111,7 +111,6 @@ export class OverworldManager
 
 	private readonly isInputEnabled: () => boolean;
 	private readonly useEnrichmentCenterCallback: () => void;
-	private readonly openGymCallback: (gymSlot: number) => void;
 	private readonly startWildEncounterCallback: () => boolean;
 	private readonly startTrainerBattleCallback: (trainerId: string, afterBattleMessage: string) => boolean;
 	private readonly isTrainerDefeatedCallback: (trainerId: string) => boolean;
@@ -149,7 +148,6 @@ export class OverworldManager
 	constructor(
 		isInputEnabled: () => boolean,
 		useEnrichmentCenterCallback: () => void,
-		openGymCallback: (gymSlot: number) => void,
 		startWildEncounterCallback: () => boolean,
 		startTrainerBattleCallback: (trainerId: string, afterBattleMessage: string) => boolean,
 		isTrainerDefeatedCallback: (trainerId: string) => boolean,
@@ -160,7 +158,6 @@ export class OverworldManager
 	{
 		this.isInputEnabled = isInputEnabled;
 		this.useEnrichmentCenterCallback = useEnrichmentCenterCallback;
-		this.openGymCallback = openGymCallback;
 		this.startWildEncounterCallback = startWildEncounterCallback;
 		this.startTrainerBattleCallback = startTrainerBattleCallback;
 		this.isTrainerDefeatedCallback = isTrainerDefeatedCallback;
@@ -1017,7 +1014,6 @@ export class OverworldManager
 	{
 		this.keyboardHeld.clear();
 		this.pointerHeld.clear();
-		if (interaction.kind === "gym") this.openGymCallback(interaction.gymSlot);
 		if (interaction.kind === "center") this.useEnrichmentCenter();
 	}
 

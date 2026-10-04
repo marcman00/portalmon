@@ -15,8 +15,7 @@
 	<div class="section-label">Gym Leaders</div>
 	<div class="row g-2 mb-3">
 		<!-- ko foreach: gymLeaders -->
-		<div class="col-4"
-			 data-bind="css: { 'pk-town-gym-focus': $parent.focusedGymSlot() === $index() }">
+		<div class="col-4">
 			<div class="gym-card h-100" data-bind="css: { 'defeated': isDefeated() }">
 
 				<span class="gym-status-badge"

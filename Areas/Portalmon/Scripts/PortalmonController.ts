@@ -158,7 +158,6 @@ class PortalmonController
 		this.overworldManager = new OverworldManager(
 			() => this.isOverworldScreenActive(),
 			() => void this.useEnrichmentCenter(),
-			(gymSlot: number) => this.openTownGym(gymSlot),
 			() => this.startWildEncounter(),
 			(trainerId: string, afterBattleMessage: string) => this.gymBattleManager.startMapTrainerBattle(trainerId, afterBattleMessage),
 			(trainerId: string) => this.gymBattleManager.isTrainerDefeated(trainerId),
@@ -704,15 +703,7 @@ class PortalmonController
 	/** Toggle the GYM overlay */
 	public toggleGym = (): void =>
 	{
-		this.gymBattleManager.focusedGymSlot(null);
 		this.activeOverlay(this.activeOverlay() === "gym" ? "none" : "gym");
-	};
-
-	/** Open the gym overlay from one of the three leader-neutral town buildings. */
-	private openTownGym = (gymSlot: number): void =>
-	{
-		this.gymBattleManager.focusedGymSlot(gymSlot);
-		this.activeOverlay("gym");
 	};
 
 	public isOverworldScreenActive = (): boolean =>

@@ -188,9 +188,6 @@ export class GymBattleManager
 
 	/** Array of gym leader view models */
 	public gymLeaders: KnockoutObservableArray<GymLeaderVM>;
-	/** Physical gym slot selected from town; independent from leader identity. */
-	public readonly focusedGymSlot: KnockoutObservable<number | null> = ko.observable(null);
-
 	/** True once every gym leader has been defeated at least once */
 	public isChampionshipUnlocked: KnockoutComputed<boolean>;
 

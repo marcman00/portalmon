@@ -85,21 +85,11 @@ export interface MapTeleportDestination
 	facing: WalkDirection;
 }
 
-export interface MapGymInteractionDef
-{
-	position: MapPoint;
-	kind: "gym";
-	/** Stable physical gym slot; leader data can change independently. */
-	gymSlot: number;
-}
-
-export interface MapCenterInteractionDef
+export interface MapInteractionDef
 {
 	position: MapPoint;
 	kind: "center";
 }
-
-export type MapInteractionDef = MapGymInteractionDef | MapCenterInteractionDef;
 
 export interface MapNpcDef
 {
